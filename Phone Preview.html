@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tony's Detailing — Phone Preview</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 20%, #1a1a1f 0%, #0a0a0a 60%, #050505 100%);
+    font-family: -apple-system, system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+  }
+  .label {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Montserrat', -apple-system, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .label::before, .label::after {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  }
+  /* iframe must look like a real phone — kill scrollbars inside */
+  iframe.phone-frame {
+    border: 0;
+    display: block;
+    background: #0a0a0a;
+  }
+</style>
+</head>
+<body>
+
+<div class="label">iPhone Preview · 402 × 874</div>
+
+<div class="stage" id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+
+<script type="text/babel">
+  const W = 402;
+  const H = 874;
+
+  function PhonePreview() {
+    return (
+      <div style={{
+        width: W,
+        height: H,
+        borderRadius: 48,
+        overflow: 'hidden',
+        position: 'relative',
+        background: '#0a0a0a',
+        boxShadow: '0 40px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+      }}>
+        <iframe
+          className="phone-frame"
+          src="index.html"
+          style={{
+            width: W,
+            height: H,
+            display: 'block',
+          }}
+        />
+        {/* home indicator */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60,
+          height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+          paddingBottom: 8, pointerEvents: 'none',
+        }}>
+          <div style={{
+            width: 139, height: 5, borderRadius: 100,
+            background: 'rgba(255,255,255,0.7)',
+          }} />
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<PhonePreview />);
+</script>
+
+</body>
+</html>
