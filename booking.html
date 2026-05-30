@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Now — Tony's Detailing | Mobile Auto Detailing, Chardon OH</title>
+<meta name="description" content="Request a mobile auto detailing appointment with Tony's Detailing in Chardon, OH. Tell us about your vehicle and we'll confirm within 24 hours.">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+/* ─────────────── FONTS ─────────────── */
+@font-face{font-family:'Inter';src:url('fonts/Inter-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Inter';src:url('fonts/Inter-Medium.ttf') format('truetype');font-weight:500;font-display:swap;}
+@font-face{font-family:'Inter';src:url('fonts/Inter-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-Medium.ttf') format('truetype');font-weight:500;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-Bold.ttf') format('truetype');font-weight:700;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-ExtraBold.ttf') format('truetype');font-weight:800;font-display:swap;}
+
+/* ─────────────── TOKENS ─────────────── */
+:root{
+  --bg:#0a0a0a;--bg-2:#0e0e10;--bg-3:#131316;--bg-4:#17171a;
+  --line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.12);
+  --fg:#ffffff;--fg-2:#d9d9d9;--fg-3:#8a8a8a;--fg-4:#5a5a5a;
+  --blue:#1e3a5f;--blue-h:#2d5590;--blue-p:#152c47;--blue-l:#4d75a8;--blue-ll:#9ab4d4;
+  --blue-glow:rgba(30,58,95,.55);
+  --ff-h:'Montserrat','Helvetica Neue',sans-serif;
+  --ff-b:'Inter','Helvetica Neue',sans-serif;
+  --wrap:1100px;--nav-h:68px;
+  --pad-x:clamp(20px,4.5vw,80px);
+  --radius-card:6px;--radius-btn:4px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--ff-b);font-size:16px;line-height:1.65;color:var(--fg-2);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+img{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+::selection{background:var(--blue-h);color:#fff;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#1e1e22;border-radius:4px;}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad-x);}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--ff-h);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;line-height:1;
+  padding:14px 24px;border:1.5px solid transparent;border-radius:var(--radius-btn);
+  background:var(--blue);color:#fff;cursor:pointer;
+  transition:background 180ms var(--ease),border-color 180ms var(--ease),color 180ms var(--ease),transform 120ms var(--ease);
+  white-space:nowrap;
+}
+.btn:hover{background:var(--blue-h);}
+.btn:active{transform:scale(.98);background:var(--blue-p);}
+.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.2);}
+.btn.ghost:hover{border-color:#fff;background:rgba(255,255,255,.04);}
+.btn .lucide{width:14px;height:14px;stroke-width:2.25;}
+
+/* NAV */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);
+  display:flex;align-items:center;gap:24px;padding:0 var(--pad-x);
+  background:rgba(10,10,10,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.brand-plate{width:42px;height:42px;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;padding:5px;flex-shrink:0;}
+.brand-plate img{width:100%;height:100%;object-fit:contain;}
+.brand-text{display:flex;flex-direction:column;line-height:1;gap:2px;}
+.brand-text .n{font-family:var(--ff-h);font-weight:800;font-size:15px;color:#fff;letter-spacing:-.01em;text-transform:uppercase;}
+.brand-text .s{font-family:var(--ff-h);font-weight:600;font-size:9px;color:var(--fg-3);letter-spacing:.18em;text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:16px;flex:1;justify-content:flex-end;}
+.nav-back{
+  display:inline-flex;align-items:center;gap:7px;font-family:var(--ff-h);font-weight:600;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);transition:color 150ms var(--ease);
+}
+.nav-back:hover{color:#fff;}
+.nav-back .lucide{width:13px;height:13px;color:var(--blue-ll);}
+.nav-phone{display:inline-flex;align-items:center;gap:7px;font-family:var(--ff-h);font-weight:600;font-size:12px;letter-spacing:.04em;color:var(--fg-2);transition:color 150ms var(--ease);}
+.nav-phone:hover{color:#fff;}
+.nav-phone .lucide{width:13px;height:13px;color:var(--blue-ll);}
+
+/* HEADER */
+#head{
+  position:relative;padding:calc(var(--nav-h) + 60px) var(--pad-x) 40px;
+  text-align:center;overflow:hidden;isolation:isolate;border-bottom:1px solid var(--line);
+}
+.head-glow{position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:min(800px,90vw);height:480px;z-index:0;background:radial-gradient(ellipse at center,var(--blue-glow) 0%,rgba(30,58,95,.16) 38%,transparent 66%);filter:blur(20px);pointer-events:none;}
+.head-inner{position:relative;z-index:1;max-width:660px;margin:0 auto;}
+.eyebrow{font-family:var(--ff-h);font-weight:700;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue-ll);display:inline-flex;align-items:center;gap:10px;}
+.eyebrow::before,.eyebrow::after{content:"";display:inline-block;width:26px;height:1px;background:linear-gradient(90deg,transparent,var(--blue));}
+.eyebrow::after{background:linear-gradient(90deg,var(--blue),transparent);}
+#head h1{font-family:var(--ff-h);font-weight:800;font-size:clamp(34px,6vw,56px);line-height:1.0;letter-spacing:-.03em;text-transform:uppercase;color:#fff;margin:14px 0 16px;text-wrap:balance;}
+#head p{font-size:clamp(15px,1.6vw,17px);color:var(--fg-2);line-height:1.6;max-width:520px;margin:0 auto;}
+
+/* LAYOUT */
+#book{padding:48px 0 88px;background:var(--bg);}
+.book-layout{display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start;}
+.book-card{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);padding:32px;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.field{display:flex;flex-direction:column;gap:7px;}
+.field.full{grid-column:1/-1;}
+.field label{font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3);display:flex;align-items:center;gap:6px;}
+.field label .req{color:#c8a14a;font-size:11px;}
+.field input,.field select,.field textarea{
+  font-family:var(--ff-b);font-size:14.5px;color:#fff;background:var(--bg-4);
+  border:1.5px solid var(--line);border-radius:4px;padding:13px 14px;outline:none;
+  transition:border-color 150ms var(--ease),background 150ms var(--ease),box-shadow 150ms var(--ease);width:100%;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--fg-4);}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:var(--line-2);}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue-l);background:#1a1a1f;box-shadow:0 0 0 4px rgba(30,58,95,.32);}
+.field select{
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%238a8a8a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+.field input[type=date]{color-scheme:dark;}
+.field textarea{resize:vertical;min-height:96px;line-height:1.55;}
+.form-actions{margin-top:24px;padding-top:24px;border-top:1px solid var(--line);}
+.form-actions .btn{width:100%;padding:16px;}
+.form-note{margin-top:14px;font-size:11.5px;color:var(--fg-3);line-height:1.55;}
+.form-note .lucide{width:12px;height:12px;color:var(--blue-l);vertical-align:-1px;margin-right:5px;}
+
+/* Success */
+.book-success{display:none;text-align:center;padding:40px 20px;}
+.book-success.show{display:block;}
+.book-success .ck{width:64px;height:64px;border-radius:50%;background:rgba(63,166,106,.12);border:1px solid rgba(63,166,106,.4);color:#3fa66a;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+.book-success .ck .lucide{width:28px;height:28px;stroke-width:2.5;}
+.book-success h3{font-family:var(--ff-h);font-weight:800;font-size:24px;color:#fff;letter-spacing:-.01em;margin-bottom:10px;}
+.book-success p{font-size:14.5px;color:var(--fg-2);line-height:1.6;max-width:360px;margin:0 auto 20px;}
+
+/* Sidebar */
+.book-side{display:flex;flex-direction:column;gap:14px;}
+.side-card{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);padding:22px;}
+.side-card h4{font-family:var(--ff-h);font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.side-card h4 .lucide{width:13px;height:13px;color:var(--blue-l);}
+.side-card .big{font-family:var(--ff-h);font-weight:800;font-size:20px;letter-spacing:-.015em;color:#fff;line-height:1.15;margin-bottom:6px;}
+.side-card .big a{color:#fff;transition:color 150ms var(--ease);}
+.side-card .big a:hover{color:var(--blue-l);}
+.side-card .meta{font-size:12.5px;color:var(--fg-3);line-height:1.55;}
+.side-promo{background:linear-gradient(180deg,rgba(30,58,95,.18),rgba(30,58,95,.05));border-color:rgba(45,85,144,.3);}
+.side-promo .amt{font-family:var(--ff-h);font-weight:800;font-size:26px;color:#fff;letter-spacing:-.02em;}
+.side-promo .amt .b{color:var(--blue-ll);}
+.side-list{list-style:none;display:flex;flex-direction:column;gap:11px;}
+.side-list li{font-size:12.5px;color:var(--fg-2);display:flex;align-items:flex-start;gap:9px;line-height:1.45;}
+.side-list li .lucide{width:13px;height:13px;color:var(--blue-l);flex-shrink:0;margin-top:2px;stroke-width:2.5;}
+
+/* FOOTER */
+footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line);}
+.foot-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.foot-row .copyright{font-size:12px;color:var(--fg-4);line-height:1.5;}
+.foot-social{display:flex;gap:10px;}
+.soc-btn{width:36px;height:36px;border-radius:5px;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--fg-3);font-family:var(--ff-h);font-weight:700;font-size:10px;transition:color 150ms var(--ease),border-color 150ms var(--ease),background 150ms var(--ease);}
+.soc-btn:hover{color:#fff;border-color:var(--blue-l);background:rgba(45,85,144,.12);}
+.soc-btn .lucide{width:15px;height:15px;}
+
+@media (max-width:880px){
+  .book-layout{grid-template-columns:1fr;}
+  .book-side{flex-direction:row;flex-wrap:wrap;}
+  .book-side .side-card{flex:1;min-width:240px;}
+}
+@media (max-width:560px){
+  .form-grid{grid-template-columns:1fr;}
+  .book-card{padding:24px;}
+  .brand-text .s{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="brand" aria-label="Tony's Detailing — home">
+    <span class="brand-plate"><img src="assets/logo.png" alt=""></span>
+    <span class="brand-text">
+      <span class="n">Tony's Detailing</span>
+      <span class="s">Chardon &middot; OH</span>
+    </span>
+  </a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back"><i data-lucide="arrow-left"></i>Back to Site</a>
+    <a href="tel:+12169034783" class="nav-phone"><i data-lucide="phone"></i>(216) 903-4783</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header id="head">
+  <div class="head-glow"></div>
+  <div class="head-inner">
+    <span class="eyebrow">Mobile Service &middot; Chardon, Ohio</span>
+    <h1>Book Your Detail</h1>
+    <p>Tell us about your vehicle and what you're after. We'll confirm your appointment within 24 hours &mdash; and we come to you.</p>
+  </div>
+</header>
+
+<!-- BOOKING -->
+<section id="book">
+  <div class="wrap">
+    <div class="book-layout">
+      <!-- Form -->
+      <div class="book-card">
+        <form id="bf" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">Full Name <span class="req">*</span></label>
+              <input id="name" name="name" type="text" placeholder="Tony Brown" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone <span class="req">*</span></label>
+              <input id="phone" name="phone" type="tel" placeholder="(440) 555-0192" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@email.com">
+            </div>
+            <div class="field">
+              <label for="vehicle">Vehicle</label>
+              <input id="vehicle" name="vehicle" type="text" placeholder="2019 Honda CR-V">
+            </div>
+            <div class="field">
+              <label for="size">Vehicle Size</label>
+              <select id="size" name="size">
+                <option value="">Select size&hellip;</option>
+                <option>Sedan / Coupe</option>
+                <option>SUV / Crossover</option>
+                <option>Large SUV / Truck</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="service">Service <span class="req">*</span></label>
+              <select id="service" name="service" required>
+                <option value="">Select a service&hellip;</option>
+                <option>Exterior Detail ($65&ndash;$95)</option>
+                <option>Interior Detail ($95&ndash;$125)</option>
+                <option>Full Detail ($150&ndash;$185)</option>
+                <option>Deep Detail ($230&ndash;$275)</option>
+                <option>Add-On: Leather Conditioning (+$40)</option>
+                <option>Add-On: Clay Decontamination (+$40&ndash;$60)</option>
+                <option>Add-On: Odor Eliminator (+$40&ndash;$75)</option>
+                <option>Not sure &mdash; need a quote</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="date">Preferred Date</label>
+              <input id="date" name="date" type="date">
+            </div>
+            <div class="field">
+              <label for="time">Preferred Time</label>
+              <select id="time" name="time">
+                <option value="">Any time</option>
+                <option>Morning (8am&ndash;12pm)</option>
+                <option>Afternoon (12pm&ndash;4pm)</option>
+                <option>Evening (4pm&ndash;7pm)</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="zip">Service Location / ZIP</label>
+              <input id="zip" name="zip" type="text" placeholder="44024 — we'll confirm your area when we reach out">
+            </div>
+            <div class="field full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" placeholder="Vehicle condition, pet hair, stains, odors, special requests&hellip;"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn">Request Appointment<i data-lucide="arrow-right"></i></button>
+            <p class="form-note"><i data-lucide="info"></i>Submitting opens your email so you can send the request to us. Prefer to talk? Call or text <a href="tel:+12169034783" style="color:#fff;border-bottom:1px solid var(--line-2);">(216) 903-4783</a>. Photos are taken on arrival as standard practice.</p>
+          </div>
+        </form>
+
+        <div class="book-success" id="bs">
+          <div class="ck"><i data-lucide="check"></i></div>
+          <h3>Request Ready</h3>
+          <p>Your email should have opened with the details filled in &mdash; just hit send and we'll confirm within 24 hours. If it didn't open, call or text us anytime.</p>
+          <a href="tel:+12169034783" class="btn ghost"><i data-lucide="phone"></i>Call (216) 903-4783</a>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="book-side">
+        <div class="side-card">
+          <h4><i data-lucide="phone"></i>Contact</h4>
+          <div class="big"><a href="tel:+12169034783">(216) 903-4783</a></div>
+          <div class="meta"><a href="mailto:tonysdetailing.net@gmail.com" style="color:var(--fg-2);">tonysdetailing.net@gmail.com</a><br>We reply within 24 hours.</div>
+        </div>
+        <div class="side-card">
+          <h4><i data-lucide="map-pin"></i>Service Area</h4>
+          <div class="big" style="font-size:16px;">Chardon, OH &amp; surrounding</div>
+          <div class="meta">All services within ~15 mi. Up to 25 mi (toward Beachwood) is Full Detail minimum. Beyond 25 mi by quote.</div>
+        </div>
+        <div class="side-card side-promo">
+          <h4><i data-lucide="star"></i>Save $10</h4>
+          <div class="amt"><span class="b">$10</span> Off Next Detail</div>
+          <div class="meta">Leave us a Google review and get $10 off your next detail!</div>
+        </div>
+        <div class="side-card">
+          <h4><i data-lucide="clipboard-check"></i>Good To Know</h4>
+          <ul class="side-list">
+            <li><i data-lucide="check"></i>Final quote confirmed on arrival</li>
+            <li><i data-lucide="check"></i>Before &amp; after photos every job</li>
+            <li><i data-lucide="check"></i>Cancellations: 24 hours' notice, please</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="copyright">
+        &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
+        Prices subject to change. Results may vary based on vehicle condition.
+      </div>
+      <div class="foot-social">
+        <a href="https://www.facebook.com/" class="soc-btn" target="_blank" rel="noopener" aria-label="Tony's Detailing on Facebook"><i data-lucide="facebook"></i></a>
+        <a href="https://nextdoor.com/" class="soc-btn" target="_blank" rel="noopener" aria-label="Tony's Detailing on Nextdoor">ND</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const form = document.getElementById('bf');
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  // Require name, phone, service
+  const required = ['name','phone','service'];
+  for(const id of required){
+    const el = document.getElementById(id);
+    if(!el.value.trim()){ el.focus(); el.style.borderColor = '#c54343'; return; }
+    el.style.borderColor = '';
+  }
+  const v = id => (document.getElementById(id).value || '').trim();
+  const lines = [
+    'New booking request from the website:','',
+    'Name: ' + v('name'),
+    'Phone: ' + v('phone'),
+    'Email: ' + (v('email') || '—'),
+    'Vehicle: ' + (v('vehicle') || '—'),
+    'Vehicle size: ' + (v('size') || '—'),
+    'Service: ' + v('service'),
+    'Preferred date: ' + (v('date') || '—'),
+    'Preferred time: ' + (v('time') || 'Any time'),
+    'Location / ZIP: ' + (v('zip') || '—'),
+    '','Notes:', (v('notes') || '—')
+  ];
+  const subject = 'Booking Request — ' + (v('name') || 'New Customer');
+  const mailto = 'mailto:tonysdetailing.net@gmail.com?subject=' +
+    encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+  window.location.href = mailto;
+  form.style.display = 'none';
+  document.getElementById('bs').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>

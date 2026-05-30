@@ -345,15 +345,15 @@ a{color:inherit;text-decoration:none;}
   margin-bottom:56px;flex-wrap:wrap;
 }
 .svc-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:16px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;
 }
 .svc-card{
   position:relative;
   background:var(--bg-3);
   border:1px solid var(--line);
   border-radius:var(--radius-card);
-  padding:28px 24px 24px;
+  padding:26px 20px 22px;
   display:flex;flex-direction:column;
   transition:transform 220ms var(--ease), background 220ms var(--ease), border-color 220ms var(--ease), box-shadow 220ms var(--ease);
   overflow:hidden;
@@ -959,6 +959,101 @@ footer{
   letter-spacing:.14em;text-transform:uppercase;color:var(--fg-4);
 }
 
+/* Footer social */
+.foot-social{display:flex;gap:10px;margin-top:18px;}
+.soc-btn{
+  width:36px;height:36px;border-radius:5px;
+  border:1px solid var(--line-2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-3);
+  font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.04em;
+  transition:color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
+}
+.soc-btn:hover{color:#fff;border-color:var(--blue-l);background:rgba(45,85,144,.12);}
+.soc-btn .lucide{width:15px;height:15px;}
+
+/* ─────────────── PROCESS / TRUST STRIP ─────────────── */
+#process{padding:34px 0;background:var(--bg);border-top:1px solid var(--line);}
+.proc-strip{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.proc-step{display:flex;align-items:flex-start;gap:13px;flex:1;padding:4px 2px;}
+.proc-ico{
+  width:44px;height:44px;border-radius:6px;flex-shrink:0;
+  background:rgba(45,85,144,.14);border:1px solid rgba(45,85,144,.32);
+  display:flex;align-items:center;justify-content:center;color:var(--blue-l);
+}
+.proc-ico .lucide{width:20px;height:20px;stroke-width:1.9;}
+.proc-n{font-family:var(--ff-h);font-weight:800;font-size:10px;letter-spacing:.16em;color:var(--blue-l);}
+.proc-txt h4{
+  font-family:var(--ff-h);font-weight:800;font-size:15px;
+  letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:3px 0 4px;
+}
+.proc-txt p{font-size:12px;color:var(--fg-3);line-height:1.45;}
+.proc-arrow{display:flex;align-items:center;color:var(--blue-l);flex-shrink:0;}
+.proc-arrow .lucide{width:18px;height:18px;}
+
+/* ─────────────── REVIEW CALLOUT ─────────────── */
+#review{padding:44px 0;background:var(--bg);border-top:1px solid var(--line);}
+.rev-strip{
+  display:flex;align-items:center;gap:30px;flex-wrap:wrap;
+  background:var(--bg-3);border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  padding:28px 32px;position:relative;overflow:hidden;
+}
+.rev-strip::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at left center, rgba(45,85,144,.12), transparent 60%);
+}
+.rev-g{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;position:relative;}
+.rev-g-circle{
+  width:54px;height:54px;border-radius:50%;
+  border:1.5px solid var(--line-2);background:var(--bg-4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:Georgia,serif;font-size:26px;font-weight:700;
+}
+.rev-g-circle span{
+  background:linear-gradient(135deg,#4285F4 0%,#34A853 35%,#FBBC04 65%,#EA4335 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.rev-stars{display:flex;gap:2px;color:#e6b34a;font-size:13px;line-height:1;}
+.rev-g-lbl{font-family:var(--ff-h);font-weight:700;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-4);}
+.rev-body{flex:1;min-width:260px;position:relative;}
+.rev-headline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:7px;}
+.rev-amt{font-family:var(--ff-h);font-weight:800;font-size:34px;letter-spacing:-.02em;color:#fff;line-height:1;}
+.rev-amt .b{color:var(--blue-l);}
+.rev-sub{font-family:var(--ff-h);font-weight:700;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);}
+.rev-msg{font-size:14px;color:var(--fg-2);line-height:1.6;max-width:560px;}
+.rev-msg strong{color:#fff;font-weight:600;}
+.rev-note{margin-top:8px;font-family:var(--ff-h);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue-l);}
+.rev-cta{flex-shrink:0;position:relative;}
+
+/* ─────────────── TERMS BLURB ─────────────── */
+#terms{padding:40px 0;background:var(--bg-2);border-top:1px solid var(--line);}
+.terms-box{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:22px 24px;
+  background:var(--bg-3);border:1px solid var(--line);
+  border-left:2px solid var(--blue);
+  border-radius:0 6px 6px 0;
+}
+.terms-box .ti{
+  width:34px;height:34px;border-radius:6px;flex-shrink:0;
+  background:rgba(45,85,144,.12);border:1px solid rgba(45,85,144,.30);
+  color:var(--blue-l);display:flex;align-items:center;justify-content:center;
+}
+.terms-box .ti .lucide{width:15px;height:15px;}
+.terms-box h4{font-family:var(--ff-h);font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin-bottom:8px;}
+.terms-box p{font-size:13px;color:var(--fg-3);line-height:1.65;}
+
+/* Services head actions + add-on "not offered" */
+.svc-head-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.pr-addons-list li.not-offered{opacity:.58;}
+.pr-addons-list li.not-offered .nm{color:var(--fg-2);}
+.addon-na{
+  font-family:var(--ff-h);font-weight:700;font-size:9px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);
+  padding:6px 10px;border-radius:2px;border:1px dashed var(--line-2);white-space:nowrap;
+}
+
 /* ─────────────── RESPONSIVE ─────────────── */
 @media (max-width: 1100px){
   .svc-grid{grid-template-columns:repeat(2,1fr);}
@@ -968,6 +1063,9 @@ footer{
   .contact-side .cside-card{flex:1;min-width:240px;}
   .disc-grid{grid-template-columns:1fr;}
   .foot-top{grid-template-columns:1fr 1fr;gap:32px;}
+  .proc-strip{flex-wrap:wrap;gap:22px 8px;}
+  .proc-step{flex:1 1 42%;min-width:220px;}
+  .proc-arrow{display:none;}
 }
 @media (max-width: 900px){
   .area-layout{grid-template-columns:1fr;gap:40px;}
@@ -992,6 +1090,10 @@ footer{
   table.ptbl thead th, table.ptbl tbody td{padding:11px 16px;font-size:12.5px;}
   .pr-addons-list li{padding:12px 16px;}
   .disc-right{padding:22px;}
+  .proc-step{flex:1 1 100%;}
+  .rev-strip{flex-direction:column;text-align:center;align-items:center;padding:26px 22px;}
+  .rev-headline{justify-content:center;}
+  .terms-box{flex-direction:column;}
 }
 @media (max-width: 480px){
   .hero-stats{gap:18px;}
@@ -1064,9 +1166,12 @@ footer{
       Clean, precise results on every vehicle, every time.
     </p>
     <div class="hero-actions">
-      <a href="#contact" class="btn lg">
+      <a href="booking.html" class="btn lg">
+        Book Now
+        <i data-lucide="calendar-check"></i>
+      </a>
+      <a href="#contact" class="btn ghost lg">
         Email Me
-        <i data-lucide="arrow-right"></i>
       </a>
       <a href="#services" class="btn ghost lg">
         View Services
@@ -1078,7 +1183,7 @@ footer{
         <span class="l">Standard Area</span>
       </div>
       <div class="hero-stat">
-        <span class="v">3</span>
+        <span class="v">4</span>
         <span class="l">Service Tiers</span>
       </div>
       <div class="hero-stat">
@@ -1097,6 +1202,49 @@ footer{
   </div>
 </section>
 
+<!-- ─────────────── PROCESS / TRUST STRIP ─────────────── -->
+<section id="process">
+  <div class="wrap">
+    <div class="proc-strip">
+      <div class="proc-step">
+        <div class="proc-ico"><i data-lucide="search"></i></div>
+        <div class="proc-txt">
+          <span class="proc-n">01</span>
+          <h4>Inspect</h4>
+          <p>We walk the vehicle with you on arrival.</p>
+        </div>
+      </div>
+      <div class="proc-arrow"><i data-lucide="chevron-right"></i></div>
+      <div class="proc-step">
+        <div class="proc-ico"><i data-lucide="camera"></i></div>
+        <div class="proc-txt">
+          <span class="proc-n">02</span>
+          <h4>Photo</h4>
+          <p>Before-and-after photos on every job.</p>
+        </div>
+      </div>
+      <div class="proc-arrow"><i data-lucide="chevron-right"></i></div>
+      <div class="proc-step">
+        <div class="proc-ico"><i data-lucide="receipt"></i></div>
+        <div class="proc-txt">
+          <span class="proc-n">03</span>
+          <h4>Quote</h4>
+          <p>Final price confirmed before any work begins.</p>
+        </div>
+      </div>
+      <div class="proc-arrow"><i data-lucide="chevron-right"></i></div>
+      <div class="proc-step">
+        <div class="proc-ico"><i data-lucide="spray-can"></i></div>
+        <div class="proc-txt">
+          <span class="proc-n">04</span>
+          <h4>Work</h4>
+          <p>We detail your vehicle, right where you parked.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ─────────────── SERVICES ─────────────── -->
 <section id="services">
   <div class="wrap">
@@ -1104,12 +1252,18 @@ footer{
       <div class="section-head" style="margin-bottom:0;">
         <span class="eyebrow">What We Offer</span>
         <h2>Services</h2>
-        <p>Three active tiers plus paint correction on the way. Each one comes to you &mdash; home, office, or wherever you park.</p>
+        <p>Four service tiers, from a quick exterior refresh to our most intensive Deep Detail. Each one comes to you &mdash; home, office, or wherever you park.</p>
       </div>
-      <a href="#pricing" class="btn ghost sm">
-        See Pricing
-        <i data-lucide="arrow-right"></i>
-      </a>
+      <div class="svc-head-actions">
+        <a href="booking.html" class="btn sm">
+          Book Now
+          <i data-lucide="calendar-check"></i>
+        </a>
+        <a href="#pricing" class="btn ghost sm">
+          See Pricing
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
     </div>
 
     <div class="svc-grid">
@@ -1131,7 +1285,7 @@ footer{
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$65</span>
           </div>
-          <a href="#contact" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -1153,7 +1307,7 @@ footer{
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$95</span>
           </div>
-          <a href="#contact" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -1174,7 +1328,28 @@ footer{
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$150</span>
           </div>
-          <a href="#contact" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+        </div>
+      </article>
+
+      <!-- Deep -->
+      <article class="svc-card">
+        <div class="svc-icon-wrap"><i data-lucide="sparkles"></i></div>
+        <div class="svc-tier">Tier 04 &middot; Deep Clean</div>
+        <h3 class="svc-name">Deep Detail</h3>
+        <p class="svc-desc">Our most intensive service. Everything in a Full Detail plus extractor-based stain, pet hair, and odor treatment.</p>
+        <ul class="svc-feat">
+          <li><i data-lucide="check"></i>Everything in Full Detail</li>
+          <li><i data-lucide="check"></i>Intensive stain treatment &mdash; extractor</li>
+          <li><i data-lucide="check"></i>Pet hair extraction</li>
+          <li><i data-lucide="check"></i>Odor treatment</li>
+        </ul>
+        <div class="svc-foot">
+          <div class="svc-price-row">
+            <span class="svc-price-lbl">Starts at</span>
+            <span class="svc-price">$230</span>
+          </div>
+          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -1229,6 +1404,12 @@ footer{
               <td>$160</td>
               <td>$185</td>
             </tr>
+            <tr>
+              <td>Deep Detail</td>
+              <td>$230</td>
+              <td>$250</td>
+              <td>$275</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -1247,7 +1428,10 @@ footer{
           <tbody>
             <tr><td>Pet hair (moderate &ndash; heavy)</td><td><span class="uc">+$20&ndash;$40</span></td></tr>
             <tr><td>Deep staining</td><td><span class="uc">+$15&ndash;$35</span></td></tr>
+            <tr><td>Smoke / odor treatment</td><td><span class="uc">+$25&ndash;$50</span></td></tr>
+            <tr><td>Biological / hazardous</td><td><span class="uc">+$40+</span></td></tr>
             <tr><td>Excessive debris / clutter</td><td><span class="uc">+$15&ndash;$30</span></td></tr>
+            <tr><td>Heavy mud / off-road exterior</td><td><span class="uc">+$20&ndash;$35</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -1262,13 +1446,43 @@ footer{
         <ul class="pr-addons-list">
           <li>
             <div class="l-name">
-              <i data-lucide="zap"></i>
+              <i data-lucide="armchair"></i>
               <div class="col">
-                <span class="nm">Decontamination &amp; Clay Bar</span>
-                <span class="ds">Iron &amp; fallout removal for embedded contaminants</span>
+                <span class="nm">Leather Conditioning</span>
+                <span class="ds">Cleans, softens &amp; protects leather seats and trim</span>
               </div>
             </div>
-            <span class="price">+$50&ndash;$75</span>
+            <span class="price">+$40 flat</span>
+          </li>
+          <li>
+            <div class="l-name">
+              <i data-lucide="sparkles"></i>
+              <div class="col">
+                <span class="nm">Clay Decontamination</span>
+                <span class="ds">Iron &amp; fallout removal &middot; Sedan +$40 / SUV +$50 / Truck +$60</span>
+              </div>
+            </div>
+            <span class="price">+$40&ndash;$60</span>
+          </li>
+          <li>
+            <div class="l-name">
+              <i data-lucide="wind"></i>
+              <div class="col">
+                <span class="nm">Odor Eliminator</span>
+                <span class="ds">Targeted treatment for smoke, pet &amp; musty odors</span>
+              </div>
+            </div>
+            <span class="price">+$40&ndash;$75</span>
+          </li>
+          <li class="not-offered">
+            <div class="l-name">
+              <i data-lucide="ban"></i>
+              <div class="col">
+                <span class="nm">Engine Bay Clean</span>
+                <span class="ds">Degrease &amp; dress the engine compartment</span>
+              </div>
+            </div>
+            <span class="addon-na">Not Currently Offered</span>
           </li>
         </ul>
       </div>
@@ -1356,7 +1570,7 @@ footer{
           <div class="zone-marker mid">25</div>
           <div class="zone-body">
             <h4>15&ndash;25 Miles <span class="surcharge">+$15&ndash;$25</span></h4>
-            <p>Extended service area. Full Detail is the minimum service. Modest distance surcharge applied based on exact location.</p>
+            <p>Extended service area toward Beachwood and surrounding suburbs. Full Detail is the minimum service, with a modest distance surcharge based on exact location. Farther areas may require a Full Detail minimum &mdash; dependent on situation.</p>
           </div>
         </div>
         <div class="zone-card">
@@ -1450,6 +1664,31 @@ footer{
   </div>
 </section>
 
+<!-- ─────────────── REVIEW CALLOUT ─────────────── -->
+<section id="review">
+  <div class="wrap">
+    <div class="rev-strip">
+      <div class="rev-g">
+        <div class="rev-g-circle"><span>G</span></div>
+        <div class="rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="rev-g-lbl">Google Review</div>
+      </div>
+      <div class="rev-body">
+        <div class="rev-headline">
+          <span class="rev-amt"><span class="b">$10</span> Off</span>
+          <span class="rev-sub">Your Next Detail</span>
+        </div>
+        <p class="rev-msg"><strong>Leave us a Google review and get $10 off your next detail!</strong> Just show us your review when you book your next appointment.</p>
+        <div class="rev-note">One per customer &middot; Valid on any service</div>
+      </div>
+      <a href="https://www.google.com/search?q=Tony%27s+Detailing+Chardon+OH" target="_blank" rel="noopener" class="btn lg rev-cta">
+        Leave a Review
+        <i data-lucide="star"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ─────────────── CONTACT ─────────────── -->
 <section id="contact">
   <div class="wrap">
@@ -1506,6 +1745,19 @@ footer{
   </div>
 </section>
 
+<!-- ─────────────── TERMS ─────────────── -->
+<section id="terms">
+  <div class="wrap">
+    <div class="terms-box">
+      <div class="ti"><i data-lucide="file-text"></i></div>
+      <div>
+        <h4>Terms &amp; Conditions</h4>
+        <p>Results not guaranteed for pre-existing damage, permanent stains, or conditions present before service. Final quote confirmed on arrival. Cancellations must be made at least 24 hours in advance &mdash; rescheduling is possible, contact us for more info. Tony's Detailing reserves the right to refuse or reschedule service at our discretion.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ─────────────── FOOTER ─────────────── -->
 <footer>
   <div class="wrap">
@@ -1519,6 +1771,10 @@ footer{
           </span>
         </a>
         <p>Professional mobile auto detailing. We come to you &mdash; clean, precise results on every vehicle, every time.</p>
+        <div class="foot-social">
+          <a href="https://www.facebook.com/" class="soc-btn" target="_blank" rel="noopener" aria-label="Tony's Detailing on Facebook"><i data-lucide="facebook"></i></a>
+          <a href="https://nextdoor.com/" class="soc-btn" target="_blank" rel="noopener" aria-label="Tony's Detailing on Nextdoor">ND</a>
+        </div>
       </div>
       <div class="foot-col">
         <h5>Services</h5>
@@ -1526,6 +1782,7 @@ footer{
           <li><a href="#services">Exterior Detail</a></li>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
+          <li><a href="#services">Deep Detail</a></li>
         </ul>
       </div>
       <div class="foot-col">
