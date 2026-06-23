@@ -144,6 +144,13 @@ a{color:inherit;text-decoration:none;}
 .check .ctxt .cprice{color:var(--blue-ll);font-weight:600;font-size:12px;}
 @media (max-width:560px){.check-grid{grid-template-columns:1fr;}}
 
+/* Second vehicle section */
+.v2-section[hidden]{display:none;}
+.v2-section{padding-top:20px;margin-top:6px;border-top:1px dashed var(--line-2);}
+.v2-head{font-family:var(--ff-h);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--blue-ll);margin-bottom:4px;}
+.v2-note{font-size:12px;color:var(--fg-3);margin-bottom:16px;line-height:1.5;}
+.v2-section .form-grid{gap:18px;}
+
 .form-actions{margin-top:24px;padding-top:24px;border-top:1px solid var(--line);}
 .form-actions .btn{width:100%;padding:16px;}
 .form-note{margin-top:14px;font-size:11.5px;color:var(--fg-3);line-height:1.55;}
@@ -241,6 +248,18 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
               <label for="email">Email</label>
               <input id="email" name="email" type="email" placeholder="you@email.com">
             </div>
+            <div class="field full">
+              <label for="location">Where are you located? (City/Address area) <span class="req">*</span></label>
+              <input id="location" name="location" type="text" placeholder="Chardon, OH — near the square" required>
+            </div>
+            <div class="field">
+              <label for="num_vehicles">Number of Vehicles</label>
+              <select id="num_vehicles" name="num_vehicles">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3+">3+</option>
+              </select>
+            </div>
             <div class="field">
               <label for="vehicle_type">Vehicle Type</label>
               <select id="vehicle_type" name="vehicle_type">
@@ -251,29 +270,21 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
                 <option value="Minivan">Minivan</option>
               </select>
             </div>
-            <div class="field">
-              <label for="num_vehicles">Number of Vehicles</label>
-              <select id="num_vehicles" name="num_vehicles">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3+">3+</option>
-              </select>
-            </div>
             <div class="field full">
               <label for="service">Service <span class="req">*</span></label>
               <select id="service" name="service" required>
                 <option value="">Select a service&hellip;</option>
-                <option value="Exterior Detail">Exterior Detail ($65&ndash;$95)</option>
-                <option value="Interior Detail">Interior Detail ($95&ndash;$125)</option>
-                <option value="Full Detail">Full Detail ($150&ndash;$185)</option>
-                <option value="Deep Clean">Deep Clean ($230&ndash;$275)</option>
+                <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
+                <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
+                <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
               </select>
             </div>
             <div class="field full">
               <label>Add-Ons</label>
               <div class="check-grid">
                 <label class="check"><input type="checkbox" name="addons" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
-                <label class="check"><input type="checkbox" name="addons" value="Clay Decontamination"><span class="ctxt">Clay Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
               </div>
             </div>
@@ -286,6 +297,52 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
                 <label class="check"><input type="checkbox" name="upcharges" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
               </div>
             </div>
+
+            <!-- Second vehicle (shown when 2+ vehicles selected) -->
+            <div class="field full v2-section" id="vehicle2-section" hidden>
+              <div class="v2-head">Second Vehicle</div>
+              <p class="v2-note">Tell us about your second vehicle. Additional vehicles (3+) are estimated at the same rate.</p>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="vehicle_type_2">Vehicle Type</label>
+                  <select id="vehicle_type_2" name="vehicle_type_2">
+                    <option value="">Select type&hellip;</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV/Crossover">SUV / Crossover</option>
+                    <option value="Large SUV/Truck">Large SUV / Truck</option>
+                    <option value="Minivan">Minivan</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="service_2">Service</label>
+                  <select id="service_2" name="service_2">
+                    <option value="">Select a service&hellip;</option>
+                    <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                    <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
+                    <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
+                    <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
+                  </select>
+                </div>
+                <div class="field full">
+                  <label>Add-Ons</label>
+                  <div class="check-grid">
+                    <label class="check"><input type="checkbox" name="addons_2" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+                  </div>
+                </div>
+                <div class="field full">
+                  <label>Condition Upcharges</label>
+                  <div class="check-grid">
+                    <label class="check"><input type="checkbox" name="upcharges_2" value="Pet Hair"><span class="ctxt">Pet Hair</span></label>
+                    <label class="check"><input type="checkbox" name="upcharges_2" value="Heavy Staining"><span class="ctxt">Heavy Staining</span></label>
+                    <label class="check"><input type="checkbox" name="upcharges_2" value="Smoke/Odor"><span class="ctxt">Smoke / Odor</span></label>
+                    <label class="check"><input type="checkbox" name="upcharges_2" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="field full">
               <label for="referred_by">Referred By</label>
               <input id="referred_by" name="referred_by" type="text" placeholder="Name of the person who referred you (for $35 off Full Detail+)">
@@ -357,10 +414,55 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
 
 <script>
 const form = document.getElementById('bf');
+
+// ── Dynamic pricing: show the exact price for the selected vehicle size ──
+const PRICES = {
+  "Exterior Detail": {"Sedan":75,"SUV/Crossover":90,"Large SUV/Truck":110,"Minivan":100},
+  "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
+  "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
+  "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315}
+};
+function refreshPrices(vehicleSel, serviceSel){
+  const veh = vehicleSel.value;
+  serviceSel.querySelectorAll('option[data-service]').forEach(opt => {
+    const svc = opt.dataset.service, table = PRICES[svc];
+    if (veh && table && table[veh] != null){
+      opt.textContent = svc + ' — $' + table[veh];
+    } else {
+      const vals = Object.values(table);
+      opt.textContent = svc + ' ($' + Math.min(...vals) + '–$' + Math.max(...vals) + ')';
+    }
+  });
+}
+const veh1 = document.getElementById('vehicle_type');
+const svc1 = document.getElementById('service');
+const veh2 = document.getElementById('vehicle_type_2');
+const svc2 = document.getElementById('service_2');
+veh1.addEventListener('change', () => refreshPrices(veh1, svc1));
+veh2.addEventListener('change', () => refreshPrices(veh2, svc2));
+refreshPrices(veh1, svc1);
+refreshPrices(veh2, svc2);
+
+// ── Second-vehicle section: show/hide based on number of vehicles ──
+const numSel = document.getElementById('num_vehicles');
+const v2section = document.getElementById('vehicle2-section');
+function toggleSecondVehicle(){
+  const show = numSel.value === '2' || numSel.value === '3+';
+  v2section.hidden = !show;
+  if (!show){
+    // Clear v2 fields so a hidden section never submits stale values
+    veh2.value = ''; svc2.value = '';
+    v2section.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+    refreshPrices(veh2, svc2);
+  }
+}
+numSel.addEventListener('change', toggleSecondVehicle);
+toggleSecondVehicle();
+
 form.addEventListener('submit', async function(e){
   e.preventDefault();
-  // Require name, phone, service
-  const required = ['name','phone','service'];
+  // Require name, phone, location, service
+  const required = ['name','phone','location','service'];
   for(const id of required){
     const el = document.getElementById(id);
     if(!el.value.trim()){ el.focus(); el.style.borderColor = '#c54343'; return; }

@@ -55,18 +55,18 @@ RESEND_FROM = os.environ.get("RESEND_FROM", "Tony's Detailing <onboarding@resend
 VEHICLE_TYPES = ["Sedan", "SUV/Crossover", "Large SUV/Truck", "Minivan"]
 
 BASE_PRICES = {
-    "Exterior Detail": {"Sedan": 65, "SUV/Crossover": 75, "Large SUV/Truck": 95, "Minivan": 85},
-    "Interior Detail": {"Sedan": 95, "SUV/Crossover": 105, "Large SUV/Truck": 125, "Minivan": 115},
-    "Full Detail": {"Sedan": 150, "SUV/Crossover": 160, "Large SUV/Truck": 185, "Minivan": 170},
-    "Deep Clean": {"Sedan": 230, "SUV/Crossover": 250, "Large SUV/Truck": 275, "Minivan": 260},
+    "Exterior Detail": {"Sedan": 75, "SUV/Crossover": 90, "Large SUV/Truck": 110, "Minivan": 100},
+    "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
+    "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
+    "Deep Clean": {"Sedan": 280, "SUV/Crossover": 300, "Large SUV/Truck": 330, "Minivan": 315},
 }
 
-# Add-on pricing. Clay Decontamination scales with vehicle size.
+# Add-on pricing. Clay & Iron Decontamination scales with vehicle size.
 CLAY_PRICES = {"Sedan": 40, "SUV/Crossover": 50, "Large SUV/Truck": 60, "Minivan": 50}
 ADDON_PRICES = {
     "Leather Conditioning": 40,
     "Odor Eliminator": 50,  # mid-point of the advertised $40–$75 range
-    # "Clay Decontamination" handled separately (size dependent)
+    # "Clay & Iron Decontamination" handled separately (size dependent)
 }
 
 # Condition upcharges are estimates confirmed on arrival.
@@ -95,7 +95,7 @@ def get_db():
 
 
 def init_db():
-    """Create the bookings table if it doesn't exist."""
+    """Create the bookings table if it doesn't exist, then add any new columns."""
     conn = get_db()
     conn.execute(
         """
@@ -104,10 +104,15 @@ def init_db():
             name             TEXT    NOT NULL,
             phone            TEXT    NOT NULL,
             email            TEXT,
+            location         TEXT,
             vehicle_type     TEXT,
             service          TEXT,
             addons           TEXT,
             upcharges        TEXT,
+            vehicle_type_2   TEXT,
+            service_2        TEXT,
+            addons_2         TEXT,
+            upcharges_2      TEXT,
             num_vehicles     TEXT,
             referred_by      TEXT,
             discount_applied TEXT,
@@ -117,6 +122,20 @@ def init_db():
         )
         """
     )
+
+    # Migrate older databases: add any columns introduced after first release.
+    existing = {row["name"] for row in conn.execute("PRAGMA table_info(bookings)")}
+    new_columns = {
+        "location": "TEXT",
+        "vehicle_type_2": "TEXT",
+        "service_2": "TEXT",
+        "addons_2": "TEXT",
+        "upcharges_2": "TEXT",
+    }
+    for column, col_type in new_columns.items():
+        if column not in existing:
+            conn.execute(f"ALTER TABLE bookings ADD COLUMN {column} {col_type}")
+
     conn.commit()
     conn.close()
 
@@ -133,28 +152,42 @@ def parse_num_vehicles(raw):
         return 1
 
 
-def calculate_estimate(service, vehicle_type, addons, upcharges, num_vehicles, referred_by):
-    """
-    Returns (total_estimate, discount_summary).
-
-    Pricing: base (by service + vehicle) × number of vehicles, plus selected
-    add-ons and condition upcharges. Discounts: 10% for 2+ vehicles and a flat
-    $35 referral credit (Full Detail minimum). Both can stack.
-    """
+def vehicle_cost(service, vehicle_type, addons, upcharges):
+    """Price a single vehicle: base (by service + size) + add-ons + upcharges."""
     vehicle = vehicle_type if vehicle_type in VEHICLE_TYPES else "Sedan"
     base = BASE_PRICES.get(service, {}).get(vehicle, 0)
 
     addon_total = 0
     for addon in addons:
-        if addon == "Clay Decontamination":
+        if addon == "Clay & Iron Decontamination":
             addon_total += CLAY_PRICES.get(vehicle, 50)
         else:
             addon_total += ADDON_PRICES.get(addon, 0)
 
     upcharge_total = sum(UPCHARGE_PRICES.get(u, 0) for u in upcharges)
+    return base + addon_total + upcharge_total
 
+
+def calculate_estimate(num_vehicles, referred_by, vehicle1, vehicle2=None):
+    """
+    Returns (total_estimate, discount_summary).
+
+    Each vehicle (a dict of service/vehicle_type/addons/upcharges) is priced on
+    its own. Vehicle 1 is always counted; when 2+ vehicles are booked, vehicle 2
+    is priced and applied to each additional vehicle (so "3+" charges vehicle 2
+    twice — additional vehicles are estimated at the same rate).
+
+    Discounts: 10% for 2+ vehicles and a flat $35 referral credit (the order must
+    include at least a Full Detail to qualify). Both can stack.
+    """
     count = parse_num_vehicles(num_vehicles)
-    subtotal = (base * count) + addon_total + upcharge_total
+
+    subtotal = vehicle_cost(**vehicle1)
+    services = [vehicle1.get("service", "")]
+
+    if count >= 2 and vehicle2 and vehicle2.get("service"):
+        subtotal += vehicle_cost(**vehicle2) * (count - 1)
+        services.append(vehicle2.get("service", ""))
 
     # ── Discounts ──
     discount_total = 0.0
@@ -165,7 +198,7 @@ def calculate_estimate(service, vehicle_type, addons, upcharges, num_vehicles, r
         discount_total += multi
         notes.append(f"Multi-vehicle 10% (-${multi:.2f})")
 
-    if (referred_by or "").strip() and service in REFERRAL_ELIGIBLE_SERVICES:
+    if (referred_by or "").strip() and any(s in REFERRAL_ELIGIBLE_SERVICES for s in services):
         discount_total += REFERRAL_DISCOUNT
         notes.append(f"Referral (-${REFERRAL_DISCOUNT:.2f})")
 
@@ -214,6 +247,23 @@ def send_notification_email(booking):
                 f"</tr>"
             )
 
+        def section(label):
+            return (
+                f"<tr><td colspan='2' style='padding:12px 14px 6px;background:#f4f6f9;"
+                f"color:#1e3a5f;font-size:11px;font-weight:700;letter-spacing:.08em;"
+                f"text-transform:uppercase;'>{label}</td></tr>"
+            )
+
+        vehicle2_rows = ""
+        if booking.get("vehicle_type_2") or booking.get("service_2"):
+            vehicle2_rows = (
+                section("Second Vehicle")
+                + row("Vehicle Type", booking.get("vehicle_type_2"))
+                + row("Service", booking.get("service_2"))
+                + row("Add-ons", booking.get("addons_2"))
+                + row("Condition Upcharges", booking.get("upcharges_2"))
+            )
+
         html = f"""
         <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
           <div style="background:#1e3a5f;padding:22px 24px;border-radius:6px 6px 0 0;">
@@ -227,11 +277,15 @@ def send_notification_email(booking):
             {row("Name", booking["name"])}
             {row("Phone", booking["phone"])}
             {row("Email", booking["email"])}
-            {row("Vehicle Type", booking["vehicle_type"])}
+            {row("Location", booking.get("location"))}
             {row("# Vehicles", booking["num_vehicles"])}
+            {section("Vehicle 1")}
+            {row("Vehicle Type", booking["vehicle_type"])}
             {row("Service", booking["service"])}
             {row("Add-ons", booking["addons"])}
             {row("Condition Upcharges", booking["upcharges"])}
+            {vehicle2_rows}
+            {section("Summary")}
             {row("Referred By", booking["referred_by"])}
             {row("Discount Applied", booking["discount_applied"])}
             {row("Estimated Total", f"${booking['total_estimate']:.2f}")}
@@ -268,23 +322,36 @@ def book():
     form = request.form
     name = (form.get("name") or "").strip()
     phone = (form.get("phone") or "").strip()
+    location = (form.get("location") or "").strip()
 
-    if not name or not phone:
-        return jsonify({"ok": False, "error": "Name and phone are required."}), 400
+    if not name or not phone or not location:
+        return jsonify({"ok": False, "error": "Name, phone, and location are required."}), 400
 
     email = (form.get("email") or "").strip()
-    vehicle_type = (form.get("vehicle_type") or "").strip()
-    service = (form.get("service") or "").strip()
     num_vehicles = (form.get("num_vehicles") or "1").strip()
     referred_by = (form.get("referred_by") or "").strip()
     notes = (form.get("notes") or "").strip()
 
+    # Vehicle 1
+    vehicle_type = (form.get("vehicle_type") or "").strip()
+    service = (form.get("service") or "").strip()
     addons = [a.strip() for a in form.getlist("addons") if a.strip()]
     upcharges = [u.strip() for u in form.getlist("upcharges") if u.strip()]
 
-    total_estimate, discount_applied = calculate_estimate(
-        service, vehicle_type, addons, upcharges, num_vehicles, referred_by
-    )
+    # Vehicle 2 (only meaningful when 2+ vehicles are booked)
+    vehicle_type_2 = (form.get("vehicle_type_2") or "").strip()
+    service_2 = (form.get("service_2") or "").strip()
+    addons_2 = [a.strip() for a in form.getlist("addons_2") if a.strip()]
+    upcharges_2 = [u.strip() for u in form.getlist("upcharges_2") if u.strip()]
+
+    has_second = parse_num_vehicles(num_vehicles) >= 2
+    if not has_second:
+        vehicle_type_2, service_2, addons_2, upcharges_2 = "", "", [], []
+
+    v1 = {"service": service, "vehicle_type": vehicle_type, "addons": addons, "upcharges": upcharges}
+    v2 = {"service": service_2, "vehicle_type": vehicle_type_2, "addons": addons_2, "upcharges": upcharges_2}
+
+    total_estimate, discount_applied = calculate_estimate(num_vehicles, referred_by, v1, v2)
 
     conn = get_db()
     visits = record_visit_count(conn, email)
@@ -293,23 +360,28 @@ def book():
     conn.execute(
         """
         INSERT INTO bookings (
-            name, phone, email, vehicle_type, service, addons, upcharges,
+            name, phone, email, location, vehicle_type, service, addons, upcharges,
+            vehicle_type_2, service_2, addons_2, upcharges_2,
             num_vehicles, referred_by, discount_applied, total_estimate,
             visits, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            name, phone, email, vehicle_type, service,
-            ", ".join(addons), ", ".join(upcharges), num_vehicles,
-            referred_by, discount_applied, total_estimate, visits, timestamp,
+            name, phone, email, location, vehicle_type, service,
+            ", ".join(addons), ", ".join(upcharges),
+            vehicle_type_2, service_2, ", ".join(addons_2), ", ".join(upcharges_2),
+            num_vehicles, referred_by, discount_applied, total_estimate, visits, timestamp,
         ),
     )
     conn.commit()
     conn.close()
 
     booking = {
-        "name": name, "phone": phone, "email": email, "vehicle_type": vehicle_type,
-        "service": service, "addons": ", ".join(addons), "upcharges": ", ".join(upcharges),
+        "name": name, "phone": phone, "email": email, "location": location,
+        "vehicle_type": vehicle_type, "service": service,
+        "addons": ", ".join(addons), "upcharges": ", ".join(upcharges),
+        "vehicle_type_2": vehicle_type_2, "service_2": service_2,
+        "addons_2": ", ".join(addons_2), "upcharges_2": ", ".join(upcharges_2),
         "num_vehicles": num_vehicles, "referred_by": referred_by,
         "discount_applied": discount_applied, "total_estimate": total_estimate,
         "visits": visits, "notes": notes, "timestamp": timestamp,
