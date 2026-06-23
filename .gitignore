@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# SQLite database (created at runtime)
+bookings.db
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.pytest_cache/
+
+# Vercel
+.vercel/
