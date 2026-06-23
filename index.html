@@ -1145,6 +1145,42 @@ footer{
   overflow:hidden;
 }
 .booking-frame iframe{display:block;width:100%;border:0;border-radius:4px;background:#fff;}
+.booking-form{padding:36px;}
+
+/* Checkbox groups (add-ons + condition upcharges) */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.check{
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  background:var(--bg-4);border:1.5px solid var(--line);border-radius:4px;
+  padding:12px 14px;transition:border-color 150ms var(--ease),background 150ms var(--ease);
+}
+.check:hover{border-color:var(--line-2);}
+.check input{
+  appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;
+  border:1.5px solid var(--line-2);border-radius:4px;background:#fff;
+  cursor:pointer;position:relative;transition:background 150ms var(--ease),border-color 150ms var(--ease);
+}
+.check input:checked{background:var(--blue);border-color:var(--blue);}
+.check input:checked::after{
+  content:"";position:absolute;left:5px;top:1.5px;width:5px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+.check:has(input:checked){border-color:var(--blue);background:rgba(30,58,95,.06);}
+.check .ctxt{font-family:var(--ff-b);font-size:13.5px;color:var(--fg);line-height:1.3;}
+.check .ctxt .cprice{color:var(--blue);font-weight:700;font-size:12px;}
+
+/* Inline booking success */
+.booking-success{display:none;text-align:center;padding:48px 24px;}
+.booking-success.show{display:block;}
+.booking-success .ck{
+  width:64px;height:64px;border-radius:50%;background:rgba(30,58,95,.08);
+  border:1px solid rgba(30,58,95,.20);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 22px;
+}
+.booking-success .ck .lucide{width:28px;height:28px;stroke-width:2.5;}
+.booking-success h3{font-family:var(--ff-h);font-weight:800;font-size:24px;color:var(--fg);letter-spacing:-.01em;margin-bottom:10px;}
+.booking-success p{font-size:14.5px;color:var(--fg-2);line-height:1.6;max-width:420px;margin:0 auto;}
+@media (max-width:560px){.check-grid{grid-template-columns:1fr;}.booking-form{padding:24px;}}
 
 /* ─────────────── RESPONSIVE ─────────────── */
 @media (max-width: 1100px){
@@ -1791,7 +1827,85 @@ footer{
         <p>Pick your service and a time that works for you. We'll confirm your appointment and review the final quote with you on arrival.</p>
       </div>
       <div class="booking-frame">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeBQ-9Zaexhn-j5P-7X0gDyYgjv_4SwlQHhpFykHrOLkv3pBw/viewform?embedded=true" width="100%" height="1929" frameborder="0" marginheight="0" marginwidth="0" title="Book Your Detail">Loading…</iframe>
+        <form id="bf" class="booking-form" action="/api/book" method="post" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">Full Name <span class="req">*</span></label>
+              <input id="name" name="name" type="text" placeholder="Tony Brown" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone <span class="req">*</span></label>
+              <input id="phone" name="phone" type="tel" placeholder="(440) 555-0192" required>
+            </div>
+            <div class="field full">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@email.com">
+            </div>
+            <div class="field">
+              <label for="vehicle_type">Vehicle Type</label>
+              <select id="vehicle_type" name="vehicle_type">
+                <option value="">Select type&hellip;</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV/Crossover">SUV / Crossover</option>
+                <option value="Large SUV/Truck">Large SUV / Truck</option>
+                <option value="Minivan">Minivan</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="num_vehicles">Number of Vehicles</label>
+              <select id="num_vehicles" name="num_vehicles">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3+">3+</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="service">Service <span class="req">*</span></label>
+              <select id="service" name="service" required>
+                <option value="">Select a service&hellip;</option>
+                <option value="Exterior Detail">Exterior Detail ($65&ndash;$95)</option>
+                <option value="Interior Detail">Interior Detail ($95&ndash;$125)</option>
+                <option value="Full Detail">Full Detail ($150&ndash;$185)</option>
+                <option value="Deep Clean">Deep Clean ($230&ndash;$275)</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label>Add-Ons</label>
+              <div class="check-grid">
+                <label class="check"><input type="checkbox" name="addons" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Clay Decontamination"><span class="ctxt">Clay Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Condition Upcharges</label>
+              <div class="check-grid">
+                <label class="check"><input type="checkbox" name="upcharges" value="Pet Hair"><span class="ctxt">Pet Hair</span></label>
+                <label class="check"><input type="checkbox" name="upcharges" value="Heavy Staining"><span class="ctxt">Heavy Staining</span></label>
+                <label class="check"><input type="checkbox" name="upcharges" value="Smoke/Odor"><span class="ctxt">Smoke / Odor</span></label>
+                <label class="check"><input type="checkbox" name="upcharges" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
+              </div>
+            </div>
+            <div class="field full">
+              <label for="referred_by">Referred By</label>
+              <input id="referred_by" name="referred_by" type="text" placeholder="Name of the person who referred you (for $35 off Full Detail+)">
+            </div>
+            <div class="field full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" placeholder="Vehicle condition, special requests, preferred date/time&hellip;"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn lg">Request Appointment <i data-lucide="arrow-right"></i></button>
+            <p class="note"><i data-lucide="info"></i>We'll confirm within 24 hours and review the final quote on arrival. Prefer to talk? Call or text <a href="tel:+12169034783">(216) 903-4783</a>.</p>
+          </div>
+        </form>
+
+        <div class="booking-success" id="bs">
+          <div class="ck"><i data-lucide="check"></i></div>
+          <h3>Request Received</h3>
+          <p id="bs-msg">Thanks! We've got your request and will confirm within 24 hours. Your final quote is confirmed on arrival.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1956,6 +2070,52 @@ const io = new IntersectionObserver((entries) => {
   });
 }, { rootMargin: '-50% 0px -45% 0px', threshold: 0 });
 sections.forEach(s => io.observe(s));
+
+// ───────────────── BOOKING FORM ───────────────────
+const bookingForm = document.getElementById('bf');
+if (bookingForm) {
+  bookingForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const required = ['name','phone','service'];
+    for (const id of required){
+      const el = document.getElementById(id);
+      const field = el.closest('.field');
+      if (!el.value.trim()){ el.focus(); if (field) field.classList.add('error'); return; }
+      if (field) field.classList.remove('error');
+    }
+
+    const btn = bookingForm.querySelector('button[type=submit]');
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/book', { method: 'POST', body: new FormData(bookingForm) });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Submission failed');
+
+      let msg = 'Thanks! We’ve got your request and will confirm within 24 hours.';
+      if (typeof data.total_estimate === 'number') {
+        msg += ' Your estimated total is $' + data.total_estimate.toFixed(2);
+        if (data.discount_applied && data.discount_applied !== 'None') {
+          msg += ' (' + data.discount_applied + ')';
+        }
+        msg += '. Final quote is confirmed on arrival.';
+      }
+      document.getElementById('bs-msg').textContent = msg;
+
+      bookingForm.style.display = 'none';
+      document.getElementById('bs').classList.add('show');
+      if (window.lucide) lucide.createIcons();
+      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+      if (window.lucide) lucide.createIcons();
+      alert('Sorry, something went wrong sending your request. Please call or text us at (216) 903-4783.');
+    }
+  });
+}
 
 // Initial icon render
 if (window.lucide) lucide.createIcons();
