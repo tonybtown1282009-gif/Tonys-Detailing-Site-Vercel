@@ -195,6 +195,66 @@ def test_second_vehicle_ignored_when_count_one():
 
 
 # ──────────────────────────────────────────────────────────────────────────
+#  calculate_estimate — expecting / new-parent $50 Deep Clean discount
+# ──────────────────────────────────────────────────────────────────────────
+def test_expecting_discount_on_deep_clean():
+    # Deep Clean Sedan 280 - 50 = 230
+    total, summary = appmod.calculate_estimate(
+        "1", "", veh("Deep Clean", "Sedan"), expecting1=True
+    )
+    assert total == 230
+    assert "Expecting/new parent (-$50.00)" in summary
+
+
+def test_expecting_discount_ignored_for_non_deep_clean():
+    # Checkbox set but service is Full Detail -> no discount
+    total, summary = appmod.calculate_estimate(
+        "1", "", veh("Full Detail", "Sedan"), expecting1=True
+    )
+    assert total == 195
+    assert "Expecting" not in summary
+
+
+def test_expecting_discount_defaults_off():
+    total, summary = appmod.calculate_estimate("1", "", veh("Deep Clean", "Sedan"))
+    assert total == 280
+    assert summary == "None"
+
+
+def test_expecting_discount_via_second_vehicle():
+    # v1 Full Sedan 195 + v2 Deep Clean Sedan 280 = 475
+    # multi 10% = 47.5; expecting on v2 = 50 => 475 - 47.5 - 50 = 377.5
+    total, summary = appmod.calculate_estimate(
+        "2", "", veh("Full Detail", "Sedan"), veh("Deep Clean", "Sedan"),
+        expecting2=True,
+    )
+    assert total == 377.5
+    assert "Expecting/new parent (-$50.00)" in summary
+    assert "Multi-vehicle 10%" in summary
+
+
+def test_expecting_discount_scales_for_three_plus():
+    # v1 Deep Clean Sedan 280 + v2 Deep Clean Sedan 280 x2 = 840
+    # multi 10% = 84; expecting v1 50 + v2 50x2 = 150 => 840 - 84 - 150 = 606
+    total, summary = appmod.calculate_estimate(
+        "3+", "", veh("Deep Clean", "Sedan"), veh("Deep Clean", "Sedan"),
+        expecting1=True, expecting2=True,
+    )
+    assert total == 606.0
+    assert "Expecting/new parent (-$150.00)" in summary
+
+
+def test_expecting_and_referral_stack():
+    # Deep Clean Sedan 280, referral 35 + expecting 50 => 195
+    total, summary = appmod.calculate_estimate(
+        "1", "A Friend", veh("Deep Clean", "Sedan"), expecting1=True
+    )
+    assert total == 195
+    assert "Referral (-$35.00)" in summary
+    assert "Expecting/new parent (-$50.00)" in summary
+
+
+# ──────────────────────────────────────────────────────────────────────────
 #  /api/book endpoint
 # ──────────────────────────────────────────────────────────────────────────
 def test_book_endpoint_success_two_vehicles(client):
@@ -247,6 +307,41 @@ def test_book_endpoint_clears_v2_when_single(client):
     assert row["total_estimate"] == 75  # only vehicle 1 counted
 
 
+def test_book_endpoint_applies_and_persists_expecting_discount(client):
+    res = client.post("/api/book", data={
+        "name": "Parent", "phone": "440", "location": "Chardon",
+        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Deep Clean",
+        "expecting_discount_1": "1",
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["total_estimate"] == 230  # 280 - 50
+    assert "Expecting" in data["discount_applied"]
+
+    conn = appmod.get_db()
+    row = conn.execute("SELECT * FROM bookings WHERE name = 'Parent'").fetchone()
+    conn.close()
+    assert row["expecting_discount_1"] == 1
+    assert row["expecting_discount_2"] == 0
+
+
+def test_book_endpoint_ignores_expecting_when_not_deep_clean(client):
+    res = client.post("/api/book", data={
+        "name": "NotEligible", "phone": "440", "location": "Chardon",
+        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Full Detail",
+        "expecting_discount_1": "1",
+    })
+    data = res.get_json()
+    assert data["total_estimate"] == 195  # no discount
+    assert "Expecting" not in data["discount_applied"]
+
+    conn = appmod.get_db()
+    row = conn.execute("SELECT * FROM bookings WHERE name = 'NotEligible'").fetchone()
+    conn.close()
+    # Stored flag is normalized to off because the service doesn't qualify.
+    assert row["expecting_discount_1"] == 0
+
+
 @pytest.mark.parametrize("payload", [
     {"phone": "1", "location": "x"},        # missing name
     {"name": "n", "location": "x"},         # missing phone
@@ -275,7 +370,10 @@ def test_schema_has_new_columns():
     conn = appmod.get_db()
     cols = {r["name"] for r in conn.execute("PRAGMA table_info(bookings)")}
     conn.close()
-    for c in ("location", "vehicle_type_2", "service_2", "addons_2", "upcharges_2"):
+    for c in (
+        "location", "vehicle_type_2", "service_2", "addons_2", "upcharges_2",
+        "expecting_discount_1", "expecting_discount_2",
+    ):
         assert c in cols
 
 
@@ -288,6 +386,13 @@ def test_home_serves_index(client):
 def test_booking_page_serves(client):
     assert client.get("/booking").status_code == 200
     assert client.get("/booking.html").status_code == 200
+
+
+def test_deep_clean_page_serves(client):
+    res = client.get("/deep-clean")
+    assert res.status_code == 200
+    assert b"Deep Clean" in res.data
+    assert client.get("/deep-clean.html").status_code == 200
 
 
 def test_static_assets_serve(client):

@@ -82,6 +82,10 @@ REFERRAL_ELIGIBLE_SERVICES = {"Full Detail", "Deep Clean"}
 REFERRAL_DISCOUNT = 35
 MULTI_VEHICLE_RATE = 0.10  # 10% off for 2+ vehicles
 
+# Expecting / new-parent courtesy: $50 off a Deep Clean, per qualifying vehicle.
+DEEP_CLEAN_SERVICE = "Deep Clean"
+EXPECTING_DISCOUNT = 50
+
 app = Flask(__name__, static_folder=None)
 
 
@@ -131,6 +135,8 @@ def init_db():
         "service_2": "TEXT",
         "addons_2": "TEXT",
         "upcharges_2": "TEXT",
+        "expecting_discount_1": "INTEGER DEFAULT 0",
+        "expecting_discount_2": "INTEGER DEFAULT 0",
     }
     for column, col_type in new_columns.items():
         if column not in existing:
@@ -168,7 +174,10 @@ def vehicle_cost(service, vehicle_type, addons, upcharges):
     return base + addon_total + upcharge_total
 
 
-def calculate_estimate(num_vehicles, referred_by, vehicle1, vehicle2=None):
+def calculate_estimate(
+    num_vehicles, referred_by, vehicle1, vehicle2=None,
+    expecting1=False, expecting2=False,
+):
     """
     Returns (total_estimate, discount_summary).
 
@@ -177,8 +186,11 @@ def calculate_estimate(num_vehicles, referred_by, vehicle1, vehicle2=None):
     is priced and applied to each additional vehicle (so "3+" charges vehicle 2
     twice — additional vehicles are estimated at the same rate).
 
-    Discounts: 10% for 2+ vehicles and a flat $35 referral credit (the order must
-    include at least a Full Detail to qualify). Both can stack.
+    Discounts: 10% for 2+ vehicles, a flat $35 referral credit (the order must
+    include at least a Full Detail to qualify), and a $50 expecting/new-parent
+    courtesy per Deep Clean vehicle where the customer checked the box. All can
+    stack. The referral and expecting credits are applied as flat amounts after
+    the multi-vehicle percentage.
     """
     count = parse_num_vehicles(num_vehicles)
 
@@ -201,6 +213,19 @@ def calculate_estimate(num_vehicles, referred_by, vehicle1, vehicle2=None):
     if (referred_by or "").strip() and any(s in REFERRAL_ELIGIBLE_SERVICES for s in services):
         discount_total += REFERRAL_DISCOUNT
         notes.append(f"Referral (-${REFERRAL_DISCOUNT:.2f})")
+
+    # Expecting / new-parent courtesy — only on Deep Clean vehicles.
+    expecting_total = 0.0
+    if expecting1 and vehicle1.get("service") == DEEP_CLEAN_SERVICE:
+        expecting_total += EXPECTING_DISCOUNT
+    if (
+        count >= 2 and expecting2 and vehicle2
+        and vehicle2.get("service") == DEEP_CLEAN_SERVICE
+    ):
+        expecting_total += EXPECTING_DISCOUNT * (count - 1)
+    if expecting_total:
+        discount_total += expecting_total
+        notes.append(f"Expecting/new parent (-${expecting_total:.2f})")
 
     total = max(0.0, round(subtotal - discount_total, 2))
 
@@ -254,6 +279,10 @@ def send_notification_email(booking):
                 f"text-transform:uppercase;'>{label}</td></tr>"
             )
 
+        vehicle1_expecting = ""
+        if booking.get("expecting_discount_1"):
+            vehicle1_expecting = row("Expecting / New Parent", "Yes — $50 off Deep Clean")
+
         vehicle2_rows = ""
         if booking.get("vehicle_type_2") or booking.get("service_2"):
             vehicle2_rows = (
@@ -262,6 +291,10 @@ def send_notification_email(booking):
                 + row("Service", booking.get("service_2"))
                 + row("Add-ons", booking.get("addons_2"))
                 + row("Condition Upcharges", booking.get("upcharges_2"))
+                + (
+                    row("Expecting / New Parent", "Yes — $50 off Deep Clean")
+                    if booking.get("expecting_discount_2") else ""
+                )
             )
 
         html = f"""
@@ -284,6 +317,7 @@ def send_notification_email(booking):
             {row("Service", booking["service"])}
             {row("Add-ons", booking["addons"])}
             {row("Condition Upcharges", booking["upcharges"])}
+            {vehicle1_expecting}
             {vehicle2_rows}
             {section("Summary")}
             {row("Referred By", booking["referred_by"])}
@@ -332,26 +366,40 @@ def book():
     referred_by = (form.get("referred_by") or "").strip()
     notes = (form.get("notes") or "").strip()
 
+    # Checkbox values arrive only when ticked; treat any present value as True.
+    def checkbox(name):
+        return bool((form.get(name) or "").strip())
+
     # Vehicle 1
     vehicle_type = (form.get("vehicle_type") or "").strip()
     service = (form.get("service") or "").strip()
     addons = [a.strip() for a in form.getlist("addons") if a.strip()]
     upcharges = [u.strip() for u in form.getlist("upcharges") if u.strip()]
+    expecting_1 = checkbox("expecting_discount_1")
 
     # Vehicle 2 (only meaningful when 2+ vehicles are booked)
     vehicle_type_2 = (form.get("vehicle_type_2") or "").strip()
     service_2 = (form.get("service_2") or "").strip()
     addons_2 = [a.strip() for a in form.getlist("addons_2") if a.strip()]
     upcharges_2 = [u.strip() for u in form.getlist("upcharges_2") if u.strip()]
+    expecting_2 = checkbox("expecting_discount_2")
 
     has_second = parse_num_vehicles(num_vehicles) >= 2
     if not has_second:
         vehicle_type_2, service_2, addons_2, upcharges_2 = "", "", [], []
+        expecting_2 = False
+
+    # The expecting discount only applies to Deep Clean vehicles.
+    expecting_1 = expecting_1 and service == DEEP_CLEAN_SERVICE
+    expecting_2 = expecting_2 and service_2 == DEEP_CLEAN_SERVICE
 
     v1 = {"service": service, "vehicle_type": vehicle_type, "addons": addons, "upcharges": upcharges}
     v2 = {"service": service_2, "vehicle_type": vehicle_type_2, "addons": addons_2, "upcharges": upcharges_2}
 
-    total_estimate, discount_applied = calculate_estimate(num_vehicles, referred_by, v1, v2)
+    total_estimate, discount_applied = calculate_estimate(
+        num_vehicles, referred_by, v1, v2,
+        expecting1=expecting_1, expecting2=expecting_2,
+    )
 
     conn = get_db()
     visits = record_visit_count(conn, email)
@@ -362,14 +410,16 @@ def book():
         INSERT INTO bookings (
             name, phone, email, location, vehicle_type, service, addons, upcharges,
             vehicle_type_2, service_2, addons_2, upcharges_2,
+            expecting_discount_1, expecting_discount_2,
             num_vehicles, referred_by, discount_applied, total_estimate,
             visits, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             name, phone, email, location, vehicle_type, service,
             ", ".join(addons), ", ".join(upcharges),
             vehicle_type_2, service_2, ", ".join(addons_2), ", ".join(upcharges_2),
+            int(expecting_1), int(expecting_2),
             num_vehicles, referred_by, discount_applied, total_estimate, visits, timestamp,
         ),
     )
@@ -382,6 +432,7 @@ def book():
         "addons": ", ".join(addons), "upcharges": ", ".join(upcharges),
         "vehicle_type_2": vehicle_type_2, "service_2": service_2,
         "addons_2": ", ".join(addons_2), "upcharges_2": ", ".join(upcharges_2),
+        "expecting_discount_1": expecting_1, "expecting_discount_2": expecting_2,
         "num_vehicles": num_vehicles, "referred_by": referred_by,
         "discount_applied": discount_applied, "total_estimate": total_estimate,
         "visits": visits, "notes": notes, "timestamp": timestamp,
@@ -410,6 +461,12 @@ def home():
 @app.route("/booking.html")
 def booking_page():
     return send_from_directory(BASE_DIR, "booking.html")
+
+
+@app.route("/deep-clean")
+@app.route("/deep-clean.html")
+def deep_clean_page():
+    return send_from_directory(BASE_DIR, "deep-clean.html")
 
 
 @app.route("/<path:filename>", methods=["GET"])
