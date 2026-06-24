@@ -13,6 +13,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <title>Tony's Detailing — Professional Mobile Auto Detailing in Chardon, OH</title>
 <meta name="description" content="Professional mobile auto detailing in Chardon, Ohio. We come to you. Exterior, interior, and full details. Call (216) 903-4783.">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>try{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}catch(e){}</script>
 <style>
 /* ─────────────── FONTS ─────────────── */
 @font-face{font-family:'Inter';src:url('fonts/Inter-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
@@ -54,6 +55,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* Layout */
   --wrap:1200px;
   --nav-h:68px;
+  --promo-h:42px;
   --pad-x: clamp(20px, 4.5vw, 80px);
   --sec-y: clamp(64px, 9vw, 112px);
   --radius-card: 6px;
@@ -62,7 +64,41 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + var(--promo-h) + 10px);}
+html.promo-off{--promo-h:0px;}
+html.promo-off #promo{display:none;}
+
+/* ─────────────── PROMO BANNER ─────────────── */
+#promo{
+  position:fixed;top:0;left:0;right:0;z-index:201;
+  height:var(--promo-h);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:0 46px;
+  background:linear-gradient(90deg,var(--blue-p),var(--blue) 45%,var(--blue-h));
+  color:#fff;text-align:center;
+  border-bottom:1px solid rgba(255,255,255,.16);
+}
+#promo .promo-link{
+  display:inline-flex;align-items:center;gap:9px;color:#fff;
+  font-family:var(--ff-h);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+}
+#promo .promo-link .promo-em{color:#ffe1a3;}
+#promo .promo-link .lucide{width:14px;height:14px;stroke-width:2.25;}
+#promo .promo-link .arr{transition:transform 180ms var(--ease);}
+#promo .promo-link:hover .arr{transform:translateX(4px);}
+#promo-close{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:none;border-radius:5px;cursor:pointer;
+  color:rgba(255,255,255,.7);transition:color 150ms var(--ease),background 150ms var(--ease);
+}
+#promo-close:hover{color:#fff;background:rgba(255,255,255,.14);}
+#promo-close .lucide{width:15px;height:15px;}
+@media (max-width:560px){
+  #promo{padding:0 40px 0 12px;}
+  #promo .promo-link{font-size:10px;letter-spacing:.05em;gap:7px;}
+  #promo .promo-link .label-full{display:none;}
+}
 body{
   font-family:var(--ff-b);
   font-size:16px;
@@ -135,13 +171,13 @@ a{color:inherit;text-decoration:none;}
 
 /* ─────────────── NAV ─────────────── */
 #nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
+  position:fixed;top:var(--promo-h);left:0;right:0;z-index:200;
   height:var(--nav-h);
   display:flex;align-items:center;gap:24px;
   padding:0 var(--pad-x);
   background:#ffffff;
   border-bottom:1px solid var(--line);
-  transition:background 240ms var(--ease), border-color 240ms var(--ease), box-shadow 240ms var(--ease);
+  transition:top 240ms var(--ease), background 240ms var(--ease), border-color 240ms var(--ease), box-shadow 240ms var(--ease);
 }
 #nav.s{
   background:rgba(255,255,255,.78);
@@ -205,7 +241,7 @@ a{color:inherit;text-decoration:none;}
 .hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
 
 #drawer{
-  position:fixed;inset:var(--nav-h) 0 auto 0;z-index:195;
+  position:fixed;top:calc(var(--nav-h) + var(--promo-h));left:0;right:0;z-index:195;
   background:#ffffff;backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
   box-shadow:0 12px 24px rgba(0,0,0,0.08);
@@ -240,7 +276,7 @@ a{color:inherit;text-decoration:none;}
   --blue-l:#9ab4d4;
   overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:calc(var(--nav-h) + 64px) var(--pad-x) 88px;
+  padding:calc(var(--nav-h) + var(--promo-h) + 64px) var(--pad-x) 88px;
   text-align:center;
   isolation:isolate;
 }
@@ -349,7 +385,7 @@ a{color:inherit;text-decoration:none;}
 
 /* Hero phone badge (desktop) */
 .hero-phone-pill{
-  position:absolute;top:calc(var(--nav-h) + 24px);right:var(--pad-x);
+  position:absolute;top:calc(var(--nav-h) + var(--promo-h) + 24px);right:var(--pad-x);
   display:inline-flex;align-items:center;gap:8px;
   padding:8px 14px;border-radius:999px;
   background:rgba(255,255,255,.06);border:1px solid var(--line-2);
@@ -1397,6 +1433,16 @@ footer{
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
+<!-- ─────────────── PROMO BANNER ─────────────── -->
+<div id="promo">
+  <a href="#booking" class="promo-link">
+    <i data-lucide="badge-percent"></i>
+    <span><span class="label-full">Limited-Time Sale &mdash; </span><span class="promo-em">15% Off</span> Your Next Detail</span>
+    <i data-lucide="arrow-right" class="arr"></i>
+  </a>
+  <button id="promo-close" aria-label="Dismiss announcement"><i data-lucide="x"></i></button>
+</div>
+
 <!-- ─────────────── NAV ─────────────── -->
 <nav id="nav">
   <a href="#hero" class="brand" aria-label="Tony's Detailing — home">
@@ -1505,7 +1551,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="trust-ico"><i data-lucide="badge-check"></i></div>
         <div class="t-txt">
           <h4>Licensed &amp; Professional</h4>
-          <p>Insured, careful, and detail-obsessed.</p>
+          <p>Careful, reliable, and detail-obsessed.</p>
         </div>
       </div>
       <div class="trust-item">
@@ -2384,6 +2430,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </footer>
 
 <script>
+// ───────────────── PROMO BANNER DISMISS ───────────────────
+(function(){
+  const close = document.getElementById('promo-close');
+  if (!close) return;
+  close.addEventListener('click', () => {
+    document.documentElement.classList.add('promo-off');
+    try { localStorage.setItem('td_promo15_dismissed', '1'); } catch (e) {}
+  });
+})();
+
 // ───────────────── NAV SCROLL STATE ───────────────────
 const nav = document.getElementById('nav');
 const onScroll = () => nav.classList.toggle('s', window.scrollY > 40);
