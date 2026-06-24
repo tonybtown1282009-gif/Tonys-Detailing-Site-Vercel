@@ -56,11 +56,11 @@ a{color:inherit;text-decoration:none;}
   font-family:var(--ff-h);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;line-height:1;
   padding:14px 24px;border:1.5px solid transparent;border-radius:var(--radius-btn);
   background:var(--blue);color:#fff;cursor:pointer;
-  transition:background 180ms var(--ease),border-color 180ms var(--ease),color 180ms var(--ease),transform 120ms var(--ease);
+  transition:background 180ms var(--ease),border-color 180ms var(--ease),color 180ms var(--ease),transform 160ms var(--ease),filter 180ms var(--ease),box-shadow 180ms var(--ease);
   white-space:nowrap;
 }
-.btn:hover{background:var(--blue-h);}
-.btn:active{transform:scale(.98);background:var(--blue-p);}
+.btn:hover{background:var(--blue-h);transform:translateY(-1px) scale(1.02);filter:brightness(1.08);box-shadow:0 8px 20px rgba(30,58,95,.32);}
+.btn:active{transform:scale(.98);background:var(--blue-p);filter:none;box-shadow:none;}
 .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.2);}
 .btn.ghost:hover{border-color:#fff;background:rgba(255,255,255,.04);}
 .btn .lucide{width:14px;height:14px;stroke-width:2.25;}
@@ -88,6 +88,35 @@ a{color:inherit;text-decoration:none;}
 .nav-phone{display:inline-flex;align-items:center;gap:7px;font-family:var(--ff-h);font-weight:600;font-size:12px;letter-spacing:.04em;color:var(--fg-2);transition:color 150ms var(--ease);}
 .nav-phone:hover{color:#fff;}
 .nav-phone .lucide{width:13px;height:13px;color:var(--blue-ll);}
+
+/* Nav links + mobile drawer (consistent with home) */
+.nav-links{display:flex;gap:6px;flex:1;justify-content:center;}
+.nav-links a{
+  font-family:var(--ff-h);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--fg-2);padding:8px 12px;border-radius:4px;transition:color 150ms var(--ease),background 150ms var(--ease);
+}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.06);}
+.nav-links a.dc{color:var(--blue-ll);}
+.hbg{display:none;flex-direction:column;gap:5px;width:36px;height:36px;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line-2);border-radius:4px;cursor:pointer;}
+.hbg span{display:block;width:16px;height:1.5px;background:#fff;transition:transform 200ms var(--ease),opacity 200ms var(--ease);}
+.hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.hbg.open span:nth-child(2){opacity:0;}
+.hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+#drawer{
+  position:fixed;inset:var(--nav-h) 0 auto 0;z-index:195;
+  background:rgba(10,10,10,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);box-shadow:0 12px 24px rgba(0,0,0,.4);
+  display:none;flex-direction:column;padding:16px var(--pad-x) 24px;
+}
+#drawer.open{display:flex;}
+#drawer a{
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--ff-h);font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-2);padding:16px 0;border-bottom:1px solid var(--line);
+}
+#drawer a:last-child{border-bottom:none;}
+#drawer a:hover{color:#fff;}
+#drawer a .lucide{width:14px;height:14px;}
 
 /* HEADER */
 #head{
@@ -196,10 +225,48 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
 .soc-btn:hover{color:#fff;border-color:var(--blue-l);background:rgba(45,85,144,.12);}
 .soc-btn .lucide{width:15px;height:15px;}
 
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);will-change:opacity,transform;}
+.reveal.in{opacity:1;transform:none;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1;transform:none;transition:none;}
+}
+
+/* Card hover lift */
+.side-card,.book-card{transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);}
+.side-card:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:0 14px 30px rgba(0,0,0,.35);}
+
+/* Expecting / new-parent callout */
+.expecting-field[hidden]{display:none !important;}
+.expecting-check{
+  display:flex;align-items:center;gap:13px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(45,85,144,.20),rgba(30,58,95,.06));
+  border:1.5px solid rgba(77,117,168,.45);border-radius:6px;
+  padding:15px 16px;transition:border-color 150ms var(--ease),background 150ms var(--ease);
+}
+.expecting-check:hover{border-color:var(--blue-ll);}
+.expecting-check:has(input:checked){border-color:var(--blue-ll);background:rgba(45,85,144,.30);}
+.expecting-check input{
+  appearance:none;-webkit-appearance:none;width:20px;height:20px;flex-shrink:0;
+  border:1.5px solid var(--line-2);border-radius:4px;background:transparent;
+  cursor:pointer;position:relative;transition:background 150ms var(--ease),border-color 150ms var(--ease);
+}
+.expecting-check input:checked{background:var(--blue-h);border-color:var(--blue-l);}
+.expecting-check input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.expecting-check .ctxt{font-family:var(--ff-b);font-size:13.5px;color:var(--fg);line-height:1.4;}
+.expecting-check .ctxt strong{font-weight:700;color:#fff;}
+.expecting-check .cprice{color:var(--blue-ll);font-weight:700;font-size:12px;margin-left:2px;}
+
 @media (max-width:880px){
   .book-layout{grid-template-columns:1fr;}
   .book-side{flex-direction:row;flex-wrap:wrap;}
   .book-side .side-card{flex:1;min-width:240px;}
+}
+@media (max-width:720px){
+  .nav-links{display:none;}
+  .nav-phone{display:none;}
+  .hbg{display:flex;}
 }
 @media (max-width:560px){
   .form-grid{grid-template-columns:1fr;}
@@ -223,11 +290,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="s">Chardon &middot; OH</span>
     </span>
   </a>
-  <div class="nav-right">
-    <a href="index.html" class="nav-back"><i data-lucide="arrow-left"></i>Back to Site</a>
+  <div class="nav-links" role="navigation">
+    <a href="index.html#services">Services</a>
+    <a href="index.html#pricing">Pricing</a>
+    <a href="deep-clean.html" class="dc">Deep Clean</a>
+    <a href="index.html#area">Service Area</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+  <div class="nav-right" style="flex:0 0 auto;">
     <a href="tel:+12169034783" class="nav-phone"><i data-lucide="phone"></i>(216) 903-4783</a>
+    <button class="hbg" id="hbg" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div id="drawer">
+  <a href="index.html#services">Services <i data-lucide="arrow-right"></i></a>
+  <a href="index.html#pricing">Pricing <i data-lucide="arrow-right"></i></a>
+  <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right"></i></a>
+  <a href="index.html#area">Service Area <i data-lucide="arrow-right"></i></a>
+  <a href="index.html#contact">Contact <i data-lucide="arrow-right"></i></a>
+  <a href="tel:+12169034783"><i data-lucide="phone"></i> (216) 903-4783</a>
+</div>
 
 <!-- HEADER -->
 <header id="head">
@@ -309,6 +393,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
             </div>
 
+            <!-- Expecting / new-parent discount (shown only for Deep Clean) -->
+            <div class="field full expecting-field" id="expecting1-field" hidden>
+              <label class="expecting-check">
+                <input type="checkbox" name="expecting_discount_1" value="1">
+                <span class="ctxt"><strong>Expecting or New Parent</strong> &mdash; take <span class="cprice">$50 off</span> your Deep Clean. Welcome, little one!</span>
+              </label>
+            </div>
+
             <!-- Second vehicle (shown when 2+ vehicles selected) -->
             <div class="field full v2-section" id="vehicle2-section" hidden>
               <div class="v2-head">Second Vehicle</div>
@@ -350,6 +442,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="check"><input type="checkbox" name="upcharges_2" value="Smoke/Odor"><span class="ctxt">Smoke / Odor</span></label>
                     <label class="check"><input type="checkbox" name="upcharges_2" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
                   </div>
+                </div>
+                <!-- Expecting / new-parent discount for vehicle 2 (Deep Clean only) -->
+                <div class="field full expecting-field" id="expecting2-field" hidden>
+                  <label class="expecting-check">
+                    <input type="checkbox" name="expecting_discount_2" value="1">
+                    <span class="ctxt"><strong>Expecting or New Parent</strong> &mdash; take <span class="cprice">$50 off</span> this Deep Clean too.</span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -454,21 +553,102 @@ veh2.addEventListener('change', () => refreshPrices(veh2, svc2));
 refreshPrices(veh1, svc1);
 refreshPrices(veh2, svc2);
 
+// ── Robust show/hide (inline display beats any stylesheet rule) ──
+function setShown(el, shown){
+  if (!el) return;
+  el.hidden = !shown;
+  el.style.display = shown ? '' : 'none';
+}
+
+// ── Expecting / new-parent checkbox — only when Deep Clean is selected ──
+const exp1 = document.getElementById('expecting1-field');
+const exp2 = document.getElementById('expecting2-field');
+function toggleExpecting(serviceSel, field){
+  if (!field) return;
+  const show = serviceSel.value === 'Deep Clean';
+  setShown(field, show);
+  if (!show){
+    const cb = field.querySelector('input[type=checkbox]');
+    if (cb) cb.checked = false;
+  }
+}
+
 // ── Second-vehicle section: show/hide based on number of vehicles ──
 const numSel = document.getElementById('num_vehicles');
 const v2section = document.getElementById('vehicle2-section');
 function toggleSecondVehicle(){
   const show = numSel.value === '2' || numSel.value === '3+';
-  v2section.hidden = !show;
+  setShown(v2section, show);
   if (!show){
     // Clear v2 fields so a hidden section never submits stale values
     veh2.value = ''; svc2.value = '';
     v2section.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
     refreshPrices(veh2, svc2);
   }
+  toggleExpecting(svc2, exp2);
 }
 numSel.addEventListener('change', toggleSecondVehicle);
+svc1.addEventListener('change', () => toggleExpecting(svc1, exp1));
+svc2.addEventListener('change', () => toggleExpecting(svc2, exp2));
+toggleExpecting(svc1, exp1);
 toggleSecondVehicle();
+
+// ── Pre-select a service from the URL (e.g. deep-clean.html → ?service=Deep+Clean) ──
+(function(){
+  const wanted = new URLSearchParams(window.location.search).get('service');
+  if (!wanted) return;
+  const match = Array.from(svc1.options).find(o => o.value === wanted);
+  if (match){
+    svc1.value = wanted;
+    toggleExpecting(svc1, exp1);
+    refreshPrices(veh1, svc1);
+  }
+})();
+
+// ── Mobile drawer ──
+const hbg = document.getElementById('hbg');
+const drawer = document.getElementById('drawer');
+if (hbg && drawer){
+  hbg.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    hbg.classList.toggle('open', open);
+    hbg.setAttribute('aria-expanded', String(open));
+  });
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    drawer.classList.remove('open');
+    hbg.classList.remove('open');
+    hbg.setAttribute('aria-expanded', 'false');
+  }));
+}
+
+// ── Scroll reveal (fade-in + slide-up) ──
+(function(){
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = Array.from(document.querySelectorAll('.book-card, .side-card'));
+  if (!targets.length) return;
+  if (reduce || !('IntersectionObserver' in window)){
+    targets.forEach(t => t.classList.add('reveal','in'));
+    return;
+  }
+  const byParent = new Map();
+  targets.forEach(t => {
+    t.classList.add('reveal');
+    const p = t.parentElement;
+    if (!byParent.has(p)) byParent.set(p, []);
+    byParent.get(p).push(t);
+  });
+  byParent.forEach(arr => arr.forEach((t, i) => { t.style.transitionDelay = Math.min(i, 6) * 80 + 'ms'; }));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      el.classList.add('in');
+      obs.unobserve(el);
+      window.setTimeout(() => { el.classList.remove('reveal','in'); el.style.transitionDelay=''; el.style.willChange=''; }, 900);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  targets.forEach(t => obs.observe(t));
+})();
 
 form.addEventListener('submit', async function(e){
   e.preventDefault();
