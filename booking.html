@@ -441,7 +441,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <p class="v2-note">Tell us about your second vehicle. Additional vehicles (3+) are estimated at the same rate.</p>
               <div class="form-grid">
                 <div class="field">
-                  <label for="vehicle_type_2">Vehicle Type</label>
+                  <label for="vehicle_type_2">Vehicle Type <span class="req">*</span></label>
                   <select id="vehicle_type_2" name="vehicle_type_2">
                     <option value="">Select type&hellip;</option>
                     <option value="Sedan">Sedan</option>
@@ -451,7 +451,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </select>
                 </div>
                 <div class="field">
-                  <label for="service_2">Service</label>
+                  <label for="service_2">Service <span class="req">*</span></label>
                   <select id="service_2" name="service_2">
                     <option value="">Select a service&hellip;</option>
                     <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
@@ -629,6 +629,8 @@ function toggleSecondVehicle(){
     v2section.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
     refreshPrices(veh2, svc2);
   }
+  veh2.required = show;
+  svc2.required = show;
   toggleExpecting(svc2, exp2);
 }
 numSel.addEventListener('change', toggleSecondVehicle);
@@ -696,8 +698,10 @@ if (hbg && drawer){
 
 form.addEventListener('submit', async function(e){
   e.preventDefault();
-  // Require name, phone, location, service
+  // Require name, phone, location, service — plus the second vehicle's
+  // type and service when 2+ vehicles are booked
   const required = ['name','phone','location','service'];
+  if (numSel.value !== '1') required.push('vehicle_type_2','service_2');
   for(const id of required){
     const el = document.getElementById(id);
     if(!el.value.trim()){ el.focus(); el.style.borderColor = '#c54343'; return; }
