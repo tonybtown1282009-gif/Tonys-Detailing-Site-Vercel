@@ -1256,6 +1256,21 @@ footer{
   .area-layout{grid-template-columns:1fr;gap:40px;}
   .area-diagram{max-width:340px;margin:0 auto;}
 }
+/* 8-link nav: tighten below 1300, drop the phone number below 1200,
+   switch to the hamburger below 1080 — the full row no longer fits. */
+@media (max-width: 1299px){
+  #nav{gap:18px;}
+  .nav-links{gap:3px;}
+  .nav-links a{padding:8px 9px;font-size:10.5px;}
+  .nav-links a.active::after{left:9px;right:9px;}
+}
+@media (max-width: 1200px){
+  .nav-phone{display:none;}
+}
+@media (max-width: 1079px){
+  .nav-links{display:none;}
+  .hbg{display:flex;}
+}
 @media (max-width: 720px){
   .nav-links{display:none;}
   .nav-phone{display:none;}
@@ -1464,6 +1479,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#services" data-target="services">Services</a>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="deep-clean.html">Deep Clean</a>
+    <a href="rv-detailing.html">RVs</a>
+    <a href="boat-detailing.html">Boats</a>
     <a href="#area" data-target="area">Service Area</a>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
@@ -1483,6 +1500,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <a href="#services">Services <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <a href="rv-detailing.html">RVs <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <a href="boat-detailing.html">Boats <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#contact">Contact <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -2402,6 +2421,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
           <li><a href="deep-clean.html">Deep Clean</a></li>
+          <li><a href="rv-detailing.html">RVs</a></li>
+          <li><a href="boat-detailing.html">Boats</a></li>
         </ul>
       </div>
       <div class="foot-col">

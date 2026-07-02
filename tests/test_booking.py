@@ -395,6 +395,40 @@ def test_deep_clean_page_serves(client):
     assert client.get("/deep-clean.html").status_code == 200
 
 
+def test_rv_detailing_page_serves(client):
+    res = client.get("/rv-detailing")
+    assert res.status_code == 200
+    # One package with size-bracket pricing.
+    assert b"Full Deep Detail" in res.data
+    assert b"$550" in res.data and b"$700" in res.data and b"$1,000" in res.data
+    assert b"Contact for Quote" not in res.data
+    assert client.get("/rv-detailing.html").status_code == 200
+
+
+def test_boat_detailing_page_serves(client):
+    res = client.get("/boat-detailing")
+    assert res.status_code == 200
+    assert b"Pontoon" in res.data
+    assert b"Contact for Quote" in res.data
+    assert client.get("/boat-detailing.html").status_code == 200
+
+
+def test_home_links_to_rv_and_boat_pages_without_their_content(client):
+    """RV/boat content lives only on the dedicated pages; the homepage
+    carries nothing beyond nav/footer links to them."""
+    html = client.get("/").data.decode("utf-8")
+
+    assert 'href="rv-detailing.html"' in html
+    assert 'href="boat-detailing.html"' in html
+
+    # No RV/boat sections, cards, or pricing on the homepage.
+    for marker in (
+        "Full Deep Detail", "$550", "Travel Trailer", "Class A", "Class C",
+        "Contact for Quote", "Jet Ski", "Pontoon", "Bowrider", "Cabin Cruiser",
+    ):
+        assert marker not in html, f"homepage should not contain RV/boat content: {marker!r}"
+
+
 def test_static_assets_serve(client):
     assert client.get("/fonts/Inter-Regular.ttf").status_code == 200
     assert client.get("/assets/logo.png").status_code == 200

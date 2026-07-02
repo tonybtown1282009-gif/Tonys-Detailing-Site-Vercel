@@ -469,6 +469,18 @@ def deep_clean_page():
     return send_from_directory(BASE_DIR, "deep-clean.html")
 
 
+@app.route("/rv-detailing")
+@app.route("/rv-detailing.html")
+def rv_detailing_page():
+    return send_from_directory(BASE_DIR, "rv-detailing.html")
+
+
+@app.route("/boat-detailing")
+@app.route("/boat-detailing.html")
+def boat_detailing_page():
+    return send_from_directory(BASE_DIR, "boat-detailing.html")
+
+
 @app.route("/<path:filename>", methods=["GET"])
 def static_files(filename):
     """Serve any existing file from the project root (fonts, assets, images)."""
