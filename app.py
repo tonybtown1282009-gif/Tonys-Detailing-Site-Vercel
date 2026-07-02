@@ -519,6 +519,30 @@ def boat_detailing_page():
     return send_from_directory(BASE_DIR, "boat-detailing.html")
 
 
+@app.route("/about")
+@app.route("/about.html")
+def about_page():
+    return send_from_directory(BASE_DIR, "about.html")
+
+
+@app.route("/gallery")
+@app.route("/gallery.html")
+def gallery_page():
+    return send_from_directory(BASE_DIR, "gallery.html")
+
+
+@app.route("/reviews")
+@app.route("/reviews.html")
+def reviews_page():
+    return send_from_directory(BASE_DIR, "reviews.html")
+
+
+@app.route("/faq")
+@app.route("/faq.html")
+def faq_page():
+    return send_from_directory(BASE_DIR, "faq.html")
+
+
 @app.route("/<path:filename>", methods=["GET"])
 def static_files(filename):
     """Serve any existing file from the project root (fonts, assets, images)."""

@@ -429,6 +429,47 @@ def test_home_links_to_rv_and_boat_pages_without_their_content(client):
         assert marker not in html, f"homepage should not contain RV/boat content: {marker!r}"
 
 
+@pytest.mark.parametrize("path,marker", [
+    ("/about", b"Owner-Operated"),
+    ("/about.html", b"Meet Tony"),
+    ("/gallery", b"Before &amp; After"),
+    ("/gallery.html", b"galGrid"),
+    ("/reviews", b"reviews-embed"),
+    ("/reviews.html", b"Trusted By Local Drivers"),
+    ("/faq", b"Frequently Asked"),
+    ("/faq.html", b"FAQPage"),
+])
+def test_content_pages_serve(client, path, marker):
+    res = client.get(path)
+    assert res.status_code == 200
+    assert marker in res.data
+
+
+def test_content_pages_have_unique_titles(client):
+    import re
+    titles = {}
+    for path in ("/", "/booking", "/deep-clean", "/rv-detailing", "/boat-detailing",
+                 "/about", "/gallery", "/reviews", "/faq"):
+        html = client.get(path).data.decode("utf-8")
+        m = re.search(r"<title>(.*?)</title>", html, re.S)
+        assert m, f"{path} has no <title>"
+        titles[path] = m.group(1).strip()
+    # Every page's SEO title is unique.
+    assert len(set(titles.values())) == len(titles), titles
+
+
+def test_faq_has_valid_faqpage_jsonld(client):
+    import json, re
+    html = client.get("/faq").data.decode("utf-8")
+    blocks = re.findall(
+        r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+    )
+    assert blocks, "FAQ page is missing JSON-LD"
+    data = json.loads(blocks[0])  # must be valid JSON
+    assert data["@type"] == "FAQPage"
+    assert len(data["mainEntity"]) >= 6
+
+
 def test_static_assets_serve(client):
     assert client.get("/fonts/Inter-Regular.ttf").status_code == 200
     assert client.get("/assets/logo.png").status_code == 200

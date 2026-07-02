@@ -18,8 +18,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Boat Detailing — Tony's Detailing | Mobile Detailing, Chardon OH</title>
-<meta name="description" content="Professional mobile boat detailing in Chardon, Ohio. Basic and Deep Detail packages for jet skis, fishing boats, pontoons, and cabin cruisers — on the trailer or at the dock. Contact for a quote.">
+<title>About Tony's Detailing — Owner-Operated Mobile Detailing in Geauga &amp; Lake County, OH</title>
+<meta name="description" content="Meet Tony — owner-operated mobile auto detailing serving Geauga and Lake County plus the premium east-side Cleveland suburbs. The same hands on every job, come-to-you service, and before-and-after photos on every detail.">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>try{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}catch(e){}</script>
 <style>
@@ -163,86 +163,16 @@ a{color:inherit;text-decoration:none;}
 #hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.40);}
 #hero .btn.ghost:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.10);}
 
-/* ─────────────── SERVICE TIERS ─────────────── */
-#tiers{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
-.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.tier-card{
-  position:relative;background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
-  padding:30px 26px 24px;display:flex;flex-direction:column;overflow:hidden;
-  transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);
-}
-.tier-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 14px 32px rgba(0,0,0,.10),0 0 0 1px rgba(30,58,95,.14);}
-.tier-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue);transform:scaleX(.18);transform-origin:left;transition:transform 360ms var(--ease);}
-.tier-card:hover::before{transform:scaleX(1);}
-.tier-icon{width:52px;height:52px;border-radius:6px;background:rgba(30,58,95,.07);border:1px solid rgba(30,58,95,.18);display:flex;align-items:center;justify-content:center;color:var(--blue);margin-bottom:22px;}
-.tier-icon .lucide{width:22px;height:22px;stroke-width:1.75;}
-.tier-kicker{font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
-.tier-name{font-family:var(--ff-h);font-weight:800;font-size:23px;line-height:1.05;letter-spacing:-.015em;color:var(--fg);margin-bottom:10px;}
-.tier-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-h);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:5px 10px;border-radius:999px;border:1px solid rgba(30,58,95,.24);background:rgba(30,58,95,.06);margin-bottom:12px;align-self:flex-start;}
-.tier-badge .lucide{width:11px;height:11px;}
-.tier-desc{font-size:13.5px;color:var(--fg-3);line-height:1.6;margin-bottom:20px;}
-.tier-feat{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px;flex:1;}
-.tier-feat li{font-size:13px;color:var(--fg-2);display:flex;align-items:flex-start;gap:9px;line-height:1.45;}
-.tier-feat li .lucide{width:13px;height:13px;color:var(--blue);flex-shrink:0;margin-top:2px;stroke-width:2.5;}
-.tier-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:auto;padding-top:20px;border-top:1px solid var(--line);}
-.tier-price-row{display:flex;flex-direction:column;gap:2px;}
-.tier-price-lbl{font-family:var(--ff-h);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-4);}
-.tier-price{font-family:var(--ff-h);font-weight:800;font-size:16px;color:var(--fg);letter-spacing:-.01em;}
-.tier-cta{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#fff;padding:9px 14px;border-radius:4px;background:var(--blue);transition:background 180ms var(--ease);}
-.tier-cta:hover{background:var(--blue-h);}
-.tier-cta .lucide{width:11px;height:11px;}
-.tier-note{margin-top:18px;font-size:12.5px;color:var(--fg-3);line-height:1.6;}
-.tier-note strong{color:var(--fg-2);font-weight:600;}
+/* ─────────────── PROSE / STORY ─────────────── */
+#story{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
+.prose{max-width:760px;}
+.prose p{font-size:clamp(15px,1.5vw,17px);color:var(--fg-2);line-height:1.85;margin-bottom:20px;}
+.prose p:last-child{margin-bottom:0;}
+.prose p strong{color:var(--fg);font-weight:600;}
 
-/* ─────────────── PLAN-AHEAD CALLOUT ─────────────── */
-#timeline{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
-.exp-card{
-  position:relative;overflow:hidden;
-  background:var(--blue);
-  --fg:#fff;--fg-2:rgba(255,255,255,.85);--blue-l:#9ab4d4;
-  border-radius:14px;
-  padding:clamp(36px,5vw,64px);
-  display:grid;grid-template-columns:auto 1fr auto;gap:36px;align-items:center;
-  box-shadow:0 24px 60px rgba(30,58,95,.30);
-}
-.exp-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at top right,rgba(255,255,255,.12),transparent 55%);}
-.exp-badge{position:relative;width:96px;height:96px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;color:#fff;}
-.exp-badge .lucide{width:42px;height:42px;stroke-width:1.6;}
-.exp-body{position:relative;}
-.exp-body .amt{font-family:var(--ff-h);font-weight:800;font-size:clamp(24px,3.2vw,36px);letter-spacing:-.02em;color:#fff;line-height:1.1;margin-bottom:12px;}
-.exp-body .amt .b{color:var(--blue-l);}
-.exp-body p{font-size:15px;color:var(--fg-2);line-height:1.65;max-width:560px;}
-.exp-body p strong{color:#fff;font-weight:600;}
-.exp-cta{position:relative;flex-shrink:0;}
-.exp-card .btn{background:#fff;color:var(--blue);border-color:#fff;}
-.exp-card .btn:hover{background:#e6edf5;color:var(--blue-p);border-color:#e6edf5;}
-
-/* ─────────────── PRICING ─────────────── */
-#pricing{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
-.pr-stack{display:flex;flex-direction:column;gap:22px;max-width:760px;}
-.pr-card{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);overflow:hidden;max-width:760px;}
-.pr-head{display:flex;align-items:center;gap:10px;padding:18px 22px;background:linear-gradient(180deg,rgba(30,58,95,.08),rgba(30,58,95,.02));border-bottom:1px solid var(--line);}
-.pr-head .lucide{width:15px;height:15px;color:var(--blue);}
-.pr-head h3{font-family:var(--ff-h);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);flex:1;}
-.pr-head .pr-pill{font-family:var(--ff-h);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:4px 9px;border-radius:2px;border:1px solid rgba(30,58,95,.24);background:rgba(30,58,95,.06);}
-table.ptbl{width:100%;border-collapse:collapse;}
-table.ptbl thead th{font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);padding:14px 22px;text-align:left;background:rgba(30,58,95,.03);border-bottom:1px solid var(--line);}
-table.ptbl thead th:last-child{text-align:right;}
-table.ptbl tbody td{font-size:14px;padding:16px 22px;border-bottom:1px solid var(--line);color:var(--fg);}
-table.ptbl tbody tr:nth-child(even) td{background:rgba(30,58,95,.025);}
-table.ptbl tbody tr:last-child td{border-bottom:none;}
-table.ptbl tbody tr:hover td{background:rgba(45,85,144,.06);}
-table.ptbl tbody td:first-child{color:var(--fg);font-weight:500;}
-table.ptbl tbody td:last-child{font-family:var(--ff-h);font-weight:800;color:var(--blue);text-align:right;font-size:17px;}
-table.ptbl.quote thead th:not(:first-child){text-align:right;}
-table.ptbl.quote tbody td:not(:first-child){font-family:var(--ff-h);font-weight:700;color:var(--blue);text-align:right;font-size:12px;letter-spacing:.02em;white-space:nowrap;}
-.pr-disclaimer{margin-top:22px;padding:16px 20px;border-left:2px solid var(--blue);background:rgba(30,58,95,.05);border-radius:0 4px 4px 0;max-width:760px;}
-.pr-disclaimer p{font-size:13px;color:var(--fg-2);line-height:1.6;}
-.pr-disclaimer strong{color:var(--fg);font-weight:600;}
-
-/* ─────────────── CONDITIONS & LIMITATIONS ─────────────── */
-#limits{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
-#limits .inc-grid{grid-template-columns:repeat(2,1fr);}
+/* ─────────────── CARD GRID (shared) ─────────────── */
+#why{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
+#why .inc-grid{grid-template-columns:repeat(2,1fr);}
 .inc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 .inc-card{
   background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
@@ -254,9 +184,12 @@ table.ptbl.quote tbody td:not(:first-child){font-family:var(--ff-h);font-weight:
 .inc-ico .lucide{width:23px;height:23px;stroke-width:1.8;}
 .inc-card h3{font-family:var(--ff-h);font-weight:800;font-size:16px;letter-spacing:-.01em;color:var(--fg);margin-bottom:6px;line-height:1.2;}
 .inc-card p{font-size:13px;color:var(--fg-3);line-height:1.55;}
-.limits-note{margin-top:22px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--fg-3);line-height:1.6;}
-.limits-note .lucide{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:3px;}
-.limits-note strong{color:var(--fg-2);font-weight:600;}
+
+/* ─────────────── SERVICE AREA ─────────────── */
+#area{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
+.area-wrap{max-width:820px;}
+.area-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+.area-chips span{font-family:var(--ff-h);font-weight:600;font-size:12px;letter-spacing:.03em;color:var(--blue);background:rgba(30,58,95,.06);border:1px solid rgba(30,58,95,.18);border-radius:999px;padding:8px 15px;}
 
 /* ─────────────── FINAL CTA ─────────────── */
 #cta{
@@ -273,8 +206,6 @@ table.ptbl.quote tbody td:not(:first-child){font-family:var(--ff-h);font-weight:
 #cta .btn:not(.ghost):hover{background:#e6edf5;color:var(--blue-p);border-color:#e6edf5;}
 #cta .btn.ghost{color:#fff;border-color:rgba(255,255,255,.40);background:transparent;}
 #cta .btn.ghost:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.10);}
-.cta-note{margin-top:20px;font-family:var(--ff-h);font-weight:600;font-size:11px;letter-spacing:.06em;color:var(--fg-3);}
-.cta-note a{color:#fff;border-bottom:1px solid rgba(255,255,255,.3);}
 
 /* ─────────────── FOOTER ─────────────── */
 footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,.80);--fg-3:rgba(255,255,255,.55);--fg-4:rgba(255,255,255,.40);--line:rgba(255,255,255,.10);--blue-l:#9ab4d4;border-top:1px solid rgba(255,255,255,.08);}
@@ -296,13 +227,8 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
 /* ─────────────── RESPONSIVE ─────────────── */
 @media (max-width:1000px){
   .inc-grid{grid-template-columns:1fr 1fr;}
-  .exp-card{grid-template-columns:1fr;text-align:center;gap:24px;justify-items:center;}
-  .exp-body p{margin:0 auto;}
 }
-@media (max-width:860px){
-  .tier-grid{grid-template-columns:1fr;}
-}
-@media (max-width:1023px){
+@media (max-width:1099px){
   .nav-links{display:none;}
   .hbg{display:flex;}
 }
@@ -312,9 +238,7 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
 @media (max-width:560px){
   .nav-right .btn{display:none;}
   .inc-grid{grid-template-columns:1fr;}
-  #limits .inc-grid{grid-template-columns:1fr;}
-  table.ptbl thead th,table.ptbl tbody td{padding:13px 14px;}
-  table.ptbl.quote tbody td:not(:first-child){font-size:10.5px;}
+  #why .inc-grid{grid-template-columns:1fr;}
   .hero-actions{flex-direction:column;width:100%;max-width:300px;margin:0 auto;}
   .hero-actions .btn{width:100%;}
   .cta-actions{flex-direction:column;width:100%;max-width:300px;margin:0 auto;}
@@ -330,7 +254,7 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   #hero{padding-top:calc(var(--nav-h) + var(--promo-h) + 128px);padding-bottom:120px;}
   .hero-h1{font-size:clamp(56px,7vw,104px);}
   @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
-    .inc-card,.rec-card,.tier-card,.pr-card{
+    .inc-card{
       background:var(--v2-glass);
       -webkit-backdrop-filter:blur(16px) saturate(150%);
       backdrop-filter:blur(16px) saturate(150%);
@@ -338,7 +262,7 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
       box-shadow:0 10px 34px rgba(10,10,10,.07),inset 0 1px 0 rgba(255,255,255,.55);
     }
   }
-  .inc-card:hover,.rec-card:hover,.tier-card:hover{transform:translateY(-6px);}
+  .inc-card:hover{transform:translateY(-6px);}
 }
 
 /* Mobile — lightweight & fast: compressed rhythm, tap-friendly, minimal motion */
@@ -347,9 +271,8 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   .btn{min-height:48px;}
   .btn.sm{min-height:44px;}
   .nav-phone{min-height:44px;}
-  .tier-cta{min-height:44px;}
-  .inc-card,.rec-card,.tier-card,.pr-card{transition:none;}
-  .inc-card:hover,.rec-card:hover,.tier-card:hover{transform:none;box-shadow:var(--shadow-card);}
+  .inc-card{transition:none;}
+  .inc-card:hover{transform:none;box-shadow:var(--shadow-card);}
   .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
 }
 
@@ -359,13 +282,6 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   html{scroll-behavior:auto !important;}
   .reveal{opacity:1 !important;transform:none !important;}
 }
-
-/* ═══════════════ MEDIA SLOT — hero image ═══════════════ */
-/* Populated at runtime from /api/media; empty container keeps the gradient. */
-.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
-.hero-media:empty{display:none;}
-.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
-.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.42) 0%,rgba(15,28,47,.58) 55%,rgba(30,58,95,.76) 100%);}
 </style>
 </head>
 <body>
@@ -394,215 +310,121 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </span>
   </a>
   <div class="nav-links" role="navigation">
-    <a href="#tiers">Services</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#limits">Conditions</a>
-    <a href="rv-detailing.html">RVs</a>
+    <a href="index.html#services">Services</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="reviews.html">Reviews</a>
+    <a href="faq.html">FAQ</a>
+    <a href="about.html" class="active">About</a>
     <a href="index.html">Main Site</a>
   </div>
   <div class="nav-right">
     <a href="tel:+12169034783" class="nav-phone" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i>(216) 903-4783</a>
-    <a href="#cta" class="btn sm">Get a Quote</a>
+    <a href="booking.html" class="btn sm">Book Now</a>
     <button class="hbg" id="hbg" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div id="drawer">
-  <a href="#tiers">Services <i data-lucide="arrow-right"></i></a>
-  <a href="#pricing">Pricing <i data-lucide="arrow-right"></i></a>
-  <a href="#limits">Conditions <i data-lucide="arrow-right"></i></a>
-  <a href="rv-detailing.html">RV Detailing <i data-lucide="arrow-right"></i></a>
+  <a href="index.html#services">Services <i data-lucide="arrow-right"></i></a>
+  <a href="gallery.html">Gallery <i data-lucide="arrow-right"></i></a>
+  <a href="reviews.html">Reviews <i data-lucide="arrow-right"></i></a>
+  <a href="faq.html">FAQ <i data-lucide="arrow-right"></i></a>
+  <a href="about.html">About <i data-lucide="arrow-right"></i></a>
   <a href="index.html">Main Site <i data-lucide="arrow-right"></i></a>
-  <a href="#cta" class="btn" style="margin-top:16px;justify-content:center;">Get a Boat Quote</a>
+  <a href="booking.html" class="btn" style="margin-top:16px;justify-content:center;">Book Now</a>
 </div>
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
-  <div class="hero-media" id="heroMedia"></div>
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-inner">
     <span class="hero-tag-row">
-      <i data-lucide="sailboat"></i>
-      <span>Jet Skis &middot; Fishing Boats &middot; Pontoons &middot; Cruisers</span>
+      <i data-lucide="user-round"></i>
+      <span>Owner-Operated &middot; Chardon, Ohio</span>
     </span>
-    <h1 class="hero-h1">Boats &amp; Watercraft,<br>Detailed <span class="accent">Bow to Stern</span></h1>
+    <h1 class="hero-h1">One Detailer,<br><span class="accent">Every Detail</span></h1>
     <p class="hero-sub">
-      From jet skis to cabin cruisers &mdash; a thorough, professional clean for your boat,
-      on the trailer or at the dock. Two service tiers, priced by size and condition, and
-      <strong style="color:#fff;">we come to you</strong>.
+      Tony's Detailing is owner-operated &mdash; the same set of hands on every job, bringing
+      meticulous, showroom-quality detailing right to your driveway across
+      <strong style="color:#fff;">Geauga &amp; Lake County</strong>.
     </p>
     <div class="hero-actions">
-      <a href="#cta" class="btn xl">Get a Quote <i data-lucide="arrow-right"></i></a>
-      <a href="#tiers" class="btn ghost lg">View Services</a>
-      <a href="#pricing" class="btn ghost lg">See Pricing</a>
+      <a href="booking.html" class="btn xl">Book Now <i data-lucide="calendar-check"></i></a>
+      <a href="gallery.html" class="btn ghost lg">See Our Work</a>
     </div>
   </div>
 </section>
 
-<!-- ─────────────── SERVICE TIERS ─────────────── -->
-<section id="tiers">
+<!-- ─────────────── STORY ─────────────── -->
+<section id="story">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Boat &amp; Watercraft Care</span>
-      <h2>Two Service Tiers</h2>
-      <p>A straightforward refresh or a full, intensive deep clean &mdash; both cover the whole boat, inside and out. Choose the level your boat needs.</p>
+      <span class="eyebrow">The Story</span>
+      <h2>Meet Tony</h2>
+      <p>No rotating crews, no franchise playbook &mdash; just one detailer who treats every vehicle like his own.</p>
     </div>
-    <div class="tier-grid">
-      <article class="tier-card">
-        <div class="tier-icon"><i data-lucide="droplets"></i></div>
-        <div class="tier-kicker">Tier 01 &middot; Boat &amp; Watercraft</div>
-        <h3 class="tier-name">Basic Detail</h3>
-        <p class="tier-desc">A complete top-to-bottom clean that brings your boat back to a fresh, water-ready condition.</p>
-        <ul class="tier-feat">
-          <li><i data-lucide="check"></i>Full exterior wash &amp; hand dry (above waterline)</li>
-          <li><i data-lucide="check"></i>Hull, deck &amp; trailer rinse-off</li>
-          <li><i data-lucide="check"></i>Vinyl seats &amp; surfaces wiped down</li>
-          <li><i data-lucide="check"></i>Full interior vacuum &mdash; carpet, compartments</li>
-          <li><i data-lucide="check"></i>Console &amp; dash wipe-down</li>
-          <li><i data-lucide="check"></i>Glass / windshield clean &amp; deodorize</li>
-          <li><i data-lucide="check"></i>Steam clean &amp; hot water extraction if needed*</li>
-        </ul>
-        <div class="tier-foot">
-          <div class="tier-price-row">
-            <span class="tier-price-lbl">Pricing</span>
-            <span class="tier-price">Contact for Quote</span>
-          </div>
-          <a href="#cta" class="tier-cta">Get Quote<i data-lucide="arrow-right"></i></a>
-        </div>
-      </article>
-      <article class="tier-card">
-        <div class="tier-icon"><i data-lucide="sparkles"></i></div>
-        <div class="tier-kicker">Tier 02 &middot; Most Intensive</div>
-        <h3 class="tier-name">Deep Detail</h3>
-        <span class="tier-badge"><i data-lucide="clock"></i>1&ndash;2 Day Service</span>
-        <p class="tier-desc">Everything in a Basic Detail, plus decontamination, vinyl conditioning, protection, and a full interior steam clean &amp; extraction as standard.</p>
-        <ul class="tier-feat">
-          <li><i data-lucide="check"></i>Everything in Basic Detail</li>
-          <li><i data-lucide="check"></i>Waterline / scum-line treatment</li>
-          <li><i data-lucide="check"></i>Vinyl &amp; upholstery deep clean + conditioning</li>
-          <li><i data-lucide="check"></i>Mildew treatment on soft surfaces</li>
-          <li><i data-lucide="check"></i>Full surface protectant</li>
-          <li><i data-lucide="check"></i>Interior steam clean &amp; hot water extraction &mdash; standard</li>
-        </ul>
-        <div class="tier-foot">
-          <div class="tier-price-row">
-            <span class="tier-price-lbl">Pricing</span>
-            <span class="tier-price">Contact for Quote</span>
-          </div>
-          <a href="#cta" class="tier-cta">Get Quote<i data-lucide="arrow-right"></i></a>
-        </div>
-      </article>
-    </div>
-    <p class="tier-note"><strong>*</strong>On a Basic Detail, steam cleaning and hot water extraction are included only where needed &mdash; a condition upcharge applies. On a Deep Detail, both are standard.</p>
-  </div>
-</section>
-
-<!-- ─────────────── PLAN-AHEAD CALLOUT ─────────────── -->
-<section id="timeline">
-  <div class="wrap">
-    <div class="exp-card">
-      <div class="exp-badge"><i data-lucide="clock"></i></div>
-      <div class="exp-body">
-        <div class="amt">Please Plan Ahead &mdash; <span class="b">Deep Detail May Take 1&ndash;2 Days</span></div>
-        <p>
-          On larger boats &mdash; pontoons, cruisers, and anything with cabin space &mdash; the added
-          decontamination, steam cleaning, and hot water extraction mean a <strong>Deep Detail can take
-          one to two days</strong> depending on size and condition. We detail your boat wherever it sits:
-          <strong>on the trailer, in your driveway, or at the dock</strong>. We'll confirm the expected
-          timeline with you when we quote the job.
-        </p>
-      </div>
-      <div class="exp-cta">
-        <a href="#cta" class="btn lg">Get a Quote <i data-lucide="arrow-right"></i></a>
-      </div>
+    <div class="prose">
+      <p>Tony's Detailing started with a simple idea: <strong>do fewer cars, but do them right.</strong> Every booking is handled personally by Tony &mdash; from the first walk-around to the final wipe-down &mdash; so the quality never changes hands.</p>
+      <p>Being <strong>fully mobile</strong> means we come to your home or office with everything needed on board. You don't rearrange your day or drop your car at a shop &mdash; we set up in your driveway and get to work.</p>
+      <p>We're upfront about what a detail can and can't do, we confirm your quote before we start, and we take <strong>before-and-after photos on every job</strong> &mdash; for your records and ours. It's detailing you can trust, from someone who stakes his name on it.</p>
     </div>
   </div>
 </section>
 
-<!-- ─────────────── PRICING ─────────────── -->
-<section id="pricing">
+<!-- ─────────────── WHY OWNER-OPERATED ─────────────── -->
+<section id="why">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Transparent Pricing</span>
-      <h2>Pricing &amp; Upcharges</h2>
-      <p>Every boat is different, so pricing is based on size, layout, and condition. Reach out and we'll put together a quote &mdash; confirmed before any work begins.</p>
-    </div>
-    <div class="pr-stack">
-      <div class="pr-card">
-        <div class="pr-head">
-          <i data-lucide="sailboat"></i>
-          <h3>Pricing by Boat Size</h3>
-          <span class="pr-pill">By Size</span>
-        </div>
-        <table class="ptbl quote">
-          <thead>
-            <tr><th>Boat Type</th><th>Basic Detail</th><th>Deep Detail</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Jet Ski / PWC</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
-            <tr><td>Fishing Boat</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
-            <tr><td>Bowrider / Runabout</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
-            <tr><td>Pontoon / Tritoon</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
-            <tr><td>Cabin Cruiser / Wake Boat</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pr-card">
-        <div class="pr-head">
-          <i data-lucide="file-text"></i>
-          <h3>Condition Upcharges</h3>
-          <span class="pr-pill">Varies</span>
-        </div>
-        <table class="ptbl">
-          <thead>
-            <tr><th>Condition</th><th>Adjustment</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Waterline scum / hard-water buildup</td><td>Quoted</td></tr>
-            <tr><td>Mildew / mold treatment</td><td>Quoted</td></tr>
-            <tr><td>Pet hair</td><td>Quoted</td></tr>
-            <tr><td>Heavy staining</td><td>Quoted</td></tr>
-            <tr><td>Smoke / odor treatment</td><td>Quoted</td></tr>
-            <tr><td>Biological / hazmat</td><td>Quoted</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="pr-disclaimer">
-      <p><strong>Final quote given before work begins.</strong> Pricing varies by boat size and overall condition. Condition upcharges &mdash; including the steam cleaning and hot water extraction on a Basic Detail &mdash; are confirmed after a walk-around, and you'll approve any adjustments first.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ─────────────── CONDITIONS & LIMITATIONS ─────────────── -->
-<section id="limits">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Conditions &amp; Limitations</span>
-      <h2>An Honest Note On Results</h2>
-      <p>We work to deliver the best possible result on every boat &mdash; but there are limits to what a single service can resolve. We tell you up front, on arrival, what's realistic for your boat.</p>
+      <span class="eyebrow">Why It Matters</span>
+      <h2>The Owner-Operated Difference</h2>
+      <p>When one person owns the result, the details don't slip through the cracks.</p>
     </div>
     <div class="inc-grid">
       <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="layers"></i></div>
-        <div><h3>Permanent stains may persist</h3><p>Some vinyl, carpet, and cushion stains have set in and won't fully release, even with steam cleaning and extraction.</p></div>
+        <div class="inc-ico"><i data-lucide="hand"></i></div>
+        <div><h3>One Set of Hands</h3><p>The person who quotes your detail is the person who does it &mdash; consistent results, every visit.</p></div>
       </div>
       <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="wind"></i></div>
-        <div><h3>Mildew &amp; odors may need multiple passes</h3><p>Mildew, mold, and musty odors that have absorbed into soft surfaces may require repeat treatment or specialized equipment to fully address.</p></div>
+        <div class="inc-ico"><i data-lucide="search-check"></i></div>
+        <div><h3>Meticulous by Default</h3><p>Vents, seams, door jambs, and the spots most crews skip &mdash; because it's my name on the work.</p></div>
       </div>
       <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="sun"></i></div>
-        <div><h3>Heavy oxidation is a restoration job</h3><p>A detail won't remove heavy gel-coat oxidation or deep sun fading. Where restoration is possible, we'll tell you on arrival and quote it separately.</p></div>
+        <div class="inc-ico"><i data-lucide="badge-dollar-sign"></i></div>
+        <div><h3>Honest Quotes</h3><p>Your price is confirmed on arrival, before any work begins. No surprises at the end.</p></div>
       </div>
       <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="camera"></i></div>
-        <div><h3>Everything assessed on arrival</h3><p>Before any work begins, we walk the boat with you, photograph the starting condition, and confirm scope, timeline, and any condition upcharges.</p></div>
+        <div class="inc-ico"><i data-lucide="truck"></i></div>
+        <div><h3>We Come To You</h3><p>Fully mobile with everything on board &mdash; home or office, your driveway becomes the detail bay.</p></div>
       </div>
     </div>
-    <div class="limits-note">
-      <i data-lucide="camera"></i>
-      <span><strong>Photos are taken before and after every service</strong> as standard practice &mdash; for your records and ours.</span>
+  </div>
+</section>
+
+<!-- ─────────────── SERVICE AREA ─────────────── -->
+<section id="area">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Where We Work</span>
+      <h2>Serving Geauga &amp; Lake County</h2>
+      <p>Based in Chardon and mobile across Geauga and Lake County, plus the premium east-side Cleveland suburbs. Not sure if you're in range? Just ask &mdash; we'll let you know.</p>
+    </div>
+    <div class="area-wrap">
+      <div class="area-chips">
+        <span>Chardon</span>
+        <span>Chesterland</span>
+        <span>Chagrin Falls</span>
+        <span>Gates Mills</span>
+        <span>Kirtland</span>
+        <span>Hunting Valley</span>
+        <span>Waite Hill</span>
+        <span>Willoughby</span>
+        <span>Mentor</span>
+        <span>Concord</span>
+        <span>Painesville</span>
+        <span>Munson</span>
+        <span>Novelty</span>
+        <span>Russell</span>
+      </div>
     </div>
   </div>
 </section>
@@ -611,13 +433,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="cta">
   <div class="wrap">
     <div class="cta-inner">
-      <h2>Book Your Boat Detail</h2>
-      <p>Email is the fastest way to reach us &mdash; tell us your boat's type, length, and condition and we'll put together a quote, confirmed before any work begins.</p>
+      <h2>Ready For a Showroom-Clean Ride?</h2>
+      <p>Book online in under two minutes &mdash; Tony will confirm within 24 hours and come to you.</p>
       <div class="cta-actions">
-        <a href="mailto:tonysdetailing.net@gmail.com?subject=Boat%20Detailing%20Quote" class="btn xl">Email For A Quote <i data-lucide="mail"></i></a>
+        <a href="booking.html" class="btn xl">Book Your Detail <i data-lucide="arrow-right"></i></a>
         <a href="tel:+12169034783" class="btn ghost lg" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})">Call (216) 903-4783 <i data-lucide="phone"></i></a>
       </div>
-      <div class="cta-note">Booking a car or SUV instead? <a href="index.html#booking">Book a standard detail on our main site</a>.</div>
     </div>
   </div>
 </section>
@@ -632,21 +453,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </a>
       <div class="foot-links">
         <a href="index.html#services">Services</a>
-        <a href="index.html#pricing">Pricing</a>
-        <a href="deep-clean.html">Deep Clean</a>
-        <a href="rv-detailing.html">RVs</a>
-        <a href="boat-detailing.html">Boats</a>
         <a href="gallery.html">Gallery</a>
         <a href="reviews.html">Reviews</a>
         <a href="faq.html">FAQ</a>
         <a href="about.html">About</a>
+        <a href="deep-clean.html">Deep Clean</a>
+        <a href="rv-detailing.html">RVs</a>
+        <a href="boat-detailing.html">Boats</a>
         <a href="booking.html">Book Now</a>
         <a href="index.html#contact">Contact</a>
       </div>
     </div>
     <div class="foot-bottom">
       &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
-      Prices subject to change. Results may vary based on boat condition. Final quote confirmed before work begins. &middot; v2
+      Owner-operated mobile detailing serving Geauga &amp; Lake County, Ohio. &middot; v2
     </div>
   </div>
 </footer>
@@ -688,7 +508,7 @@ if (hbg && drawer){
 (function(){
   const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
-    '.section-head, .tier-card, .tier-note, .exp-card, .pr-card, .pr-disclaimer, .inc-card, .limits-note, .cta-inner'
+    '.section-head, .prose, .inc-card, .area-chips, .cta-inner'
   ));
   if (!targets.length) return;
   if (reduce || !('IntersectionObserver' in window)){
@@ -717,21 +537,6 @@ if (hbg && drawer){
 
 // ── Icons ──
 if (window.lucide) lucide.createIcons();
-</script>
-
-<!-- ─────────────── MEDIA SLOT (hero image) ─────────────── -->
-<script>
-(function(){
-  var host = document.getElementById('heroMedia');
-  if (!host) return;
-  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
-    if (media['boat-hero.jpg']){
-      var img = document.createElement('img');
-      img.src = '/static/media/boat-hero.jpg'; img.alt = ''; img.decoding = 'async';
-      host.appendChild(img);
-    }
-  }).catch(function(){ /* no manifest — keep the gradient */ });
-})();
 </script>
 </body>
 </html>
