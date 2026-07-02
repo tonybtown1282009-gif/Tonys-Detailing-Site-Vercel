@@ -18,8 +18,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Ultimate Deep Clean — Tony's Detailing | Mobile Detailing, Chardon OH</title>
-<meta name="description" content="Tony's Detailing Deep Clean — a complete interior reset with clay & iron decontamination, carpet shampoo, steam clean, upholstery extraction and odor elimination. $50 off for expecting & new parents. We come to you in Chardon, OH.">
+<title>Boat Detailing — Tony's Detailing | Mobile Detailing, Chardon OH</title>
+<meta name="description" content="Professional mobile boat detailing in Chardon, Ohio. Basic and Deep Detail packages for jet skis, fishing boats, pontoons, and cabin cruisers — on the trailer or at the dock. Contact for a quote.">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>try{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}catch(e){}</script>
 <style>
@@ -154,7 +154,7 @@ a{color:inherit;text-decoration:none;}
 .hero-tag-row{display:inline-flex;align-items:center;gap:14px;padding:7px 16px;border:1px solid var(--line-2);border-radius:999px;background:rgba(255,255,255,.06);margin-bottom:30px;}
 .hero-tag-row .lucide{width:13px;height:13px;color:var(--blue-l);}
 .hero-tag-row span{font-family:var(--ff-h);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);}
-.hero-h1{font-family:var(--ff-h);font-weight:800;font-size:clamp(44px,8.4vw,104px);line-height:.94;letter-spacing:-.04em;text-transform:uppercase;color:var(--fg);text-wrap:balance;margin-bottom:26px;}
+.hero-h1{font-family:var(--ff-h);font-weight:800;font-size:clamp(40px,7.4vw,92px);line-height:.96;letter-spacing:-.04em;text-transform:uppercase;color:var(--fg);text-wrap:balance;margin-bottom:26px;}
 .hero-h1 .accent{color:var(--blue-l);font-style:italic;font-weight:600;text-transform:none;letter-spacing:-.03em;}
 .hero-sub{font-size:clamp(16px,1.7vw,20px);color:var(--fg-2);line-height:1.6;max-width:640px;margin:0 auto 38px;text-wrap:balance;}
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
@@ -163,36 +163,39 @@ a{color:inherit;text-decoration:none;}
 #hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.40);}
 #hero .btn.ghost:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.10);}
 
-/* ─────────────── INCLUDED ─────────────── */
-#included{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
-.inc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.inc-card{
-  background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
-  padding:28px 24px;display:flex;align-items:flex-start;gap:16px;
+/* ─────────────── SERVICE TIERS ─────────────── */
+#tiers{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
+.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.tier-card{
+  position:relative;background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+  padding:30px 26px 24px;display:flex;flex-direction:column;overflow:hidden;
   transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);
 }
-.inc-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 16px 34px rgba(0,0,0,.10);}
-.inc-ico{width:50px;height:50px;border-radius:10px;flex-shrink:0;background:rgba(30,58,95,.07);border:1px solid rgba(30,58,95,.18);color:var(--blue);display:flex;align-items:center;justify-content:center;}
-.inc-ico .lucide{width:23px;height:23px;stroke-width:1.8;}
-.inc-card h3{font-family:var(--ff-h);font-weight:800;font-size:16px;letter-spacing:-.01em;color:var(--fg);margin-bottom:6px;line-height:1.2;}
-.inc-card p{font-size:13px;color:var(--fg-3);line-height:1.55;}
+.tier-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 14px 32px rgba(0,0,0,.10),0 0 0 1px rgba(30,58,95,.14);}
+.tier-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue);transform:scaleX(.18);transform-origin:left;transition:transform 360ms var(--ease);}
+.tier-card:hover::before{transform:scaleX(1);}
+.tier-icon{width:52px;height:52px;border-radius:6px;background:rgba(30,58,95,.07);border:1px solid rgba(30,58,95,.18);display:flex;align-items:center;justify-content:center;color:var(--blue);margin-bottom:22px;}
+.tier-icon .lucide{width:22px;height:22px;stroke-width:1.75;}
+.tier-kicker{font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
+.tier-name{font-family:var(--ff-h);font-weight:800;font-size:23px;line-height:1.05;letter-spacing:-.015em;color:var(--fg);margin-bottom:10px;}
+.tier-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-h);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:5px 10px;border-radius:999px;border:1px solid rgba(30,58,95,.24);background:rgba(30,58,95,.06);margin-bottom:12px;align-self:flex-start;}
+.tier-badge .lucide{width:11px;height:11px;}
+.tier-desc{font-size:13.5px;color:var(--fg-3);line-height:1.6;margin-bottom:20px;}
+.tier-feat{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px;flex:1;}
+.tier-feat li{font-size:13px;color:var(--fg-2);display:flex;align-items:flex-start;gap:9px;line-height:1.45;}
+.tier-feat li .lucide{width:13px;height:13px;color:var(--blue);flex-shrink:0;margin-top:2px;stroke-width:2.5;}
+.tier-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:auto;padding-top:20px;border-top:1px solid var(--line);}
+.tier-price-row{display:flex;flex-direction:column;gap:2px;}
+.tier-price-lbl{font-family:var(--ff-h);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-4);}
+.tier-price{font-family:var(--ff-h);font-weight:800;font-size:16px;color:var(--fg);letter-spacing:-.01em;}
+.tier-cta{display:inline-flex;align-items:center;gap:6px;font-family:var(--ff-h);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#fff;padding:9px 14px;border-radius:4px;background:var(--blue);transition:background 180ms var(--ease);}
+.tier-cta:hover{background:var(--blue-h);}
+.tier-cta .lucide{width:11px;height:11px;}
+.tier-note{margin-top:18px;font-size:12.5px;color:var(--fg-3);line-height:1.6;}
+.tier-note strong{color:var(--fg-2);font-weight:600;}
 
-/* ─────────────── RECOMMENDED FOR ─────────────── */
-#recommended{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
-.rec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-.rec-card{
-  background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
-  padding:30px 24px;text-align:center;
-  transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);
-}
-.rec-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 16px 34px rgba(0,0,0,.10);}
-.rec-ico{width:60px;height:60px;border-radius:50%;margin:0 auto 18px;background:linear-gradient(160deg,var(--blue),var(--blue-h));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(30,58,95,.24);}
-.rec-ico .lucide{width:26px;height:26px;stroke-width:1.85;}
-.rec-card h3{font-family:var(--ff-h);font-weight:800;font-size:16px;letter-spacing:-.01em;color:var(--fg);line-height:1.25;}
-.rec-card p{font-size:13px;color:var(--fg-3);line-height:1.55;margin-top:8px;}
-
-/* ─────────────── EXPECTING CALLOUT ─────────────── */
-#expecting{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
+/* ─────────────── PLAN-AHEAD CALLOUT ─────────────── */
+#timeline{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
 .exp-card{
   position:relative;overflow:hidden;
   background:var(--blue);
@@ -206,7 +209,7 @@ a{color:inherit;text-decoration:none;}
 .exp-badge{position:relative;width:96px;height:96px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;color:#fff;}
 .exp-badge .lucide{width:42px;height:42px;stroke-width:1.6;}
 .exp-body{position:relative;}
-.exp-body .amt{font-family:var(--ff-h);font-weight:800;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.02em;color:#fff;line-height:1.05;margin-bottom:12px;}
+.exp-body .amt{font-family:var(--ff-h);font-weight:800;font-size:clamp(24px,3.2vw,36px);letter-spacing:-.02em;color:#fff;line-height:1.1;margin-bottom:12px;}
 .exp-body .amt .b{color:var(--blue-l);}
 .exp-body p{font-size:15px;color:var(--fg-2);line-height:1.65;max-width:560px;}
 .exp-body p strong{color:#fff;font-weight:600;}
@@ -216,6 +219,7 @@ a{color:inherit;text-decoration:none;}
 
 /* ─────────────── PRICING ─────────────── */
 #pricing{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
+.pr-stack{display:flex;flex-direction:column;gap:22px;max-width:760px;}
 .pr-card{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);overflow:hidden;max-width:760px;}
 .pr-head{display:flex;align-items:center;gap:10px;padding:18px 22px;background:linear-gradient(180deg,rgba(30,58,95,.08),rgba(30,58,95,.02));border-bottom:1px solid var(--line);}
 .pr-head .lucide{width:15px;height:15px;color:var(--blue);}
@@ -230,9 +234,29 @@ table.ptbl tbody tr:last-child td{border-bottom:none;}
 table.ptbl tbody tr:hover td{background:rgba(45,85,144,.06);}
 table.ptbl tbody td:first-child{color:var(--fg);font-weight:500;}
 table.ptbl tbody td:last-child{font-family:var(--ff-h);font-weight:800;color:var(--blue);text-align:right;font-size:17px;}
+table.ptbl.quote thead th:not(:first-child){text-align:right;}
+table.ptbl.quote tbody td:not(:first-child){font-family:var(--ff-h);font-weight:700;color:var(--blue);text-align:right;font-size:12px;letter-spacing:.02em;white-space:nowrap;}
 .pr-disclaimer{margin-top:22px;padding:16px 20px;border-left:2px solid var(--blue);background:rgba(30,58,95,.05);border-radius:0 4px 4px 0;max-width:760px;}
 .pr-disclaimer p{font-size:13px;color:var(--fg-2);line-height:1.6;}
 .pr-disclaimer strong{color:var(--fg);font-weight:600;}
+
+/* ─────────────── CONDITIONS & LIMITATIONS ─────────────── */
+#limits{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
+#limits .inc-grid{grid-template-columns:repeat(2,1fr);}
+.inc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.inc-card{
+  background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+  padding:28px 24px;display:flex;align-items:flex-start;gap:16px;
+  transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);
+}
+.inc-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 16px 34px rgba(0,0,0,.10);}
+.inc-ico{width:50px;height:50px;border-radius:10px;flex-shrink:0;background:rgba(30,58,95,.07);border:1px solid rgba(30,58,95,.18);color:var(--blue);display:flex;align-items:center;justify-content:center;}
+.inc-ico .lucide{width:23px;height:23px;stroke-width:1.8;}
+.inc-card h3{font-family:var(--ff-h);font-weight:800;font-size:16px;letter-spacing:-.01em;color:var(--fg);margin-bottom:6px;line-height:1.2;}
+.inc-card p{font-size:13px;color:var(--fg-3);line-height:1.55;}
+.limits-note{margin-top:22px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--fg-3);line-height:1.6;}
+.limits-note .lucide{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:3px;}
+.limits-note strong{color:var(--fg-2);font-weight:600;}
 
 /* ─────────────── FINAL CTA ─────────────── */
 #cta{
@@ -243,9 +267,12 @@ table.ptbl tbody td:last-child{font-family:var(--ff-h);font-weight:800;color:var
 #cta::before{content:"";position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:min(800px,90vw);height:480px;background:radial-gradient(ellipse at center,rgba(120,160,210,.22),transparent 64%);filter:blur(20px);pointer-events:none;}
 .cta-inner{position:relative;z-index:1;max-width:680px;margin:0 auto;}
 .cta-inner h2{font-family:var(--ff-h);font-weight:800;font-size:clamp(30px,4.6vw,52px);line-height:1.02;letter-spacing:-.03em;text-transform:uppercase;color:#fff;margin-bottom:16px;text-wrap:balance;}
-.cta-inner p{font-size:clamp(15px,1.6vw,18px);color:var(--fg-2);line-height:1.6;max-width:520px;margin:0 auto 32px;}
-#cta .btn{background:#fff;color:var(--blue);border-color:#fff;}
-#cta .btn:hover{background:#e6edf5;color:var(--blue-p);border-color:#e6edf5;}
+.cta-inner p{font-size:clamp(15px,1.6vw,18px);color:var(--fg-2);line-height:1.6;max-width:560px;margin:0 auto 32px;}
+.cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+#cta .btn:not(.ghost){background:#fff;color:var(--blue);border-color:#fff;}
+#cta .btn:not(.ghost):hover{background:#e6edf5;color:var(--blue-p);border-color:#e6edf5;}
+#cta .btn.ghost{color:#fff;border-color:rgba(255,255,255,.40);background:transparent;}
+#cta .btn.ghost:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.10);}
 .cta-note{margin-top:20px;font-family:var(--ff-h);font-weight:600;font-size:11px;letter-spacing:.06em;color:var(--fg-3);}
 .cta-note a{color:#fff;border-bottom:1px solid rgba(255,255,255,.3);}
 
@@ -269,21 +296,29 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
 /* ─────────────── RESPONSIVE ─────────────── */
 @media (max-width:1000px){
   .inc-grid{grid-template-columns:1fr 1fr;}
-  .rec-grid{grid-template-columns:1fr 1fr;}
   .exp-card{grid-template-columns:1fr;text-align:center;gap:24px;justify-items:center;}
   .exp-body p{margin:0 auto;}
 }
-@media (max-width:720px){
+@media (max-width:860px){
+  .tier-grid{grid-template-columns:1fr;}
+}
+@media (max-width:1023px){
   .nav-links{display:none;}
-  .nav-phone{display:none;}
   .hbg{display:flex;}
 }
+@media (max-width:720px){
+  .nav-phone{display:none;}
+}
 @media (max-width:560px){
+  .nav-right .btn{display:none;}
   .inc-grid{grid-template-columns:1fr;}
-  .rec-grid{grid-template-columns:1fr;}
-  table.ptbl thead th,table.ptbl tbody td{padding:13px 16px;}
+  #limits .inc-grid{grid-template-columns:1fr;}
+  table.ptbl thead th,table.ptbl tbody td{padding:13px 14px;}
+  table.ptbl.quote tbody td:not(:first-child){font-size:10.5px;}
   .hero-actions{flex-direction:column;width:100%;max-width:300px;margin:0 auto;}
   .hero-actions .btn{width:100%;}
+  .cta-actions{flex-direction:column;width:100%;max-width:300px;margin:0 auto;}
+  .cta-actions .btn{width:100%;}
 }
 
 /* ═══════════════ VERSION 2 UI — mobile-light / desktop-premium ═══════════════ */
@@ -324,6 +359,13 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   html{scroll-behavior:auto !important;}
   .reveal{opacity:1 !important;transform:none !important;}
 }
+
+/* ═══════════════ MEDIA SLOT — hero image ═══════════════ */
+/* Populated at runtime from /api/media; empty container keeps the gradient. */
+.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
+.hero-media:empty{display:none;}
+.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.42) 0%,rgba(15,28,47,.58) 55%,rgba(30,58,95,.76) 100%);}
 </style>
 </head>
 <body>
@@ -334,7 +376,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─────────────── PROMO BANNER ─────────────── -->
 <div id="promo">
-  <a href="booking.html?service=Deep+Clean" class="promo-link">
+  <a href="index.html#booking" class="promo-link">
     <i data-lucide="badge-percent"></i>
     <span><span class="label-full">Limited-Time Sale &mdash; </span><span class="promo-em">15% Off</span> Your Next Detail</span>
     <i data-lucide="arrow-right" class="arr"></i>
@@ -352,136 +394,126 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </span>
   </a>
   <div class="nav-links" role="navigation">
-    <a href="index.html#services">Services</a>
-    <a href="index.html#pricing">Pricing</a>
-    <a href="deep-clean.html" class="active">Deep Clean</a>
-    <a href="index.html#area">Service Area</a>
-    <a href="index.html#contact">Contact</a>
+    <a href="#tiers">Services</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#limits">Conditions</a>
+    <a href="rv-detailing.html">RVs</a>
+    <a href="index.html">Main Site</a>
   </div>
   <div class="nav-right">
     <a href="tel:+12169034783" class="nav-phone" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i>(216) 903-4783</a>
-    <a href="booking.html?service=Deep+Clean" class="btn sm">Book Now</a>
+    <a href="#cta" class="btn sm">Get a Quote</a>
     <button class="hbg" id="hbg" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div id="drawer">
-  <a href="index.html#services">Services <i data-lucide="arrow-right"></i></a>
-  <a href="index.html#pricing">Pricing <i data-lucide="arrow-right"></i></a>
-  <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right"></i></a>
-  <a href="index.html#area">Service Area <i data-lucide="arrow-right"></i></a>
-  <a href="index.html#contact">Contact <i data-lucide="arrow-right"></i></a>
-  <a href="booking.html?service=Deep+Clean" class="btn" style="margin-top:16px;justify-content:center;">Book Your Deep Clean</a>
+  <a href="#tiers">Services <i data-lucide="arrow-right"></i></a>
+  <a href="#pricing">Pricing <i data-lucide="arrow-right"></i></a>
+  <a href="#limits">Conditions <i data-lucide="arrow-right"></i></a>
+  <a href="rv-detailing.html">RV Detailing <i data-lucide="arrow-right"></i></a>
+  <a href="index.html">Main Site <i data-lucide="arrow-right"></i></a>
+  <a href="#cta" class="btn" style="margin-top:16px;justify-content:center;">Get a Boat Quote</a>
 </div>
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
+  <div class="hero-media" id="heroMedia"></div>
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-inner">
     <span class="hero-tag-row">
-      <i data-lucide="sparkles"></i>
-      <span>Our Most Intensive Service</span>
+      <i data-lucide="sailboat"></i>
+      <span>Jet Skis &middot; Fishing Boats &middot; Pontoons &middot; Cruisers</span>
     </span>
-    <h1 class="hero-h1">The Ultimate <span class="accent">Deep Clean</span></h1>
+    <h1 class="hero-h1">Boats &amp; Watercraft,<br>Detailed <span class="accent">Bow to Stern</span></h1>
     <p class="hero-sub">
-      A complete, like-new reset for your vehicle's interior and exterior. Perfect for
-      <strong style="color:#fff;">new &amp; expecting parents</strong>, pet owners, and anyone
-      buying or selling a vehicle &mdash; and we bring it right to your driveway.
+      From jet skis to cabin cruisers &mdash; a thorough, professional clean for your boat,
+      on the trailer or at the dock. Two service tiers, priced by size and condition, and
+      <strong style="color:#fff;">we come to you</strong>.
     </p>
     <div class="hero-actions">
-      <a href="booking.html?service=Deep+Clean" class="btn xl">Book Your Deep Clean <i data-lucide="calendar-check"></i></a>
-      <a href="#included" class="btn ghost lg">What's Included</a>
+      <a href="#cta" class="btn xl">Get a Quote <i data-lucide="arrow-right"></i></a>
+      <a href="#tiers" class="btn ghost lg">View Services</a>
+      <a href="#pricing" class="btn ghost lg">See Pricing</a>
     </div>
   </div>
 </section>
 
-<!-- ─────────────── WHAT'S INCLUDED ─────────────── -->
-<section id="included">
+<!-- ─────────────── SERVICE TIERS ─────────────── -->
+<section id="tiers">
   <div class="wrap">
-    <div class="section-head center">
-      <span class="eyebrow">Every Deep Clean Includes</span>
-      <h2>What's Included</h2>
-      <p>A full multi-stage process that goes far beyond a standard detail &mdash; restoring your interior and protecting your paint.</p>
+    <div class="section-head">
+      <span class="eyebrow">Boat &amp; Watercraft Care</span>
+      <h2>Two Service Tiers</h2>
+      <p>A straightforward refresh or a full, intensive deep clean &mdash; both cover the whole boat, inside and out. Choose the level your boat needs.</p>
     </div>
-    <div class="inc-grid">
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="sparkles"></i></div>
-        <div><h3>Clay &amp; Iron Decontamination</h3><p>Lifts embedded fallout and contaminants for a glass-smooth finish.</p></div>
-      </div>
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="droplets"></i></div>
-        <div><h3>Full Carpet Shampoo</h3><p>Deep-cleans carpets and floor mats to release ground-in dirt.</p></div>
-      </div>
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="wind"></i></div>
-        <div><h3>Full Steam Clean</h3><p>High-heat steam sanitizes surfaces, seams, and hard-to-reach areas.</p></div>
-      </div>
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="armchair"></i></div>
-        <div><h3>Upholstery Extraction</h3><p>Hot-water extraction pulls stains and moisture out of seats and fabric.</p></div>
-      </div>
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="layers"></i></div>
-        <div><h3>Complete Interior + Exterior Detail</h3><p>Everything in our Full Detail &mdash; inside and out, top to bottom.</p></div>
-      </div>
-      <div class="inc-card">
-        <div class="inc-ico"><i data-lucide="leaf"></i></div>
-        <div><h3>Odor Elimination Treatment</h3><p>Neutralizes smoke, pet, and musty odors at the source.</p></div>
-      </div>
+    <div class="tier-grid">
+      <article class="tier-card">
+        <div class="tier-icon"><i data-lucide="droplets"></i></div>
+        <div class="tier-kicker">Tier 01 &middot; Boat &amp; Watercraft</div>
+        <h3 class="tier-name">Basic Detail</h3>
+        <p class="tier-desc">A complete top-to-bottom clean that brings your boat back to a fresh, water-ready condition.</p>
+        <ul class="tier-feat">
+          <li><i data-lucide="check"></i>Full exterior wash &amp; hand dry (above waterline)</li>
+          <li><i data-lucide="check"></i>Hull, deck &amp; trailer rinse-off</li>
+          <li><i data-lucide="check"></i>Vinyl seats &amp; surfaces wiped down</li>
+          <li><i data-lucide="check"></i>Full interior vacuum &mdash; carpet, compartments</li>
+          <li><i data-lucide="check"></i>Console &amp; dash wipe-down</li>
+          <li><i data-lucide="check"></i>Glass / windshield clean &amp; deodorize</li>
+          <li><i data-lucide="check"></i>Steam clean &amp; hot water extraction if needed*</li>
+        </ul>
+        <div class="tier-foot">
+          <div class="tier-price-row">
+            <span class="tier-price-lbl">Pricing</span>
+            <span class="tier-price">Contact for Quote</span>
+          </div>
+          <a href="#cta" class="tier-cta">Get Quote<i data-lucide="arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="tier-card">
+        <div class="tier-icon"><i data-lucide="sparkles"></i></div>
+        <div class="tier-kicker">Tier 02 &middot; Most Intensive</div>
+        <h3 class="tier-name">Deep Detail</h3>
+        <span class="tier-badge"><i data-lucide="clock"></i>1&ndash;2 Day Service</span>
+        <p class="tier-desc">Everything in a Basic Detail, plus decontamination, vinyl conditioning, protection, and a full interior steam clean &amp; extraction as standard.</p>
+        <ul class="tier-feat">
+          <li><i data-lucide="check"></i>Everything in Basic Detail</li>
+          <li><i data-lucide="check"></i>Waterline / scum-line treatment</li>
+          <li><i data-lucide="check"></i>Vinyl &amp; upholstery deep clean + conditioning</li>
+          <li><i data-lucide="check"></i>Mildew treatment on soft surfaces</li>
+          <li><i data-lucide="check"></i>Full surface protectant</li>
+          <li><i data-lucide="check"></i>Interior steam clean &amp; hot water extraction &mdash; standard</li>
+        </ul>
+        <div class="tier-foot">
+          <div class="tier-price-row">
+            <span class="tier-price-lbl">Pricing</span>
+            <span class="tier-price">Contact for Quote</span>
+          </div>
+          <a href="#cta" class="tier-cta">Get Quote<i data-lucide="arrow-right"></i></a>
+        </div>
+      </article>
     </div>
+    <p class="tier-note"><strong>*</strong>On a Basic Detail, steam cleaning and hot water extraction are included only where needed &mdash; a condition upcharge applies. On a Deep Detail, both are standard.</p>
   </div>
 </section>
 
-<!-- ─────────────── RECOMMENDED FOR ─────────────── -->
-<section id="recommended">
-  <div class="wrap">
-    <div class="section-head center">
-      <span class="eyebrow">Is It Right For You?</span>
-      <h2>Recommended For</h2>
-      <p>The Deep Clean is built for the moments when "clean" isn't enough &mdash; you need it truly reset.</p>
-    </div>
-    <div class="rec-grid">
-      <div class="rec-card">
-        <div class="rec-ico"><i data-lucide="baby"></i></div>
-        <h3>New &amp; Expecting Parents</h3>
-        <p>A fresh, sanitized space to welcome your little one home.</p>
-      </div>
-      <div class="rec-card">
-        <div class="rec-ico"><i data-lucide="paw-print"></i></div>
-        <h3>Pet Owners</h3>
-        <p>Pet hair, dander, and odor fully extracted &mdash; not just covered up.</p>
-      </div>
-      <div class="rec-card">
-        <div class="rec-ico"><i data-lucide="tag"></i></div>
-        <h3>Buying or Selling a Vehicle</h3>
-        <p>Maximize resale value or start fresh in a car that's new to you.</p>
-      </div>
-      <div class="rec-card">
-        <div class="rec-ico"><i data-lucide="sparkles"></i></div>
-        <h3>A Like-New Interior</h3>
-        <p>For anyone who simply wants their vehicle to feel brand new again.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─────────────── EXPECTING / NEW PARENT CALLOUT ─────────────── -->
-<section id="expecting">
+<!-- ─────────────── PLAN-AHEAD CALLOUT ─────────────── -->
+<section id="timeline">
   <div class="wrap">
     <div class="exp-card">
-      <div class="exp-badge"><i data-lucide="baby"></i></div>
+      <div class="exp-badge"><i data-lucide="clock"></i></div>
       <div class="exp-body">
-        <div class="amt"><span class="b">$50 Off</span> for Expecting &amp; New Parents</div>
+        <div class="amt">Please Plan Ahead &mdash; <span class="b">Deep Detail May Take 1&ndash;2 Days</span></div>
         <p>
-          Bringing home a new baby is a big moment &mdash; and a clean, healthy car should be one less
-          thing to worry about. As a small welcome from our family to yours, we take <strong>$50 off any
-          Deep Clean</strong> for expecting and new parents. Just check the
-          <strong>"Expecting or New Parent"</strong> box on the booking form when you select Deep Clean,
-          and the discount is applied automatically. Congratulations &mdash; we're honored to help.
+          On larger boats &mdash; pontoons, cruisers, and anything with cabin space &mdash; the added
+          decontamination, steam cleaning, and hot water extraction mean a <strong>Deep Detail can take
+          one to two days</strong> depending on size and condition. We detail your boat wherever it sits:
+          <strong>on the trailer, in your driveway, or at the dock</strong>. We'll confirm the expected
+          timeline with you when we quote the job.
         </p>
       </div>
       <div class="exp-cta">
-        <a href="booking.html?service=Deep+Clean" class="btn lg">Claim Your $50 Off <i data-lucide="arrow-right"></i></a>
+        <a href="#cta" class="btn lg">Get a Quote <i data-lucide="arrow-right"></i></a>
       </div>
     </div>
   </div>
@@ -492,29 +524,85 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Transparent Pricing</span>
-      <h2>Deep Clean Pricing</h2>
-      <p>Pricing scales with vehicle size. Your final quote is confirmed on arrival after a quick walk-around.</p>
+      <h2>Pricing &amp; Upcharges</h2>
+      <p>Every boat is different, so pricing is based on size, layout, and condition. Reach out and we'll put together a quote &mdash; confirmed before any work begins.</p>
     </div>
-    <div class="pr-card">
-      <div class="pr-head">
-        <i data-lucide="car"></i>
-        <h3>Deep Clean by Vehicle Size</h3>
-        <span class="pr-pill">USD</span>
+    <div class="pr-stack">
+      <div class="pr-card">
+        <div class="pr-head">
+          <i data-lucide="sailboat"></i>
+          <h3>Pricing by Boat Size</h3>
+          <span class="pr-pill">By Size</span>
+        </div>
+        <table class="ptbl quote">
+          <thead>
+            <tr><th>Boat Type</th><th>Basic Detail</th><th>Deep Detail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Jet Ski / PWC</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
+            <tr><td>Fishing Boat</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
+            <tr><td>Bowrider / Runabout</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
+            <tr><td>Pontoon / Tritoon</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
+            <tr><td>Cabin Cruiser / Wake Boat</td><td>Contact for Quote</td><td>Contact for Quote</td></tr>
+          </tbody>
+        </table>
       </div>
-      <table class="ptbl">
-        <thead>
-          <tr><th>Vehicle Size</th><th>Price</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Sedan</td><td>$280</td></tr>
-          <tr><td>SUV / Crossover</td><td>$300</td></tr>
-          <tr><td>Large SUV / Truck</td><td>$330</td></tr>
-          <tr><td>Minivan</td><td>$315</td></tr>
-        </tbody>
-      </table>
+      <div class="pr-card">
+        <div class="pr-head">
+          <i data-lucide="file-text"></i>
+          <h3>Condition Upcharges</h3>
+          <span class="pr-pill">Varies</span>
+        </div>
+        <table class="ptbl">
+          <thead>
+            <tr><th>Condition</th><th>Adjustment</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Waterline scum / hard-water buildup</td><td>Quoted</td></tr>
+            <tr><td>Mildew / mold treatment</td><td>Quoted</td></tr>
+            <tr><td>Pet hair</td><td>Quoted</td></tr>
+            <tr><td>Heavy staining</td><td>Quoted</td></tr>
+            <tr><td>Smoke / odor treatment</td><td>Quoted</td></tr>
+            <tr><td>Biological / hazmat</td><td>Quoted</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="pr-disclaimer">
-      <p><strong>Condition upcharges may apply.</strong> Heavy pet hair, deep staining, smoke/odor, and excessive debris can affect the final price. Any adjustments are estimated and confirmed with you on arrival &mdash; before any work begins.</p>
+      <p><strong>Final quote given before work begins.</strong> Pricing varies by boat size and overall condition. Condition upcharges &mdash; including the steam cleaning and hot water extraction on a Basic Detail &mdash; are confirmed after a walk-around, and you'll approve any adjustments first.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── CONDITIONS & LIMITATIONS ─────────────── -->
+<section id="limits">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Conditions &amp; Limitations</span>
+      <h2>An Honest Note On Results</h2>
+      <p>We work to deliver the best possible result on every boat &mdash; but there are limits to what a single service can resolve. We tell you up front, on arrival, what's realistic for your boat.</p>
+    </div>
+    <div class="inc-grid">
+      <div class="inc-card">
+        <div class="inc-ico"><i data-lucide="layers"></i></div>
+        <div><h3>Permanent stains may persist</h3><p>Some vinyl, carpet, and cushion stains have set in and won't fully release, even with steam cleaning and extraction.</p></div>
+      </div>
+      <div class="inc-card">
+        <div class="inc-ico"><i data-lucide="wind"></i></div>
+        <div><h3>Mildew &amp; odors may need multiple passes</h3><p>Mildew, mold, and musty odors that have absorbed into soft surfaces may require repeat treatment or specialized equipment to fully address.</p></div>
+      </div>
+      <div class="inc-card">
+        <div class="inc-ico"><i data-lucide="sun"></i></div>
+        <div><h3>Heavy oxidation is a restoration job</h3><p>A detail won't remove heavy gel-coat oxidation or deep sun fading. Where restoration is possible, we'll tell you on arrival and quote it separately.</p></div>
+      </div>
+      <div class="inc-card">
+        <div class="inc-ico"><i data-lucide="camera"></i></div>
+        <div><h3>Everything assessed on arrival</h3><p>Before any work begins, we walk the boat with you, photograph the starting condition, and confirm scope, timeline, and any condition upcharges.</p></div>
+      </div>
+    </div>
+    <div class="limits-note">
+      <i data-lucide="camera"></i>
+      <span><strong>Photos are taken before and after every service</strong> as standard practice &mdash; for your records and ours.</span>
     </div>
   </div>
 </section>
@@ -523,10 +611,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="cta">
   <div class="wrap">
     <div class="cta-inner">
-      <h2>Ready For a Like-New Interior?</h2>
-      <p>Book your Deep Clean online in under two minutes. We'll confirm within 24 hours and come to you.</p>
-      <a href="booking.html?service=Deep+Clean" class="btn xl">Book Your Deep Clean <i data-lucide="arrow-right"></i></a>
-      <div class="cta-note">Prefer to talk? Call or text <a href="tel:+12169034783" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})">(216) 903-4783</a></div>
+      <h2>Book Your Boat Detail</h2>
+      <p>Email is the fastest way to reach us &mdash; tell us your boat's type, length, and condition and we'll put together a quote, confirmed before any work begins.</p>
+      <div class="cta-actions">
+        <a href="mailto:tonysdetailing.net@gmail.com?subject=Boat%20Detailing%20Quote" class="btn xl">Email For A Quote <i data-lucide="mail"></i></a>
+        <a href="tel:+12169034783" class="btn ghost lg" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})">Call (216) 903-4783 <i data-lucide="phone"></i></a>
+      </div>
+      <div class="cta-note">Booking a car or SUV instead? <a href="index.html#booking">Book a standard detail on our main site</a>.</div>
     </div>
   </div>
 </section>
@@ -555,7 +646,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="foot-bottom">
       &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
-      Prices subject to change. Results may vary based on vehicle condition. Final quote confirmed on arrival. &middot; v2
+      Prices subject to change. Results may vary based on boat condition. Final quote confirmed before work begins. &middot; v2
     </div>
   </div>
 </footer>
@@ -597,7 +688,7 @@ if (hbg && drawer){
 (function(){
   const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
-    '.section-head, .inc-card, .rec-card, .exp-card, .pr-card, .pr-disclaimer, .cta-inner'
+    '.section-head, .tier-card, .tier-note, .exp-card, .pr-card, .pr-disclaimer, .inc-card, .limits-note, .cta-inner'
   ));
   if (!targets.length) return;
   if (reduce || !('IntersectionObserver' in window)){
@@ -626,6 +717,21 @@ if (hbg && drawer){
 
 // ── Icons ──
 if (window.lucide) lucide.createIcons();
+</script>
+
+<!-- ─────────────── MEDIA SLOT (hero image) ─────────────── -->
+<script>
+(function(){
+  var host = document.getElementById('heroMedia');
+  if (!host) return;
+  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
+    if (media['boat-hero.jpg']){
+      var img = document.createElement('img');
+      img.src = '/static/media/boat-hero.jpg'; img.alt = ''; img.decoding = 'async';
+      host.appendChild(img);
+    }
+  }).catch(function(){ /* no manifest — keep the gradient */ });
+})();
 </script>
 </body>
 </html>

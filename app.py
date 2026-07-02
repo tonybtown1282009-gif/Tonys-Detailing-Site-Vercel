@@ -42,6 +42,23 @@ DB_PATH = os.environ.get("DATABASE_PATH") or (
 SHOP_EMAIL = "tonysdetailing.net@gmail.com"
 SHOP_PHONE = "(216) 903-4783"
 
+# ──────────────────────────────────────────────────────────────────────────
+#  Media slots
+#  Named files live in static/media/. The site shows a slot only when its file
+#  exists AND is non-empty, so committed empty placeholders stay hidden until a
+#  real photo/video is dropped in with the same name. See static/media/README.md.
+# ──────────────────────────────────────────────────────────────────────────
+MEDIA_DIR = os.path.join(BASE_DIR, "static", "media")
+MEDIA_SLOTS = (
+    "hero-video.mp4",
+    "hero-fallback.jpg",
+    "gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg", "gallery-4.jpg",
+    "gallery-5.jpg", "gallery-6.jpg", "gallery-7.jpg", "gallery-8.jpg",
+    "rv-hero.jpg",
+    "boat-hero.jpg",
+)
+_MEDIA_SET = frozenset(MEDIA_SLOTS)
+
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 # Resend requires a verified sender domain. onboarding@resend.dev works out of
 # the box for testing; set RESEND_FROM once a domain is verified.
@@ -235,6 +252,21 @@ def calculate_estimate(
         discount_summary = "None"
 
     return total, discount_summary
+
+
+def media_present(name):
+    """True when a media slot exists and has real content (non-empty).
+
+    Only known slot names are checked, so this can't be used to probe arbitrary
+    paths on disk.
+    """
+    if name not in _MEDIA_SET:
+        return False
+    path = os.path.join(MEDIA_DIR, name)
+    try:
+        return os.path.isfile(path) and os.path.getsize(path) > 0
+    except OSError:
+        return False
 
 
 def record_visit_count(conn, email):
@@ -467,6 +499,48 @@ def booking_page():
 @app.route("/deep-clean.html")
 def deep_clean_page():
     return send_from_directory(BASE_DIR, "deep-clean.html")
+
+
+@app.route("/api/media")
+def media_manifest():
+    """Report which media slots are filled so the frontend can show only those."""
+    return jsonify({name: media_present(name) for name in MEDIA_SLOTS})
+
+
+@app.route("/rv-detailing")
+@app.route("/rv-detailing.html")
+def rv_detailing_page():
+    return send_from_directory(BASE_DIR, "rv-detailing.html")
+
+
+@app.route("/boat-detailing")
+@app.route("/boat-detailing.html")
+def boat_detailing_page():
+    return send_from_directory(BASE_DIR, "boat-detailing.html")
+
+
+@app.route("/about")
+@app.route("/about.html")
+def about_page():
+    return send_from_directory(BASE_DIR, "about.html")
+
+
+@app.route("/gallery")
+@app.route("/gallery.html")
+def gallery_page():
+    return send_from_directory(BASE_DIR, "gallery.html")
+
+
+@app.route("/reviews")
+@app.route("/reviews.html")
+def reviews_page():
+    return send_from_directory(BASE_DIR, "reviews.html")
+
+
+@app.route("/faq")
+@app.route("/faq.html")
+def faq_page():
+    return send_from_directory(BASE_DIR, "faq.html")
 
 
 @app.route("/<path:filename>", methods=["GET"])

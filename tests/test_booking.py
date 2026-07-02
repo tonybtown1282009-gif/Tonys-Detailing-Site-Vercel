@@ -395,9 +395,126 @@ def test_deep_clean_page_serves(client):
     assert client.get("/deep-clean.html").status_code == 200
 
 
+def test_rv_detailing_page_serves(client):
+    res = client.get("/rv-detailing")
+    assert res.status_code == 200
+    # One package with size-bracket pricing.
+    assert b"Full Deep Detail" in res.data
+    assert b"$550" in res.data and b"$700" in res.data and b"$1,000" in res.data
+    assert b"Contact for Quote" not in res.data
+    assert client.get("/rv-detailing.html").status_code == 200
+
+
+def test_boat_detailing_page_serves(client):
+    res = client.get("/boat-detailing")
+    assert res.status_code == 200
+    assert b"Pontoon" in res.data
+    assert b"Contact for Quote" in res.data
+    assert client.get("/boat-detailing.html").status_code == 200
+
+
+def test_home_links_to_rv_and_boat_pages_without_their_content(client):
+    """RV/boat content lives only on the dedicated pages; the homepage
+    carries nothing beyond nav/footer links to them."""
+    html = client.get("/").data.decode("utf-8")
+
+    assert 'href="rv-detailing.html"' in html
+    assert 'href="boat-detailing.html"' in html
+
+    # No RV/boat sections, cards, or pricing on the homepage.
+    for marker in (
+        "Full Deep Detail", "$550", "Travel Trailer", "Class A", "Class C",
+        "Contact for Quote", "Jet Ski", "Pontoon", "Bowrider", "Cabin Cruiser",
+    ):
+        assert marker not in html, f"homepage should not contain RV/boat content: {marker!r}"
+
+
+@pytest.mark.parametrize("path,marker", [
+    ("/about", b"Owner-Operated"),
+    ("/about.html", b"Meet Tony"),
+    ("/gallery", b"Before &amp; After"),
+    ("/gallery.html", b"galGrid"),
+    ("/reviews", b"reviews-embed"),
+    ("/reviews.html", b"Trusted By Local Drivers"),
+    ("/faq", b"Frequently Asked"),
+    ("/faq.html", b"FAQPage"),
+])
+def test_content_pages_serve(client, path, marker):
+    res = client.get(path)
+    assert res.status_code == 200
+    assert marker in res.data
+
+
+def test_content_pages_have_unique_titles(client):
+    import re
+    titles = {}
+    for path in ("/", "/booking", "/deep-clean", "/rv-detailing", "/boat-detailing",
+                 "/about", "/gallery", "/reviews", "/faq"):
+        html = client.get(path).data.decode("utf-8")
+        m = re.search(r"<title>(.*?)</title>", html, re.S)
+        assert m, f"{path} has no <title>"
+        titles[path] = m.group(1).strip()
+    # Every page's SEO title is unique.
+    assert len(set(titles.values())) == len(titles), titles
+
+
+def test_faq_has_valid_faqpage_jsonld(client):
+    import json, re
+    html = client.get("/faq").data.decode("utf-8")
+    blocks = re.findall(
+        r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+    )
+    assert blocks, "FAQ page is missing JSON-LD"
+    data = json.loads(blocks[0])  # must be valid JSON
+    assert data["@type"] == "FAQPage"
+    assert len(data["mainEntity"]) >= 6
+
+
 def test_static_assets_serve(client):
     assert client.get("/fonts/Inter-Regular.ttf").status_code == 200
     assert client.get("/assets/logo.png").status_code == 200
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Media slots + manifest
+# ──────────────────────────────────────────────────────────────────────────
+def test_media_manifest_lists_all_slots(client):
+    res = client.get("/api/media")
+    assert res.status_code == 200
+    data = res.get_json()
+    # Every named slot is reported...
+    assert set(data.keys()) == set(appmod.MEDIA_SLOTS)
+    # ...and the committed placeholders are empty, so all start hidden.
+    assert all(v is False for v in data.values())
+
+
+def test_media_present_requires_nonempty_known_slot(tmp_path, monkeypatch):
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+
+    # Unknown slot names are never reported present (no arbitrary path probing).
+    assert appmod.media_present("../app.py") is False
+    assert appmod.media_present("not-a-slot.jpg") is False
+
+    slot = tmp_path / "gallery-1.jpg"
+    slot.write_bytes(b"")          # empty placeholder → hidden
+    assert appmod.media_present("gallery-1.jpg") is False
+    slot.write_bytes(b"\xff\xd8\xff\xe0")  # real content → shown
+    assert appmod.media_present("gallery-1.jpg") is True
+
+
+def test_media_manifest_reflects_filled_slot(client, tmp_path, monkeypatch):
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+    (tmp_path / "hero-video.mp4").write_bytes(b"\x00\x00\x00\x18ftyp")
+    data = client.get("/api/media").get_json()
+    assert data["hero-video.mp4"] is True
+    assert data["gallery-1.jpg"] is False
+
+
+def test_media_placeholder_files_exist():
+    # The named slots are committed (as empty placeholders) so they can be
+    # replaced in place without touching code.
+    for slot in appmod.MEDIA_SLOTS:
+        assert os.path.isfile(os.path.join(appmod.MEDIA_DIR, slot)), slot
 
 
 def test_unknown_path_404(client):

@@ -1256,6 +1256,21 @@ footer{
   .area-layout{grid-template-columns:1fr;gap:40px;}
   .area-diagram{max-width:340px;margin:0 auto;}
 }
+/* 8-link nav: tighten below 1300, drop the phone number below 1200,
+   switch to the hamburger below 1080 — the full row no longer fits. */
+@media (max-width: 1299px){
+  #nav{gap:18px;}
+  .nav-links{gap:3px;}
+  .nav-links a{padding:8px 9px;font-size:10.5px;}
+  .nav-links a.active::after{left:9px;right:9px;}
+}
+@media (max-width: 1200px){
+  .nav-phone{display:none;}
+}
+@media (max-width: 1079px){
+  .nav-links{display:none;}
+  .hbg{display:flex;}
+}
 @media (max-width: 720px){
   .nav-links{display:none;}
   .nav-phone{display:none;}
@@ -1433,6 +1448,58 @@ footer{
 @media (max-width: 560px){
   .trust-strip{grid-template-columns:1fr;}
 }
+
+/* ═══════════════ VERSION 2 UI — mobile-light / desktop-premium ═══════════════ */
+/* Brand: #1e3a5f · #0a0a0a · #ffffff · #d9d9d9 | Montserrat + Inter */
+:root{--v2-glass:rgba(255,255,255,.60);--v2-glass-brd:rgba(255,255,255,.55);}
+
+/* Desktop — premium: bigger headline, glassmorphism cards, deeper hover lift */
+@media (min-width:1024px){
+  .hero-h1{font-size:clamp(56px,8.6vw,120px);}
+  @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+    .svc-card,.fut-card,.cside-card,.tst-card{
+      background:var(--v2-glass);
+      -webkit-backdrop-filter:blur(16px) saturate(150%);
+      backdrop-filter:blur(16px) saturate(150%);
+      border-color:var(--v2-glass-brd);
+      box-shadow:0 10px 34px rgba(10,10,10,.07),inset 0 1px 0 rgba(255,255,255,.55);
+    }
+  }
+  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:translateY(-6px);}
+}
+
+/* Mobile — lightweight & fast: compressed rhythm, tap-friendly, minimal motion */
+@media (max-width:720px){
+  :root{--sec-y:clamp(44px,10vw,68px);}
+  .btn{min-height:48px;}
+  .btn.sm{min-height:44px;}
+  .svc-cta{min-height:44px;}
+  .svc-card,.fut-card,.cside-card,.tst-card{transition:none;}
+  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:none;}
+  .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+}
+
+/* Motion safety — honor reduced-motion everywhere */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  html{scroll-behavior:auto !important;}
+  .reveal{opacity:1 !important;transform:none !important;}
+}
+
+/* ═══════════════ MEDIA SLOTS — hero video/image + Before/After gallery ═══════════════ */
+/* Populated at runtime from /api/media; empty containers stay hidden (gradient shows). */
+.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
+.hero-media:empty{display:none;}
+.hero-media video,.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.45) 0%,rgba(15,28,47,.60) 55%,rgba(30,58,95,.78) 100%);}
+
+#gallery{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.gal-item{position:relative;margin:0;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-card);background:var(--bg-3);aspect-ratio:4 / 3;}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 450ms var(--ease);}
+@media (min-width:1024px){.gal-item:hover img{transform:scale(1.05);}}
+@media (max-width:900px){.gal-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.gal-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -1464,6 +1531,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#services" data-target="services">Services</a>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="deep-clean.html">Deep Clean</a>
+    <a href="rv-detailing.html">RVs</a>
+    <a href="boat-detailing.html">Boats</a>
     <a href="#area" data-target="area">Service Area</a>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
@@ -1483,6 +1552,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <a href="#services">Services <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <a href="rv-detailing.html">RVs <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <a href="boat-detailing.html">Boats <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#contact">Contact <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -1494,6 +1565,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
+  <div class="hero-media" id="heroMedia"></div>
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-shine"></div>
@@ -2091,6 +2163,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- ─────────────── BEFORE / AFTER GALLERY ─────────────── -->
+<!-- Populated at runtime from filled gallery-*.jpg slots; hidden while empty. -->
+<section id="gallery" hidden>
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Before &amp; After</span>
+      <h2>See The Difference</h2>
+      <p>Real details, real results &mdash; straight from the driveway.</p>
+    </div>
+    <div class="gal-grid" id="galGrid"></div>
+  </div>
+</section>
+
 <!-- ─────────────── FUTURE SERVICES ─────────────── -->
 <section id="future">
   <div class="wrap">
@@ -2383,7 +2468,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="foot-top">
       <div class="foot-brand">
         <a href="#hero" class="brand">
-          <span class="brand-plate"><img src="assets/logo.png" alt=""></span>
+          <span class="brand-plate"><img src="assets/logo.png" alt="" loading="lazy" decoding="async"></span>
           <span class="brand-text">
             <span class="n">Tony's Detailing</span>
             <span class="s">Chardon &middot; OH</span>
@@ -2402,15 +2487,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
           <li><a href="deep-clean.html">Deep Clean</a></li>
+          <li><a href="rv-detailing.html">RVs</a></li>
+          <li><a href="boat-detailing.html">Boats</a></li>
         </ul>
       </div>
       <div class="foot-col">
         <h5>Company</h5>
         <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+          <li><a href="faq.html">FAQ</a></li>
           <li><a href="#pricing">Pricing</a></li>
           <li><a href="#area">Service Area</a></li>
-          <li><a href="#disclaimer">Conditions</a></li>
-          <li><a href="#future">What's Next</a></li>
         </ul>
       </div>
       <div class="foot-col">
@@ -2427,7 +2516,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
         Prices subject to change. Results may vary based on vehicle condition.
       </div>
-      <div class="built">Mobile Detailing &middot; Chardon, Ohio</div>
+      <div class="built">Mobile Detailing &middot; Chardon, Ohio &middot; v2</div>
     </div>
   </div>
 </footer>
@@ -2595,7 +2684,7 @@ if (bookingForm) {
 
 // ───────────────── SCROLL REVEAL (fade-in + slide-up) ───────────────────
 (function(){
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
     '.section-head, .svc-card, .pr-card, .zone-card, .fut-card, .trust-item, ' +
     '.hiw-step, .tst-card, .disc-right, .rev-strip, .terms-box, .booking-frame, ' +
@@ -2639,6 +2728,59 @@ if (bookingForm) {
 
 // Initial icon render
 if (window.lucide) lucide.createIcons();
+</script>
+
+<!-- ─────────────── MEDIA SLOTS (hero video/image + gallery) ─────────────── -->
+<script>
+(function(){
+  var MEDIA = '/static/media/';
+  var mm = window.matchMedia;
+  var isMobile = mm && mm('(max-width: 720px)').matches;
+  var reduce = mm && mm('(prefers-reduced-motion: reduce)').matches;
+
+  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
+    // Hero — use the video on desktop; otherwise fall back to the image; if
+    // neither slot is filled the container stays empty and the gradient shows.
+    var host = document.getElementById('heroMedia');
+    if (host){
+      if (media['hero-video.mp4'] && !isMobile && !reduce){
+        var v = document.createElement('video');
+        v.autoplay = true; v.loop = true; v.muted = true; v.defaultMuted = true;
+        v.setAttribute('muted',''); v.setAttribute('playsinline','');
+        v.playsInline = true; v.preload = 'metadata';
+        if (media['hero-fallback.jpg']) v.poster = MEDIA + 'hero-fallback.jpg';
+        var s = document.createElement('source');
+        s.src = MEDIA + 'hero-video.mp4'; s.type = 'video/mp4';
+        v.appendChild(s);
+        host.appendChild(v);
+        var p = v.play(); if (p && p.catch) p.catch(function(){});
+      } else if (media['hero-fallback.jpg']){
+        var img = document.createElement('img');
+        img.src = MEDIA + 'hero-fallback.jpg'; img.alt = ''; img.decoding = 'async';
+        host.appendChild(img);
+      }
+    }
+
+    // Before/After gallery — one tile per filled slot; hide the section if none.
+    var grid = document.getElementById('galGrid');
+    var section = document.getElementById('gallery');
+    if (grid && section){
+      var frag = document.createDocumentFragment(), count = 0;
+      for (var i = 1; i <= 8; i++){
+        if (!media['gallery-' + i + '.jpg']) continue;
+        var fig = document.createElement('figure');
+        fig.className = 'gal-item';
+        var im = document.createElement('img');
+        im.src = MEDIA + 'gallery-' + i + '.jpg';
+        im.loading = 'lazy'; im.decoding = 'async';
+        im.alt = "Tony's Detailing before-and-after result " + i;
+        fig.appendChild(im);
+        frag.appendChild(fig); count++;
+      }
+      if (count){ grid.appendChild(frag); section.hidden = false; }
+    }
+  }).catch(function(){ /* no manifest — hero keeps the gradient, gallery stays hidden */ });
+})();
 </script>
 </body>
 </html>

@@ -297,6 +297,38 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
   .book-card{padding:24px;}
   .brand-text .s{display:none;}
 }
+
+/* ═══════════════ VERSION 2 UI — mobile-light / desktop-premium ═══════════════ */
+/* Brand: #1e3a5f · #0a0a0a · #ffffff · #d9d9d9 | Montserrat + Inter (dark booking theme) */
+:root{--v2-glass:rgba(23,23,26,.55);--v2-glass-brd:rgba(255,255,255,.12);}
+
+/* Desktop — premium: glassmorphism cards */
+@media (min-width:1024px){
+  @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+    .book-card,.side-card{
+      background:var(--v2-glass);
+      -webkit-backdrop-filter:blur(16px) saturate(140%);
+      backdrop-filter:blur(16px) saturate(140%);
+      border-color:var(--v2-glass-brd);
+      box-shadow:0 12px 36px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);
+    }
+  }
+}
+
+/* Mobile — lightweight & fast: tap-friendly, minimal motion */
+@media (max-width:720px){
+  .btn{min-height:48px;}
+  .btn.sm{min-height:44px;}
+  .book-card,.side-card{transition:none;}
+  .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+}
+
+/* Motion safety — honor reduced-motion everywhere */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  html{scroll-behavior:auto !important;}
+  .reveal{opacity:1 !important;transform:none !important;}
+}
 </style>
 </head>
 <body>
@@ -546,7 +578,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="foot-row">
       <div class="copyright">
         &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
-        Prices subject to change. Results may vary based on vehicle condition.
+        Prices subject to change. Results may vary based on vehicle condition. &middot; v2
       </div>
       <div class="foot-social">
         <a href="https://www.facebook.com/" class="soc-btn" target="_blank" rel="noopener" aria-label="Tony's Detailing on Facebook"><i data-lucide="facebook"></i></a>
@@ -667,7 +699,7 @@ if (hbg && drawer){
 
 // ── Scroll reveal (fade-in + slide-up) ──
 (function(){
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll('.book-card, .side-card'));
   if (!targets.length) return;
   if (reduce || !('IntersectionObserver' in window)){
