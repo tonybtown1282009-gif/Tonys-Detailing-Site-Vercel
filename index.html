@@ -1448,6 +1448,43 @@ footer{
 @media (max-width: 560px){
   .trust-strip{grid-template-columns:1fr;}
 }
+
+/* ═══════════════ VERSION 2 UI — mobile-light / desktop-premium ═══════════════ */
+/* Brand: #1e3a5f · #0a0a0a · #ffffff · #d9d9d9 | Montserrat + Inter */
+:root{--v2-glass:rgba(255,255,255,.60);--v2-glass-brd:rgba(255,255,255,.55);}
+
+/* Desktop — premium: bigger headline, glassmorphism cards, deeper hover lift */
+@media (min-width:1024px){
+  .hero-h1{font-size:clamp(56px,8.6vw,120px);}
+  @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+    .svc-card,.fut-card,.cside-card,.tst-card{
+      background:var(--v2-glass);
+      -webkit-backdrop-filter:blur(16px) saturate(150%);
+      backdrop-filter:blur(16px) saturate(150%);
+      border-color:var(--v2-glass-brd);
+      box-shadow:0 10px 34px rgba(10,10,10,.07),inset 0 1px 0 rgba(255,255,255,.55);
+    }
+  }
+  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:translateY(-6px);}
+}
+
+/* Mobile — lightweight & fast: compressed rhythm, tap-friendly, minimal motion */
+@media (max-width:720px){
+  :root{--sec-y:clamp(44px,10vw,68px);}
+  .btn{min-height:48px;}
+  .btn.sm{min-height:44px;}
+  .svc-cta{min-height:44px;}
+  .svc-card,.fut-card,.cside-card,.tst-card{transition:none;}
+  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:none;}
+  .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+}
+
+/* Motion safety — honor reduced-motion everywhere */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  html{scroll-behavior:auto !important;}
+  .reveal{opacity:1 !important;transform:none !important;}
+}
 </style>
 </head>
 <body>
@@ -2402,7 +2439,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="foot-top">
       <div class="foot-brand">
         <a href="#hero" class="brand">
-          <span class="brand-plate"><img src="assets/logo.png" alt=""></span>
+          <span class="brand-plate"><img src="assets/logo.png" alt="" loading="lazy" decoding="async"></span>
           <span class="brand-text">
             <span class="n">Tony's Detailing</span>
             <span class="s">Chardon &middot; OH</span>
@@ -2448,7 +2485,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
         Prices subject to change. Results may vary based on vehicle condition.
       </div>
-      <div class="built">Mobile Detailing &middot; Chardon, Ohio</div>
+      <div class="built">Mobile Detailing &middot; Chardon, Ohio &middot; v2</div>
     </div>
   </div>
 </footer>
@@ -2616,7 +2653,7 @@ if (bookingForm) {
 
 // ───────────────── SCROLL REVEAL (fade-in + slide-up) ───────────────────
 (function(){
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
     '.section-head, .svc-card, .pr-card, .zone-card, .fut-card, .trust-item, ' +
     '.hiw-step, .tst-card, .disc-right, .rev-strip, .terms-box, .booking-frame, ' +

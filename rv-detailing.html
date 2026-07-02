@@ -320,6 +320,45 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   .cta-actions{flex-direction:column;width:100%;max-width:300px;margin:0 auto;}
   .cta-actions .btn{width:100%;}
 }
+
+/* ═══════════════ VERSION 2 UI — mobile-light / desktop-premium ═══════════════ */
+/* Brand: #1e3a5f · #0a0a0a · #ffffff · #d9d9d9 | Montserrat + Inter */
+:root{--v2-glass:rgba(255,255,255,.60);--v2-glass-brd:rgba(255,255,255,.55);}
+
+/* Desktop — premium: larger hero, glassmorphism cards, deeper hover lift */
+@media (min-width:1024px){
+  #hero{padding-top:calc(var(--nav-h) + var(--promo-h) + 128px);padding-bottom:120px;}
+  .hero-h1{font-size:clamp(56px,7vw,104px);}
+  @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+    .inc-card,.rec-card,.tier-card,.pr-card{
+      background:var(--v2-glass);
+      -webkit-backdrop-filter:blur(16px) saturate(150%);
+      backdrop-filter:blur(16px) saturate(150%);
+      border-color:var(--v2-glass-brd);
+      box-shadow:0 10px 34px rgba(10,10,10,.07),inset 0 1px 0 rgba(255,255,255,.55);
+    }
+  }
+  .inc-card:hover,.rec-card:hover,.tier-card:hover{transform:translateY(-6px);}
+}
+
+/* Mobile — lightweight & fast: compressed rhythm, tap-friendly, minimal motion */
+@media (max-width:720px){
+  :root{--sec-y:clamp(44px,10vw,68px);}
+  .btn{min-height:48px;}
+  .btn.sm{min-height:44px;}
+  .nav-phone{min-height:44px;}
+  .tier-cta{min-height:44px;}
+  .inc-card,.rec-card,.tier-card,.pr-card{transition:none;}
+  .inc-card:hover,.rec-card:hover,.tier-card:hover{transform:none;box-shadow:var(--shadow-card);}
+  .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+}
+
+/* Motion safety — honor reduced-motion everywhere */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  html{scroll-behavior:auto !important;}
+  .reveal{opacity:1 !important;transform:none !important;}
+}
 </style>
 </head>
 <body>
@@ -550,7 +589,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap">
     <div class="foot-row">
       <a href="index.html" class="foot-brand brand">
-        <span class="brand-plate"><img src="assets/logo.png" alt=""></span>
+        <span class="brand-plate"><img src="assets/logo.png" alt="" loading="lazy" decoding="async"></span>
         <span><span class="n">Tony's Detailing</span><span class="s">Chardon &middot; OH</span></span>
       </a>
       <div class="foot-links">
@@ -565,7 +604,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="foot-bottom">
       &copy; 2026 Tony's Detailing &middot; Chardon, OH. All rights reserved.<br>
-      Prices subject to change. Results may vary based on camper / RV condition. Final quote confirmed before work begins.
+      Prices subject to change. Results may vary based on camper / RV condition. Final quote confirmed before work begins. &middot; v2
     </div>
   </div>
 </footer>
@@ -605,7 +644,7 @@ if (hbg && drawer){
 
 // ── Scroll reveal (fade-in + slide-up, staggered) ──
 (function(){
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
     '.section-head, .tier-card, .tier-note, .exp-card, .pr-card, .pr-disclaimer, .inc-card, .limits-note, .cta-inner'
   ));
