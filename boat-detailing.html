@@ -359,6 +359,13 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   html{scroll-behavior:auto !important;}
   .reveal{opacity:1 !important;transform:none !important;}
 }
+
+/* ═══════════════ MEDIA SLOT — hero image ═══════════════ */
+/* Populated at runtime from /api/media; empty container keeps the gradient. */
+.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
+.hero-media:empty{display:none;}
+.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.42) 0%,rgba(15,28,47,.58) 55%,rgba(30,58,95,.76) 100%);}
 </style>
 </head>
 <body>
@@ -410,6 +417,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
+  <div class="hero-media" id="heroMedia"></div>
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-inner">
@@ -705,6 +713,21 @@ if (hbg && drawer){
 
 // ── Icons ──
 if (window.lucide) lucide.createIcons();
+</script>
+
+<!-- ─────────────── MEDIA SLOT (hero image) ─────────────── -->
+<script>
+(function(){
+  var host = document.getElementById('heroMedia');
+  if (!host) return;
+  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
+    if (media['boat-hero.jpg']){
+      var img = document.createElement('img');
+      img.src = '/static/media/boat-hero.jpg'; img.alt = ''; img.decoding = 'async';
+      host.appendChild(img);
+    }
+  }).catch(function(){ /* no manifest — keep the gradient */ });
+})();
 </script>
 </body>
 </html>

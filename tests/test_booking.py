@@ -434,5 +434,47 @@ def test_static_assets_serve(client):
     assert client.get("/assets/logo.png").status_code == 200
 
 
+# ──────────────────────────────────────────────────────────────────────────
+#  Media slots + manifest
+# ──────────────────────────────────────────────────────────────────────────
+def test_media_manifest_lists_all_slots(client):
+    res = client.get("/api/media")
+    assert res.status_code == 200
+    data = res.get_json()
+    # Every named slot is reported...
+    assert set(data.keys()) == set(appmod.MEDIA_SLOTS)
+    # ...and the committed placeholders are empty, so all start hidden.
+    assert all(v is False for v in data.values())
+
+
+def test_media_present_requires_nonempty_known_slot(tmp_path, monkeypatch):
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+
+    # Unknown slot names are never reported present (no arbitrary path probing).
+    assert appmod.media_present("../app.py") is False
+    assert appmod.media_present("not-a-slot.jpg") is False
+
+    slot = tmp_path / "gallery-1.jpg"
+    slot.write_bytes(b"")          # empty placeholder → hidden
+    assert appmod.media_present("gallery-1.jpg") is False
+    slot.write_bytes(b"\xff\xd8\xff\xe0")  # real content → shown
+    assert appmod.media_present("gallery-1.jpg") is True
+
+
+def test_media_manifest_reflects_filled_slot(client, tmp_path, monkeypatch):
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+    (tmp_path / "hero-video.mp4").write_bytes(b"\x00\x00\x00\x18ftyp")
+    data = client.get("/api/media").get_json()
+    assert data["hero-video.mp4"] is True
+    assert data["gallery-1.jpg"] is False
+
+
+def test_media_placeholder_files_exist():
+    # The named slots are committed (as empty placeholders) so they can be
+    # replaced in place without touching code.
+    for slot in appmod.MEDIA_SLOTS:
+        assert os.path.isfile(os.path.join(appmod.MEDIA_DIR, slot)), slot
+
+
 def test_unknown_path_404(client):
     assert client.get("/does-not-exist.xyz").status_code == 404

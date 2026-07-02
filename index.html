@@ -1485,6 +1485,21 @@ footer{
   html{scroll-behavior:auto !important;}
   .reveal{opacity:1 !important;transform:none !important;}
 }
+
+/* ═══════════════ MEDIA SLOTS — hero video/image + Before/After gallery ═══════════════ */
+/* Populated at runtime from /api/media; empty containers stay hidden (gradient shows). */
+.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
+.hero-media:empty{display:none;}
+.hero-media video,.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.45) 0%,rgba(15,28,47,.60) 55%,rgba(30,58,95,.78) 100%);}
+
+#gallery{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.gal-item{position:relative;margin:0;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-card);background:var(--bg-3);aspect-ratio:4 / 3;}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 450ms var(--ease);}
+@media (min-width:1024px){.gal-item:hover img{transform:scale(1.05);}}
+@media (max-width:900px){.gal-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.gal-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -1550,6 +1565,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
+  <div class="hero-media" id="heroMedia"></div>
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-shine"></div>
@@ -2147,6 +2163,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- ─────────────── BEFORE / AFTER GALLERY ─────────────── -->
+<!-- Populated at runtime from filled gallery-*.jpg slots; hidden while empty. -->
+<section id="gallery" hidden>
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Before &amp; After</span>
+      <h2>See The Difference</h2>
+      <p>Real details, real results &mdash; straight from the driveway.</p>
+    </div>
+    <div class="gal-grid" id="galGrid"></div>
+  </div>
+</section>
+
 <!-- ─────────────── FUTURE SERVICES ─────────────── -->
 <section id="future">
   <div class="wrap">
@@ -2697,6 +2726,59 @@ if (bookingForm) {
 
 // Initial icon render
 if (window.lucide) lucide.createIcons();
+</script>
+
+<!-- ─────────────── MEDIA SLOTS (hero video/image + gallery) ─────────────── -->
+<script>
+(function(){
+  var MEDIA = '/static/media/';
+  var mm = window.matchMedia;
+  var isMobile = mm && mm('(max-width: 720px)').matches;
+  var reduce = mm && mm('(prefers-reduced-motion: reduce)').matches;
+
+  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
+    // Hero — use the video on desktop; otherwise fall back to the image; if
+    // neither slot is filled the container stays empty and the gradient shows.
+    var host = document.getElementById('heroMedia');
+    if (host){
+      if (media['hero-video.mp4'] && !isMobile && !reduce){
+        var v = document.createElement('video');
+        v.autoplay = true; v.loop = true; v.muted = true; v.defaultMuted = true;
+        v.setAttribute('muted',''); v.setAttribute('playsinline','');
+        v.playsInline = true; v.preload = 'metadata';
+        if (media['hero-fallback.jpg']) v.poster = MEDIA + 'hero-fallback.jpg';
+        var s = document.createElement('source');
+        s.src = MEDIA + 'hero-video.mp4'; s.type = 'video/mp4';
+        v.appendChild(s);
+        host.appendChild(v);
+        var p = v.play(); if (p && p.catch) p.catch(function(){});
+      } else if (media['hero-fallback.jpg']){
+        var img = document.createElement('img');
+        img.src = MEDIA + 'hero-fallback.jpg'; img.alt = ''; img.decoding = 'async';
+        host.appendChild(img);
+      }
+    }
+
+    // Before/After gallery — one tile per filled slot; hide the section if none.
+    var grid = document.getElementById('galGrid');
+    var section = document.getElementById('gallery');
+    if (grid && section){
+      var frag = document.createDocumentFragment(), count = 0;
+      for (var i = 1; i <= 8; i++){
+        if (!media['gallery-' + i + '.jpg']) continue;
+        var fig = document.createElement('figure');
+        fig.className = 'gal-item';
+        var im = document.createElement('img');
+        im.src = MEDIA + 'gallery-' + i + '.jpg';
+        im.loading = 'lazy'; im.decoding = 'async';
+        im.alt = "Tony's Detailing before-and-after result " + i;
+        fig.appendChild(im);
+        frag.appendChild(fig); count++;
+      }
+      if (count){ grid.appendChild(frag); section.hidden = false; }
+    }
+  }).catch(function(){ /* no manifest — hero keeps the gradient, gallery stays hidden */ });
+})();
 </script>
 </body>
 </html>
