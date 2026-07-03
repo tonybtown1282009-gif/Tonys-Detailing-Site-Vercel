@@ -1,3 +1,7 @@
 # Development/test dependencies. Install with: pip install -r requirements-dev.txt
 -r requirements.txt
 pytest>=8.0
+
+# Only needed to regenerate fonts/*.woff2 (tools/build_fonts.py).
+fonttools>=4.50
+brotli>=1.1
