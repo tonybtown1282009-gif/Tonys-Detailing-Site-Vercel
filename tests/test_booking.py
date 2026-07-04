@@ -519,3 +519,147 @@ def test_media_placeholder_files_exist():
 
 def test_unknown_path_404(client):
     assert client.get("/does-not-exist.xyz").status_code == 404
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Static route lockdown — only fonts/, assets/, static/ are servable
+# ──────────────────────────────────────────────────────────────────────────
+@pytest.mark.parametrize("path", [
+    "/app.py",
+    "/bookings.db",
+    "/.env",
+    "/.env.example",
+    "/requirements.txt",
+    "/requirements-dev.txt",
+    "/tests/test_booking.py",
+    "/tools/build_fonts.py",
+    "/.git/config",
+    "/vercel.json",
+    "/README.md",
+    "/Phone Preview.html",
+    "/fonts/../app.py",
+])
+def test_sensitive_paths_blocked(client, path):
+    assert client.get(path).status_code == 404, f"{path} must not be served"
+
+
+def test_allowed_static_dirs_still_serve(client):
+    for path in (
+        "/fonts/Inter-Regular.ttf",
+        "/fonts/Inter-Regular.woff2",
+        "/fonts/Montserrat-ExtraBold.woff2",
+        "/assets/logo.png",
+        "/assets/og-card.jpg",
+        "/assets/favicon-32.png",
+        "/assets/lucide-1.23.0.min.js",
+        "/favicon.ico",
+    ):
+        assert client.get(path).status_code == 200, path
+
+
+def test_index_html_alias(client):
+    res = client.get("/index.html")
+    assert res.status_code == 200
+    assert b"Tony's Detailing" in res.data
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  robots.txt + sitemap.xml
+# ──────────────────────────────────────────────────────────────────────────
+def test_robots_txt(client):
+    res = client.get("/robots.txt")
+    assert res.status_code == 200
+    body = res.data.decode()
+    assert "User-agent: *" in body
+    assert "Disallow: /api/" in body
+    assert "Sitemap: http://localhost/sitemap.xml" in body
+
+
+def test_sitemap_lists_every_public_page(client):
+    import xml.etree.ElementTree as ET
+
+    res = client.get("/sitemap.xml")
+    assert res.status_code == 200
+    root = ET.fromstring(res.data)  # must be valid XML
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = {el.text for el in root.findall("sm:url/sm:loc", ns)}
+    expected = {
+        "http://localhost" + ("/" if page == "/" else page)
+        for page in appmod.PUBLIC_PAGES
+    }
+    assert locs == expected
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Cache + security headers
+# ──────────────────────────────────────────────────────────────────────────
+def test_cache_headers_by_path_type(client):
+    assert "immutable" in client.get("/fonts/Inter-Regular.woff2").headers["Cache-Control"]
+    assert "immutable" in client.get("/assets/lucide-1.23.0.min.js").headers["Cache-Control"]
+    assert "max-age=604800" in client.get("/assets/logo.png").headers["Cache-Control"]
+    assert "max-age=3600" in client.get("/static/media/gallery-1.jpg").headers["Cache-Control"]
+    assert client.get("/").headers["Cache-Control"] == "no-cache"
+    assert client.get("/api/media").headers["Cache-Control"] == "no-store"
+
+
+def test_security_headers_on_all_responses(client):
+    for path in ("/", "/booking", "/api/media", "/does-not-exist"):
+        headers = client.get(path).headers
+        assert headers["X-Content-Type-Options"] == "nosniff"
+        assert headers["X-Frame-Options"] == "SAMEORIGIN"
+        assert headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Branded 404 + SEO head tags
+# ──────────────────────────────────────────────────────────────────────────
+def test_branded_404_page(client):
+    res = client.get("/no-such-page")
+    assert res.status_code == 404
+    assert b"Page Not Found" in res.data
+    assert b"Back to Homepage" in res.data
+
+
+def test_api_404_stays_json(client):
+    res = client.get("/api/no-such-endpoint")
+    assert res.status_code == 404
+    assert res.get_json()["ok"] is False
+
+
+def test_every_page_has_seo_head_tags(client):
+    for page in appmod.PUBLIC_PAGES:
+        html = client.get(page).data.decode("utf-8")
+        assert 'rel="canonical"' in html, page
+        assert 'property="og:title"' in html, page
+        assert 'property="og:image"' in html, page
+        assert 'name="twitter:card"' in html, page
+        assert 'rel="icon"' in html, page
+        assert "woff2" in html, page
+        assert "unpkg.com" not in html, page
+        assert "/assets/lucide-1.23.0.min.js" in html, page
+
+
+def test_homepage_has_localbusiness_jsonld(client):
+    import json, re
+    html = client.get("/").data.decode("utf-8")
+    blocks = re.findall(
+        r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+    )
+    assert blocks, "homepage is missing JSON-LD"
+    data = json.loads(blocks[0])
+    assert data["@type"] == "AutoWash"
+    assert data["telephone"] == "+12169034783"
+
+
+def test_fonts_are_real_binaries():
+    """Guard against the base64-text corruption that broke every font."""
+    import glob
+    ttfs = glob.glob(os.path.join(appmod.BASE_DIR, "fonts", "*.ttf"))
+    woff2s = glob.glob(os.path.join(appmod.BASE_DIR, "fonts", "*.woff2"))
+    assert len(ttfs) == 8 and len(woff2s) == 8
+    for path in ttfs:
+        with open(path, "rb") as fh:
+            assert fh.read(4) == b"\x00\x01\x00\x00", f"{path} is not a TTF"
+    for path in woff2s:
+        with open(path, "rb") as fh:
+            assert fh.read(4) == b"wOF2", f"{path} is not a WOFF2"

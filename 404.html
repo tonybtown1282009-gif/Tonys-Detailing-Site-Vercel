@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found — Tony's Detailing</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="icon" href="/assets/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32">
+<style>
+@font-face{font-family:'Inter';src:url('/fonts/Inter-Regular.woff2') format('woff2'),url('/fonts/Inter-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('/fonts/Montserrat-ExtraBold.woff2') format('woff2'),url('/fonts/Montserrat-ExtraBold.ttf') format('truetype');font-weight:800;font-display:swap;}
+@font-face{font-family:'Montserrat';src:url('/fonts/Montserrat-SemiBold.woff2') format('woff2'),url('/fonts/Montserrat-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter','Helvetica Neue',sans-serif;
+  background:#ffffff;color:#6b7280;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:24px;text-align:center;-webkit-font-smoothing:antialiased;
+}
+.card{max-width:440px;}
+.badge{
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:64px;
+  color:#1e3a5f;letter-spacing:-.03em;line-height:1;
+}
+h1{
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:24px;
+  color:#0a0a0a;text-transform:uppercase;letter-spacing:-.01em;
+  margin:14px 0 10px;
+}
+p{font-size:15px;line-height:1.65;margin-bottom:26px;}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{
+  font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  padding:13px 24px;border-radius:4px;display:inline-block;
+  transition:background 150ms ease,color 150ms ease;
+}
+.btn.solid{background:#1e3a5f;color:#fff;}
+.btn.solid:hover{background:#2d5590;}
+.btn.ghost{color:#1e3a5f;border:1.5px solid #d9dde4;}
+.btn.ghost:hover{border-color:#1e3a5f;}
+.phone{margin-top:26px;font-size:13.5px;color:#9ca3af;}
+.phone a{color:#1e3a5f;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="badge">404</div>
+  <h1>Page Not Found</h1>
+  <p>That page doesn't exist — it may have moved when the site was updated. Everything we offer is one click from the homepage.</p>
+  <div class="actions">
+    <a class="btn solid" href="/">Back to Homepage</a>
+    <a class="btn ghost" href="/booking">Book a Detail</a>
+  </div>
+  <p class="phone">Or call / text <a href="tel:+12169034783">(216) 903-4783</a></p>
+</div>
+</body>
+</html>

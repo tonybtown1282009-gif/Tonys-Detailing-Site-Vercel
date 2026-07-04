@@ -18,6 +18,7 @@ from flask import (
     abort,
     jsonify,
     request,
+    send_file,
     send_from_directory,
 )
 
@@ -484,7 +485,29 @@ def book():
 # ──────────────────────────────────────────────────────────────────────────
 #  Routes — static frontend
 # ──────────────────────────────────────────────────────────────────────────
+# Clean URLs of every public page, in sitemap order. The booking backend and
+# any future custom domain both hang off these, so keep this list in sync
+# when a page is added.
+PUBLIC_PAGES = (
+    "/",
+    "/booking",
+    "/deep-clean",
+    "/rv-detailing",
+    "/boat-detailing",
+    "/about",
+    "/gallery",
+    "/reviews",
+    "/faq",
+)
+
+# Only these directories are served by the static catch-all. Everything else
+# in the project root (app.py, tests, requirements, any local .env or
+# bookings.db) must never be reachable over HTTP.
+STATIC_DIRS = ("fonts", "assets", "static")
+
+
 @app.route("/")
+@app.route("/index.html")
 def home():
     return send_from_directory(BASE_DIR, "index.html")
 
@@ -543,13 +566,96 @@ def faq_page():
     return send_from_directory(BASE_DIR, "faq.html")
 
 
+@app.route("/robots.txt")
+def robots_txt():
+    """Crawler policy, built against whatever host the site is served from."""
+    base = request.url_root.rstrip("/")
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        f"Sitemap: {base}/sitemap.xml\n"
+    )
+    return body, 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    base = request.url_root.rstrip("/")
+    urls = "\n".join(
+        f"  <url><loc>{base + '/' if page == '/' else base + page}</loc></url>"
+        for page in PUBLIC_PAGES
+    )
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}\n"
+        "</urlset>\n"
+    )
+    return body, 200, {"Content-Type": "application/xml; charset=utf-8"}
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(os.path.join(BASE_DIR, "assets"), "favicon.ico")
+
+
 @app.route("/<path:filename>", methods=["GET"])
 def static_files(filename):
-    """Serve any existing file from the project root (fonts, assets, images)."""
-    full_path = os.path.join(BASE_DIR, filename)
-    if os.path.isfile(full_path):
-        return send_from_directory(BASE_DIR, filename)
-    abort(404)
+    """Serve site assets (fonts/, assets/, static/) — and nothing else.
+
+    The project root also holds the app source, tests, and (locally) the
+    bookings database and .env, so the resolved path must land inside one of
+    the known static directories. realpath() also collapses any ../ tricks
+    that would otherwise escape them.
+    """
+    full_path = os.path.realpath(os.path.join(BASE_DIR, filename))
+    allowed = tuple(
+        os.path.join(os.path.realpath(BASE_DIR), d) + os.sep for d in STATIC_DIRS
+    )
+    if not full_path.startswith(allowed):
+        abort(404)
+    if not os.path.isfile(full_path):
+        abort(404)
+    return send_file(full_path, conditional=True)
+
+
+@app.errorhandler(404)
+def page_not_found(_error):
+    """Branded 404 for page requests; JSON for API paths."""
+    if request.path.startswith("/api/"):
+        return jsonify({"ok": False, "error": "Not found."}), 404
+    return send_from_directory(BASE_DIR, "404.html"), 404
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Response headers — caching + security
+# ──────────────────────────────────────────────────────────────────────────
+@app.after_request
+def set_headers(response):
+    path = request.path
+
+    # Overwrite Flask's send_file default ("no-cache") with a policy per
+    # path type; only error responses keep their own caching behavior.
+    if response.status_code < 400:
+        if path.startswith("/fonts/") or path.startswith("/assets/lucide-"):
+            # Fonts and version-stamped bundles never change in place.
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        elif path.startswith("/assets/") or path == "/favicon.ico":
+            response.headers["Cache-Control"] = "public, max-age=604800, stale-while-revalidate=86400"
+        elif path.startswith("/static/"):
+            # Media slots are replaced in place (same filename), so keep
+            # browser caching short enough for swaps to show up same-day.
+            response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
+        elif path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-store"
+        else:
+            response.headers["Cache-Control"] = "no-cache"
+
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 
 # Initialize the database on import (covers both local + serverless cold starts).
