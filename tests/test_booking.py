@@ -550,7 +550,9 @@ def test_allowed_static_dirs_still_serve(client):
         "/fonts/Montserrat-ExtraBold.woff2",
         "/assets/logo.png",
         "/assets/og-card.jpg",
-        "/assets/favicon-32.png",
+        "/assets/favicon-32x32.png",
+        "/assets/favicon-16x16.png",
+        "/assets/apple-touch-icon.png",
         "/assets/lucide-1.23.0.min.js",
         "/favicon.ico",
     ):
