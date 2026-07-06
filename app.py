@@ -48,13 +48,13 @@ SHOP_PHONE = "(216) 903-4783"
 #  Named files live in static/media/. The site shows a slot only when its file
 #  exists AND is non-empty, so committed empty placeholders stay hidden until a
 #  real photo/video is dropped in with the same name. See static/media/README.md.
+#  (Gallery photos work differently: static/gallery/placeholder-N.jpg are
+#  always-visible placeholder images swapped in place — see that folder's README.)
 # ──────────────────────────────────────────────────────────────────────────
 MEDIA_DIR = os.path.join(BASE_DIR, "static", "media")
 MEDIA_SLOTS = (
     "hero-video.mp4",
     "hero-fallback.jpg",
-    "gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg", "gallery-4.jpg",
-    "gallery-5.jpg", "gallery-6.jpg", "gallery-7.jpg", "gallery-8.jpg",
     "rv-hero.jpg",
     "boat-hero.jpg",
 )
