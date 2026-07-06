@@ -1536,13 +1536,26 @@ footer{
 .hero-media video,.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
 .hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.45) 0%,rgba(15,28,47,.60) 55%,rgba(30,58,95,.78) 100%);}
 
+/* ─────────────── OUR WORK — horizontal gallery strip ─────────────── */
+/* Images live in /static/gallery/placeholder-N.jpg — swap in real photos with the same names. */
 #gallery{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
-.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-.gal-item{position:relative;margin:0;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-card);background:var(--bg-3);aspect-ratio:4 / 3;}
-.gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 450ms var(--ease);}
-@media (min-width:1024px){.gal-item:hover img{transform:scale(1.05);}}
-@media (max-width:900px){.gal-grid{grid-template-columns:repeat(2,1fr);}}
-@media (max-width:520px){.gal-grid{grid-template-columns:1fr;}}
+.work-strip-wrap{position:relative;}
+.work-strip{display:flex;gap:14px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;}
+.work-strip::-webkit-scrollbar{height:8px;}
+.work-strip::-webkit-scrollbar-track{background:transparent;}
+.work-item{flex:0 0 auto;width:clamp(250px,34vw,380px);aspect-ratio:4 / 3;margin:0;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-card);background:var(--bg-3);scroll-snap-align:start;}
+.work-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 450ms var(--ease);}
+/* "View All" veil — hover-capable devices; touch gets the button below the strip */
+.work-overlay{position:absolute;inset:4px 4px 16px;display:none;align-items:center;justify-content:center;border-radius:var(--radius-card);background:linear-gradient(180deg,rgba(10,16,26,.34),rgba(15,28,47,.52));opacity:0;pointer-events:none;transition:opacity 220ms var(--ease);z-index:2;}
+.work-overlay .btn{box-shadow:0 10px 26px rgba(10,16,26,.35);}
+.work-strip-cta{display:flex;justify-content:center;margin-top:26px;}
+@media (hover:hover) and (pointer:fine){
+  .work-overlay{display:flex;}
+  .work-strip-wrap:hover .work-overlay,.work-strip-wrap:focus-within .work-overlay{opacity:1;}
+  .work-strip-wrap:hover .work-overlay .btn,.work-strip-wrap:focus-within .work-overlay .btn{pointer-events:auto;}
+  .work-strip-cta{display:none;}
+  .work-item:hover img{transform:scale(1.05);}
+}
 
 /* ─────────────── SERVICES DROPDOWN ─────────────── */
 .nav-dd{position:relative;}
@@ -2248,16 +2261,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- ─────────────── BEFORE / AFTER GALLERY ─────────────── -->
-<!-- Populated at runtime from filled gallery-*.jpg slots; hidden while empty. -->
-<section id="gallery" hidden>
+<!-- ─────────────── OUR WORK — GALLERY STRIP ─────────────── -->
+<!-- Swap /static/gallery/placeholder-N.jpg (same names) to replace these with real photos. -->
+<section id="gallery">
   <div class="wrap">
     <div class="section-head center">
-      <span class="eyebrow">Before &amp; After</span>
-      <h2>See The Difference</h2>
-      <p>Real details, real results &mdash; straight from the driveway.</p>
+      <span class="eyebrow">The Gallery</span>
+      <h2>Our Work</h2>
+      <p>A look at the vehicles we bring back to showroom clean &mdash; scroll through, or open the full gallery.</p>
     </div>
-    <div class="gal-grid" id="galGrid"></div>
+    <div class="work-strip-wrap">
+      <div class="work-strip" role="region" aria-label="Our work — gallery preview, scroll sideways for more">
+        <figure class="work-item"><img src="/static/gallery/placeholder-1.jpg" alt="Tony's Detailing work photo 1" loading="lazy" decoding="async"></figure>
+        <figure class="work-item"><img src="/static/gallery/placeholder-2.jpg" alt="Tony's Detailing work photo 2" loading="lazy" decoding="async"></figure>
+        <figure class="work-item"><img src="/static/gallery/placeholder-3.jpg" alt="Tony's Detailing work photo 3" loading="lazy" decoding="async"></figure>
+        <figure class="work-item"><img src="/static/gallery/placeholder-4.jpg" alt="Tony's Detailing work photo 4" loading="lazy" decoding="async"></figure>
+        <figure class="work-item"><img src="/static/gallery/placeholder-5.jpg" alt="Tony's Detailing work photo 5" loading="lazy" decoding="async"></figure>
+        <figure class="work-item"><img src="/static/gallery/placeholder-6.jpg" alt="Tony's Detailing work photo 6" loading="lazy" decoding="async"></figure>
+      </div>
+      <div class="work-overlay">
+        <a href="gallery.html" class="btn lg">View All <i data-lucide="arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="work-strip-cta">
+      <a href="gallery.html" class="btn ghost">View Full Gallery <i data-lucide="arrow-right"></i></a>
+    </div>
   </div>
 </section>
 
@@ -2815,7 +2843,7 @@ if (bookingForm) {
 tdIcons();
 </script>
 
-<!-- ─────────────── MEDIA SLOTS (hero video/image + gallery) ─────────────── -->
+<!-- ─────────────── MEDIA SLOTS (hero video/image) ─────────────── -->
 <script>
 (function(){
   var MEDIA = '/static/media/';
@@ -2845,26 +2873,7 @@ tdIcons();
         host.appendChild(img);
       }
     }
-
-    // Before/After gallery — one tile per filled slot; hide the section if none.
-    var grid = document.getElementById('galGrid');
-    var section = document.getElementById('gallery');
-    if (grid && section){
-      var frag = document.createDocumentFragment(), count = 0;
-      for (var i = 1; i <= 8; i++){
-        if (!media['gallery-' + i + '.jpg']) continue;
-        var fig = document.createElement('figure');
-        fig.className = 'gal-item';
-        var im = document.createElement('img');
-        im.src = MEDIA + 'gallery-' + i + '.jpg';
-        im.loading = 'lazy'; im.decoding = 'async';
-        im.alt = "Tony's Detailing before-and-after result " + i;
-        fig.appendChild(im);
-        frag.appendChild(fig); count++;
-      }
-      if (count){ grid.appendChild(frag); section.hidden = false; }
-    }
-  }).catch(function(){ /* no manifest — hero keeps the gradient, gallery stays hidden */ });
+  }).catch(function(){ /* no manifest — hero keeps the gradient */ });
 })();
 </script>
 <script>

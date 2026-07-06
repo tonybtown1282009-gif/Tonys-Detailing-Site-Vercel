@@ -432,7 +432,7 @@ def test_home_links_to_rv_and_boat_pages_without_their_content(client):
 @pytest.mark.parametrize("path,marker", [
     ("/about", b"Owner-Operated"),
     ("/about.html", b"Meet Tony"),
-    ("/gallery", b"Before &amp; After"),
+    ("/gallery", b"Our Work"),
     ("/gallery.html", b"galGrid"),
     ("/reviews", b"reviews-embed"),
     ("/reviews.html", b"Trusted By Local Drivers"),
@@ -484,8 +484,11 @@ def test_media_manifest_lists_all_slots(client):
     data = res.get_json()
     # Every named slot is reported...
     assert set(data.keys()) == set(appmod.MEDIA_SLOTS)
-    # ...and the committed placeholders are empty, so all start hidden.
-    assert all(v is False for v in data.values())
+    # ...and each slot reflects whether its committed file has content
+    # (e.g. the hero video ships filled; unfilled placeholders stay hidden).
+    for name, filled in data.items():
+        size = os.path.getsize(os.path.join(appmod.MEDIA_DIR, name))
+        assert filled == (size > 0), name
 
 
 def test_media_present_requires_nonempty_known_slot(tmp_path, monkeypatch):
@@ -495,11 +498,11 @@ def test_media_present_requires_nonempty_known_slot(tmp_path, monkeypatch):
     assert appmod.media_present("../app.py") is False
     assert appmod.media_present("not-a-slot.jpg") is False
 
-    slot = tmp_path / "gallery-1.jpg"
+    slot = tmp_path / "rv-hero.jpg"
     slot.write_bytes(b"")          # empty placeholder → hidden
-    assert appmod.media_present("gallery-1.jpg") is False
+    assert appmod.media_present("rv-hero.jpg") is False
     slot.write_bytes(b"\xff\xd8\xff\xe0")  # real content → shown
-    assert appmod.media_present("gallery-1.jpg") is True
+    assert appmod.media_present("rv-hero.jpg") is True
 
 
 def test_media_manifest_reflects_filled_slot(client, tmp_path, monkeypatch):
@@ -507,7 +510,7 @@ def test_media_manifest_reflects_filled_slot(client, tmp_path, monkeypatch):
     (tmp_path / "hero-video.mp4").write_bytes(b"\x00\x00\x00\x18ftyp")
     data = client.get("/api/media").get_json()
     assert data["hero-video.mp4"] is True
-    assert data["gallery-1.jpg"] is False
+    assert data["rv-hero.jpg"] is False
 
 
 def test_media_placeholder_files_exist():
@@ -515,6 +518,35 @@ def test_media_placeholder_files_exist():
     # replaced in place without touching code.
     for slot in appmod.MEDIA_SLOTS:
         assert os.path.isfile(os.path.join(appmod.MEDIA_DIR, slot)), slot
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Gallery placeholders (static/gallery/) — always visible, swapped in place
+# ──────────────────────────────────────────────────────────────────────────
+def test_gallery_placeholder_images_serve(client):
+    # Unlike the hidden media slots, gallery placeholders ship with real
+    # content so the strip and grid are always visible.
+    for i in range(1, 7):
+        res = client.get(f"/static/gallery/placeholder-{i}.jpg")
+        assert res.status_code == 200
+        assert len(res.data) > 1000, f"placeholder-{i}.jpg looks empty"
+
+
+def test_homepage_our_work_strip(client):
+    html = client.get("/").data.decode("utf-8")
+    assert "Our Work" in html
+    assert "work-strip" in html
+    for i in range(1, 7):
+        assert f"/static/gallery/placeholder-{i}.jpg" in html
+    # The hover overlay links through to the full gallery page.
+    assert "work-overlay" in html
+    assert "gallery.html" in html
+
+
+def test_gallery_page_grid_lists_all_placeholders(client):
+    html = client.get("/gallery").data.decode("utf-8")
+    for i in range(1, 7):
+        assert f"/static/gallery/placeholder-{i}.jpg" in html
 
 
 def test_unknown_path_404(client):
@@ -599,7 +631,7 @@ def test_cache_headers_by_path_type(client):
     assert "immutable" in client.get("/fonts/Inter-Regular.woff2").headers["Cache-Control"]
     assert "immutable" in client.get("/assets/lucide-1.23.0.min.js").headers["Cache-Control"]
     assert "max-age=604800" in client.get("/assets/logo.png").headers["Cache-Control"]
-    assert "max-age=3600" in client.get("/static/media/gallery-1.jpg").headers["Cache-Control"]
+    assert "max-age=3600" in client.get("/static/gallery/placeholder-1.jpg").headers["Cache-Control"]
     assert client.get("/").headers["Cache-Control"] == "no-cache"
     assert client.get("/api/media").headers["Cache-Control"] == "no-store"
 

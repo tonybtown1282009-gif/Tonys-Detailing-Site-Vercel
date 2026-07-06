@@ -10,9 +10,13 @@ site once its file has real content; empty slots are hidden automatically.
 |------|----------------|-------------|
 | `hero-video.mp4` | Homepage hero background (desktop only). Falls back to `hero-fallback.jpg` if missing, and always uses the image on phones. | MP4, H.264, muted, ~10–20s loop, 1920×1080, keep under ~8 MB |
 | `hero-fallback.jpg` | Homepage hero background when there's no video (and the video's poster while it loads). | JPG, 1920×1080 |
-| `gallery-1.jpg` … `gallery-8.jpg` | Homepage **Before & After** gallery. Fill as many as you like — empty ones are skipped, and the whole section hides if all are empty. | JPG, ~1200×900, landscape |
 | `rv-hero.jpg` | `/rv-detailing` hero background. | JPG, 1920×1080 |
 | `boat-hero.jpg` | `/boat-detailing` hero background. | JPG, 1920×1080 |
+
+> **Gallery photos moved.** The homepage "Our Work" strip and the `/gallery`
+> page now use `static/gallery/placeholder-1.jpg` … `placeholder-6.jpg`. Those
+> are always visible (they ship as branded "photo coming soon" tiles) — replace
+> a file with a real photo of the same name and push. See `static/gallery/README.md`.
 
 ## How it works
 
