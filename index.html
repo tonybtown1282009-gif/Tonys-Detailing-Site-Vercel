@@ -1304,8 +1304,8 @@ footer{
 @media (max-width: 1299px){
   #nav{gap:18px;}
   .nav-links{gap:3px;}
-  .nav-links a{padding:8px 9px;font-size:10.5px;}
-  .nav-links a.active::after{left:9px;right:9px;}
+  .nav-links a,.nav-links .nav-dd-btn{padding:8px 9px;font-size:10.5px;}
+  .nav-links a.active::after,.nav-links .nav-dd-btn.active::after{left:9px;right:9px;}
 }
 @media (max-width: 1200px){
   .nav-phone{display:none;}
@@ -1543,6 +1543,50 @@ footer{
 @media (min-width:1024px){.gal-item:hover img{transform:scale(1.05);}}
 @media (max-width:900px){.gal-grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:520px){.gal-grid{grid-template-columns:1fr;}}
+
+/* ─────────────── SERVICES DROPDOWN ─────────────── */
+.nav-dd{position:relative;}
+.nav-dd-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--ff-h);font-weight:600;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--fg-2);
+  padding:8px 12px;border:0;border-radius:4px;
+  background:transparent;cursor:pointer;position:relative;
+  transition:color 150ms var(--ease), background 150ms var(--ease);
+}
+.nav-dd-btn .lucide{width:12px;height:12px;transition:transform 150ms var(--ease);}
+.nav-dd-btn:hover,.nav-dd.open .nav-dd-btn{color:var(--fg);background:rgba(30,58,95,.06);}
+.nav-dd.open .nav-dd-btn .lucide{transform:rotate(180deg);}
+.nav-dd-btn.active{color:var(--fg);}
+.nav-dd-btn.active::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;height:2px;background:var(--blue);}
+.nav-dd-menu{
+  position:absolute;top:calc(100% + 4px);left:0;min-width:200px;
+  background:#fff;border:1px solid var(--line);border-radius:6px;
+  box-shadow:0 14px 30px rgba(30,58,95,.16);
+  padding:6px;display:none;flex-direction:column;gap:2px;z-index:210;
+}
+.nav-dd.open .nav-dd-menu{display:flex;}
+.nav-links .nav-dd-menu a{padding:10px 12px;border-radius:4px;white-space:nowrap;}
+.nav-links .nav-dd-menu a[aria-current="page"]{color:var(--fg);background:rgba(30,58,95,.06);}
+#drawer .drawer-dd-btn{
+  display:flex;justify-content:space-between;align-items:center;width:100%;
+  font-family:var(--ff-h);font-weight:700;font-size:14px;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-2);
+  padding:16px 0;background:transparent;border:0;
+  border-bottom:1px solid var(--line);
+  cursor:pointer;text-align:left;
+  transition:color 150ms var(--ease);
+}
+#drawer .drawer-dd-btn:hover{color:var(--fg);}
+#drawer .drawer-dd-btn .lucide{width:14px;height:14px;transition:transform 200ms var(--ease);}
+#drawer .drawer-dd-btn[aria-expanded="true"] .lucide{transform:rotate(180deg);}
+#drawer .drawer-dd-list{display:flex;flex-direction:column;}
+#drawer .drawer-dd-list[hidden]{display:none;}
+#drawer .drawer-dd-list a{padding-left:18px;font-size:13px;font-weight:600;}
+#drawer .drawer-dd-list a:last-child{border-bottom:1px solid var(--line);}
+#drawer .drawer-dd-list a .lucide{width:14px;height:14px;}
 </style>
 </head>
 <body>
@@ -1561,11 +1605,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </span>
   </a>
   <div class="nav-links" role="navigation">
-    <a href="#services" data-target="services">Services</a>
+    <div class="nav-dd" id="navSvcDd">
+      <button type="button" class="nav-dd-btn" data-target="services" aria-expanded="false" aria-controls="navSvcMenu">Services <i data-lucide="chevron-down"></i></button>
+      <div class="nav-dd-menu" id="navSvcMenu">
+        <a href="/#services">Car Detailing</a>
+        <a href="/rv-detailing">RV Detailing</a>
+        <a href="/boat-detailing">Boat Detailing</a>
+      </div>
+    </div>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="deep-clean.html">Deep Clean</a>
-    <a href="rv-detailing.html">RVs</a>
-    <a href="boat-detailing.html">Boats</a>
     <a href="#area" data-target="area">Service Area</a>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
@@ -1582,11 +1631,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </nav>
 <div id="drawer">
-  <a href="#services">Services <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <button type="button" class="drawer-dd-btn" id="drawerSvcBtn" aria-expanded="false" aria-controls="drawerSvcList">Services <i data-lucide="chevron-down"></i></button>
+  <div class="drawer-dd-list" id="drawerSvcList" hidden>
+    <a href="/#services">Car Detailing <i data-lucide="arrow-right"></i></a>
+    <a href="/rv-detailing">RV Detailing <i data-lucide="arrow-right"></i></a>
+    <a href="/boat-detailing">Boat Detailing <i data-lucide="arrow-right"></i></a>
+  </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
-  <a href="rv-detailing.html">RVs <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
-  <a href="boat-detailing.html">Boats <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#contact">Contact <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -2589,7 +2641,7 @@ drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
 const sections = ['hero','services','pricing','area','disclaimer','future','booking','contact']
   .map(id => document.getElementById(id))
   .filter(Boolean);
-const navLinks = document.querySelectorAll('#nav .nav-links a');
+const navLinks = document.querySelectorAll('#nav .nav-links [data-target]');
 const setActive = (id) => {
   navLinks.forEach(a => a.classList.toggle('active', a.dataset.target === id));
 };
@@ -2813,6 +2865,76 @@ tdIcons();
       if (count){ grid.appendChild(frag); section.hidden = false; }
     }
   }).catch(function(){ /* no manifest — hero keeps the gradient, gallery stays hidden */ });
+})();
+</script>
+<script>
+/* ───────────────── SERVICES DROPDOWN (nav + mobile drawer) ───────────────── */
+(function(){
+  var dd = document.getElementById('navSvcDd');
+  if (dd){
+    var btn = dd.querySelector('.nav-dd-btn');
+    var menu = dd.querySelector('.nav-dd-menu');
+    var hoverable = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var closeTimer = null;
+    var setOpen = function(open){
+      dd.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    dd.addEventListener('mouseenter', function(){
+      if (!hoverable.matches) return;
+      clearTimeout(closeTimer);
+      setOpen(true);
+    });
+    dd.addEventListener('mouseleave', function(){
+      if (!hoverable.matches) return;
+      closeTimer = setTimeout(function(){ setOpen(false); }, 160);
+    });
+    btn.addEventListener('click', function(){
+      var open = dd.classList.contains('open');
+      // On hover-capable devices the menu is already open under the pointer — keep it open.
+      if (open && hoverable.matches && dd.matches(':hover')) return;
+      setOpen(!open);
+    });
+    btn.addEventListener('keydown', function(e){
+      if (e.key === 'ArrowDown'){
+        e.preventDefault();
+        setOpen(true);
+        menu.querySelector('a').focus();
+      }
+    });
+    menu.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      e.preventDefault();
+      var items = Array.prototype.slice.call(menu.querySelectorAll('a'));
+      var i = items.indexOf(document.activeElement);
+      var step = e.key === 'ArrowDown' ? 1 : -1;
+      items[(i + step + items.length) % items.length].focus();
+    });
+    dd.addEventListener('keydown', function(e){
+      if (e.key === 'Escape'){
+        setOpen(false);
+        btn.focus();
+      }
+    });
+    dd.addEventListener('focusout', function(e){
+      if (e.relatedTarget && !dd.contains(e.relatedTarget)) setOpen(false);
+    });
+    document.addEventListener('click', function(e){
+      if (!dd.contains(e.target)) setOpen(false);
+    });
+    Array.prototype.forEach.call(menu.querySelectorAll('a'), function(a){
+      a.addEventListener('click', function(){ setOpen(false); });
+    });
+  }
+  var dBtn = document.getElementById('drawerSvcBtn');
+  var dList = document.getElementById('drawerSvcList');
+  if (dBtn && dList){
+    dBtn.addEventListener('click', function(){
+      var open = dBtn.getAttribute('aria-expanded') === 'true';
+      dBtn.setAttribute('aria-expanded', String(!open));
+      dList.hidden = open;
+    });
+  }
 })();
 </script>
 </body>
