@@ -317,7 +317,10 @@ def send_notification_email(booking):
             vehicle1_expecting = row("Expecting / New Parent", "Yes — $50 off Deep Clean")
 
         vehicle2_rows = ""
-        if booking.get("vehicle_type_2") or booking.get("service_2"):
+        if any(
+            booking.get(k)
+            for k in ("vehicle_type_2", "service_2", "addons_2", "upcharges_2")
+        ):
             vehicle2_rows = (
                 section("Second Vehicle")
                 + row("Vehicle Type", booking.get("vehicle_type_2"))
@@ -421,6 +424,12 @@ def book():
     if not has_second:
         vehicle_type_2, service_2, addons_2, upcharges_2 = "", "", [], []
         expecting_2 = False
+    elif not service_2:
+        # Without a service the second vehicle can't be priced, so the 10%
+        # multi-vehicle discount would apply to a single car's total.
+        return jsonify(
+            {"ok": False, "error": "Please select a service for your second vehicle."}
+        ), 400
 
     # The expecting discount only applies to Deep Clean vehicles.
     expecting_1 = expecting_1 and service == DEEP_CLEAN_SERVICE

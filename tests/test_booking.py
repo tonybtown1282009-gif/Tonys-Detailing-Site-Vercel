@@ -307,6 +307,68 @@ def test_book_endpoint_clears_v2_when_single(client):
     assert row["total_estimate"] == 75  # only vehicle 1 counted
 
 
+def test_notification_email_includes_second_vehicle(monkeypatch):
+    import sys, types
+
+    sent = {}
+    fake = types.ModuleType("resend")
+    fake.api_key = ""
+    fake.Emails = types.SimpleNamespace(send=lambda payload: sent.update(payload))
+    monkeypatch.setitem(sys.modules, "resend", fake)
+    monkeypatch.setattr(appmod, "RESEND_API_KEY", "test-key")
+
+    booking = {
+        "name": "Jane", "phone": "440", "email": "jane@example.com",
+        "location": "Chardon", "vehicle_type": "Sedan", "service": "Full Detail",
+        "addons": "", "upcharges": "",
+        "vehicle_type_2": "Minivan", "service_2": "Deep Clean",
+        "addons_2": "Odor Eliminator", "upcharges_2": "Pet Hair",
+        "expecting_discount_1": False, "expecting_discount_2": False,
+        "num_vehicles": "2", "referred_by": "",
+        "discount_applied": "Multi-vehicle 10%", "total_estimate": 540.0,
+        "visits": 1, "notes": "", "timestamp": "2026-07-01 12:00:00",
+    }
+    assert appmod.send_notification_email(booking) is True
+    html = sent["html"]
+    assert "Second Vehicle" in html
+    assert "Minivan" in html
+    assert "Deep Clean" in html
+    assert "Odor Eliminator" in html
+    assert "Pet Hair" in html
+
+
+def test_book_endpoint_rejects_missing_second_vehicle_service(client):
+    """2+ vehicles without a second service must not book (the 10% discount
+    would otherwise apply to a single car's total)."""
+    for num in ("2", "3+"):
+        res = client.post("/api/book", data={
+            "name": "Gap", "phone": "216", "location": "Chardon",
+            "num_vehicles": num, "vehicle_type": "Sedan", "service": "Full Detail",
+        })
+        assert res.status_code == 400
+        data = res.get_json()
+        assert data["ok"] is False
+        assert "second vehicle" in data["error"]
+    conn = appmod.get_db()
+    row = conn.execute("SELECT COUNT(*) AS c FROM bookings").fetchone()
+    conn.close()
+    assert row["c"] == 0  # nothing persisted
+
+
+def test_multi_vehicle_discount_uses_combined_total(client):
+    res = client.post("/api/book", data={
+        "name": "Combo", "phone": "216", "location": "Chardon",
+        "num_vehicles": "2", "vehicle_type": "Sedan", "service": "Full Detail",
+        "vehicle_type_2": "SUV/Crossover", "service_2": "Interior Detail",
+        "addons_2": ["Odor Eliminator"],
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    # v1 195 + v2 (135 + 50) = 380 subtotal, 10% off => 342
+    assert data["total_estimate"] == 342.0
+    assert "Multi-vehicle 10% (-$38.00)" in data["discount_applied"]
+
+
 def test_book_endpoint_applies_and_persists_expecting_discount(client):
     res = client.post("/api/book", data={
         "name": "Parent", "phone": "440", "location": "Chardon",
