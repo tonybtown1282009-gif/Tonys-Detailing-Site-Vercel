@@ -524,9 +524,9 @@ def test_media_placeholder_files_exist():
 #  Gallery placeholders (static/gallery/) — always visible, swapped in place
 # ──────────────────────────────────────────────────────────────────────────
 def test_gallery_placeholder_images_serve(client):
-    # Unlike the hidden media slots, gallery placeholders ship with real
-    # content so the strip and grid are always visible.
-    for i in range(1, 7):
+    # Gallery images ship with real content so the strip and grid are always
+    # visible. Slots 7-34 are real customer-vehicle photos.
+    for i in range(7, 35):
         res = client.get(f"/static/gallery/placeholder-{i}.jpg")
         assert res.status_code == 200
         assert len(res.data) > 1000, f"placeholder-{i}.jpg looks empty"
@@ -536,7 +536,7 @@ def test_homepage_our_work_strip(client):
     html = client.get("/").data.decode("utf-8")
     assert "Our Work" in html
     assert "work-strip" in html
-    for i in range(1, 7):
+    for i in range(7, 35):
         assert f"/static/gallery/placeholder-{i}.jpg" in html
     # The hover overlay links through to the full gallery page.
     assert "work-overlay" in html
@@ -545,7 +545,7 @@ def test_homepage_our_work_strip(client):
 
 def test_gallery_page_grid_lists_all_placeholders(client):
     html = client.get("/gallery").data.decode("utf-8")
-    for i in range(1, 7):
+    for i in range(7, 35):
         assert f"/static/gallery/placeholder-{i}.jpg" in html
 
 
@@ -631,7 +631,7 @@ def test_cache_headers_by_path_type(client):
     assert "immutable" in client.get("/fonts/Inter-Regular.woff2").headers["Cache-Control"]
     assert "immutable" in client.get("/assets/lucide-1.23.0.min.js").headers["Cache-Control"]
     assert "max-age=604800" in client.get("/assets/logo.png").headers["Cache-Control"]
-    assert "max-age=3600" in client.get("/static/gallery/placeholder-1.jpg").headers["Cache-Control"]
+    assert "max-age=3600" in client.get("/static/gallery/placeholder-7.jpg").headers["Cache-Control"]
     assert client.get("/").headers["Cache-Control"] == "no-cache"
     assert client.get("/api/media").headers["Cache-Control"] == "no-store"
 
