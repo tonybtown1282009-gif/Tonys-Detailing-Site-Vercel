@@ -182,7 +182,34 @@ a{color:inherit;text-decoration:none;}
 
 /* ─────────────── REVIEWS ─────────────── */
 #reviews{padding:var(--sec-y) 0;background:var(--bg);border-top:1px solid var(--line);}
-.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+/* Horizontal scroll carousel — one row, swipe/drag on mobile + desktop */
+.rev-carousel{position:relative;}
+.rev-grid{
+  display:flex;gap:16px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 2px 18px;
+  scrollbar-width:none;-ms-overflow-style:none;   /* hide scrollbar (Firefox/IE) */
+}
+.rev-grid::-webkit-scrollbar{display:none;}         /* hide scrollbar (WebKit) */
+/* Cards keep a fixed width, don't shrink, and snap into place */
+.rev-card{flex:0 0 auto;width:340px;max-width:82vw;scroll-snap-align:center;}
+/* Scroll arrows — desktop only (swipe handles mobile) */
+.rev-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:44px;height:44px;border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+  background:var(--bg-3);color:var(--blue);
+  border:1px solid var(--line-2);box-shadow:var(--shadow-card);
+  cursor:pointer;transition:background 180ms var(--ease),color 180ms var(--ease),box-shadow 180ms var(--ease);
+}
+.rev-arrow:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.rev-arrow:active{transform:translateY(-50%) scale(.94);}
+.rev-arrow .lucide{width:20px;height:20px;}
+.rev-prev{left:-10px;}
+.rev-next{right:-10px;}
+@media (min-width:768px){.rev-arrow{display:inline-flex;}}
 .rev-card{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px 26px;display:flex;flex-direction:column;gap:14px;transition:transform 220ms var(--ease),border-color 220ms var(--ease),box-shadow 220ms var(--ease);}
 .rev-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 16px 34px rgba(0,0,0,.10);}
 .rev-stars{color:#f5a623;letter-spacing:3px;font-size:15px;}
@@ -241,7 +268,8 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
   .hbg{display:flex;}
 }
 @media (max-width:760px){
-  .rev-grid{grid-template-columns:1fr;}
+  /* Show ~1 card at a time on mobile (with a slight peek of the next) */
+  .rev-card{width:86vw;max-width:360px;}
 }
 @media (max-width:720px){
   .nav-phone{display:none;}
@@ -417,7 +445,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2>Trusted By Local Drivers</h2>
       <p>A few of the reviews customers have left on Google &mdash; real results, right in the driveway.</p>
     </div>
-    <div class="rev-grid">
+    <div class="rev-carousel">
+      <button type="button" class="rev-arrow rev-prev" aria-label="Previous reviews"><i data-lucide="chevron-left"></i></button>
+      <div class="rev-grid" id="revTrack">
       <article class="rev-card">
         <div class="rev-stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <p class="rev-quote">Excellent job. Very meticulous. Will hire Tony to do my wife's car soon!</p>
@@ -451,6 +481,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
       </article>
+      </div>
+      <button type="button" class="rev-arrow rev-next" aria-label="Next reviews"><i data-lucide="chevron-right"></i></button>
     </div>
   </div>
 </section>
@@ -582,6 +614,21 @@ if (hbg && drawer){
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   targets.forEach(t => obs.observe(t));
+})();
+
+// ── Reviews carousel arrows (scroll by one card) ──
+(function(){
+  const track = document.getElementById('revTrack');
+  if (!track) return;
+  const prev = document.querySelector('.rev-prev');
+  const next = document.querySelector('.rev-next');
+  const step = () => {
+    const card = track.querySelector('.rev-card');
+    const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 16;
+    return card ? card.getBoundingClientRect().width + gap : track.clientWidth;
+  };
+  if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+  if (next) next.addEventListener('click', () => track.scrollBy({ left:  step(), behavior: 'smooth' }));
 })();
 
 // ── Icons ──
