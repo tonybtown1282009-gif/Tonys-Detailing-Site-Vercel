@@ -291,6 +291,33 @@ a{color:inherit;text-decoration:none;}
 .hbg.open span:nth-child(2){opacity:0;}
 .hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
 
+/* ─────────────── MOBILE FLOATING "BOOK NOW" CTA ─────────────── */
+/* Hidden on desktop — the nav links / Email Me CTA already cover booking there.
+   Shown only on the mobile breakpoint where the row collapses to the hamburger. */
+.mobile-book-fab{
+  display:none;
+  position:fixed;
+  /* Pinned just below the fixed nav bar, tracking the promo-banner state so it
+     never overlaps the logo or the hamburger (which pack to the LEFT once the
+     nav links collapse). Sits in the top-right, stays put while scrolling. */
+  top:calc(var(--promo-h) + var(--nav-h) + 10px);
+  right:var(--pad-x);
+  z-index:190; /* above page content, below the drawer (195) so the open menu covers it */
+  height:34px;padding:0 15px;
+  align-items:center;justify-content:center;
+  font-family:var(--ff-h);font-weight:700;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;line-height:1;
+  color:#fff;background:var(--blue);
+  border-radius:8px;
+  /* light ring + neutral shadow keep the pill readable on the dark navy hero
+     as well as on the light content sections below it */
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 4px 16px rgba(0,0,0,.32);
+  transition:background 180ms var(--ease), transform 160ms var(--ease), box-shadow 180ms var(--ease);
+}
+.mobile-book-fab:hover{background:var(--blue-h);box-shadow:0 6px 20px rgba(0,0,0,.36);}
+.mobile-book-fab:active{transform:scale(.97);background:var(--blue-p);}
+
 #drawer{
   position:fixed;top:calc(var(--nav-h) + var(--promo-h));left:0;right:0;z-index:195;
   background:#ffffff;backdrop-filter:blur(14px);
@@ -1319,6 +1346,7 @@ footer{
   .nav-phone{display:none;}
   .nav-right .btn{display:none;}
   .hbg{display:flex;}
+  .mobile-book-fab{display:inline-flex;}
   .hero-phone-pill{display:none;}
   .svc-grid{grid-template-columns:1fr;}
   .svc-card{min-height:auto;}
@@ -1676,6 +1704,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </button>
   </div>
 </nav>
+<!-- Mobile-only floating Book Now CTA (points to the same #booking anchor as the nav/drawer) -->
+<a href="#booking" class="mobile-book-fab" aria-label="Book Now">Book Now</a>
 <div id="drawer">
   <button type="button" class="drawer-dd-btn" id="drawerSvcBtn" aria-expanded="false" aria-controls="drawerSvcList">Services <i data-lucide="chevron-down"></i></button>
   <div class="drawer-dd-list" id="drawerSvcList" hidden>
