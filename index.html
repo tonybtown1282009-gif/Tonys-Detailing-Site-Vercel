@@ -1432,7 +1432,41 @@ footer{
 
 /* ─────────────── TESTIMONIALS ─────────────── */
 #testimonials{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
-.tst-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px;max-width:880px;margin-left:auto;margin-right:auto;}
+/* Reviews — horizontal scroll strip (was a 2-col grid) */
+.tst-scroll-wrap{position:relative;margin-top:8px;max-width:880px;margin-left:auto;margin-right:auto;}
+.tst-strip{
+  display:flex;gap:18px;
+  overflow-x:auto;
+  padding:4px 4px 16px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;    /* momentum scroll on iOS */
+  scroll-behavior:smooth;
+  scrollbar-width:none;                /* Firefox — hide scrollbar, keep scroll */
+}
+.tst-strip::-webkit-scrollbar{display:none;}
+.tst-strip > .tst-card{flex:0 0 auto;width:clamp(280px,80vw,320px);scroll-snap-align:start;}
+/* Edge fade overlays — signal more cards off-screen (toggled by .has-prev/.has-next) */
+.tst-fade{position:absolute;top:0;bottom:16px;width:48px;pointer-events:none;z-index:2;opacity:0;transition:opacity 200ms var(--ease);}
+.tst-fade.l{left:0;background:linear-gradient(90deg,var(--bg-2),rgba(244,244,244,0));}
+.tst-fade.r{right:0;background:linear-gradient(270deg,var(--bg-2),rgba(244,244,244,0));}
+.tst-scroll-wrap.has-prev .tst-fade.l{opacity:1;}
+.tst-scroll-wrap.has-next .tst-fade.r{opacity:1;}
+/* Arrow buttons — desktop / fine-pointer only */
+.tst-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:40px;height:40px;border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+  background:var(--bg-3);border:1px solid var(--line-2);
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+  color:var(--fg);cursor:pointer;
+  transition:background 160ms var(--ease),border-color 160ms var(--ease),color 160ms var(--ease),opacity 160ms var(--ease);
+}
+.tst-arrow:hover{background:var(--blue);border-color:var(--blue);color:#fff;}
+.tst-arrow.l{left:-6px;}
+.tst-arrow.r{right:-6px;}
+.tst-arrow i{width:20px;height:20px;}
+.tst-arrow[disabled]{opacity:0;pointer-events:none;}
+@media (hover:hover) and (pointer:fine){.tst-arrow{display:flex;}}
 .tst-card{
   background:var(--bg-3);
   border:1px solid var(--line);
@@ -1486,7 +1520,6 @@ footer{
 @media (max-width: 1000px){
   .trust-strip{grid-template-columns:1fr 1fr;}
   .hiw-grid{grid-template-columns:1fr;max-width:520px;margin-left:auto;margin-right:auto;}
-  .tst-grid{grid-template-columns:1fr;max-width:560px;margin-left:auto;margin-right:auto;}
 }
 @media (max-width: 560px){
   .trust-strip{grid-template-columns:1fr;}
@@ -2228,7 +2261,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2>Trusted By Local Drivers</h2>
       <p>Real results, right in the driveway &mdash; straight from our Google reviews.</p>
     </div>
-    <div class="tst-grid">
+    <div class="tst-scroll-wrap">
+      <button class="tst-arrow l" type="button" aria-label="Scroll reviews left"><i data-lucide="chevron-left"></i></button>
+      <button class="tst-arrow r" type="button" aria-label="Scroll reviews right"><i data-lucide="chevron-right"></i></button>
+      <div class="tst-fade l" aria-hidden="true"></div>
+      <div class="tst-fade r" aria-hidden="true"></div>
+      <div class="tst-strip" role="region" aria-label="Customer reviews — scroll sideways for more">
       <article class="tst-card">
         <div class="tst-stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <p class="tst-quote">Excellent job. Very meticulous. Will hire Tony to do my wife's car soon!</p>
@@ -2273,7 +2311,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
       </article>
-    </div>
+      </div><!-- .tst-strip -->
+    </div><!-- .tst-scroll-wrap -->
     <div style="text-align:center;margin-top:32px;">
       <a href="https://www.google.com/search?q=Tony%27s+Detailing+Chardon+OH" target="_blank" rel="noopener" class="btn ghost sm">
         Read Our Reviews On Google
@@ -2988,6 +3027,35 @@ tdIcons();
       dList.hidden = open;
     });
   }
+})();
+
+/* Reviews strip — arrow nav + edge-fade state */
+(function(){
+  var wrap = document.querySelector('.tst-scroll-wrap');
+  if (!wrap) return;
+  var strip = wrap.querySelector('.tst-strip');
+  if (!strip) return;
+  var prev = wrap.querySelector('.tst-arrow.l');
+  var next = wrap.querySelector('.tst-arrow.r');
+  var step = function(){
+    var card = strip.querySelector('.tst-card');
+    var gap = parseFloat(getComputedStyle(strip).columnGap) || 18;
+    return card ? card.getBoundingClientRect().width + gap : strip.clientWidth * 0.9;
+  };
+  var update = function(){
+    var max = strip.scrollWidth - strip.clientWidth;
+    var hasPrev = strip.scrollLeft > 8;          // tolerance for the strip's 4px start padding
+    var hasNext = strip.scrollLeft < max - 8;
+    wrap.classList.toggle('has-prev', hasPrev);
+    wrap.classList.toggle('has-next', hasNext);
+    if (prev) prev.disabled = !hasPrev;
+    if (next) next.disabled = !hasNext;
+  };
+  if (prev) prev.addEventListener('click', function(){ strip.scrollBy({left: -step(), behavior: 'smooth'}); });
+  if (next) next.addEventListener('click', function(){ strip.scrollBy({left:  step(), behavior: 'smooth'}); });
+  strip.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', update);
+  update();
 })();
 </script>
 </body>
