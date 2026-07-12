@@ -8,6 +8,7 @@ input validation, and static file serving.
 Run with:  pytest -v
 """
 
+import json
 import os
 import tempfile
 
@@ -361,6 +362,100 @@ def test_loyalty_visits_increment(client):
             "location": "Chardon", "service": "Exterior Detail", "vehicle_type": "Sedan",
         })
         assert res.get_json()["visits"] == expected
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Google Sheets backup webhook
+# ──────────────────────────────────────────────────────────────────────────
+def test_sheets_webhook_skipped_when_unset(monkeypatch):
+    """No URL configured => no HTTP call, returns False."""
+    monkeypatch.setattr(appmod, "SHEETS_WEBHOOK_URL", "")
+    called = {"n": 0}
+
+    def fake_urlopen(*args, **kwargs):  # pragma: no cover — should never run
+        called["n"] += 1
+
+    monkeypatch.setattr(appmod.urllib.request, "urlopen", fake_urlopen)
+    assert appmod.send_to_sheets_webhook({"name": "X"}) is False
+    assert called["n"] == 0
+
+
+def test_sheets_webhook_posts_payload(monkeypatch):
+    """When configured, the full booking is POSTed as JSON within the timeout."""
+    monkeypatch.setattr(appmod, "SHEETS_WEBHOOK_URL", "https://example.com/exec")
+    captured = {}
+
+    def fake_urlopen(req, timeout=None):
+        captured["url"] = req.full_url
+        captured["method"] = req.get_method()
+        captured["content_type"] = req.headers.get("Content-type")
+        captured["timeout"] = timeout
+        captured["body"] = req.data.decode("utf-8")
+        return None
+
+    monkeypatch.setattr(appmod.urllib.request, "urlopen", fake_urlopen)
+
+    booking = {"name": "Jane", "total_estimate": 195.0, "expecting_discount_1": True}
+    assert appmod.send_to_sheets_webhook(booking) is True
+    assert captured["url"] == "https://example.com/exec"
+    assert captured["method"] == "POST"
+    assert captured["content_type"] == "application/json"
+    assert captured["timeout"] == appmod.SHEETS_WEBHOOK_TIMEOUT
+    assert json.loads(captured["body"]) == booking
+
+
+def test_sheets_webhook_failure_is_swallowed(monkeypatch):
+    """A webhook error is caught, not raised, so a booking can't break."""
+    monkeypatch.setattr(appmod, "SHEETS_WEBHOOK_URL", "https://example.com/exec")
+
+    def boom(*args, **kwargs):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(appmod.urllib.request, "urlopen", boom)
+    assert appmod.send_to_sheets_webhook({"name": "X"}) is False
+
+
+def test_book_endpoint_survives_webhook_failure(client, monkeypatch):
+    """A failing Sheets webhook must not affect the booking response."""
+    monkeypatch.setattr(appmod, "SHEETS_WEBHOOK_URL", "https://example.com/exec")
+
+    def boom(*args, **kwargs):
+        raise OSError("timeout")
+
+    monkeypatch.setattr(appmod.urllib.request, "urlopen", boom)
+    res = client.post("/api/book", data={
+        "name": "Webhook Down", "phone": "440", "location": "Chardon",
+        "service": "Exterior Detail", "vehicle_type": "Sedan",
+    })
+    assert res.status_code == 200
+    assert res.get_json()["ok"] is True
+    # And the booking was still persisted.
+    conn = appmod.get_db()
+    row = conn.execute("SELECT * FROM bookings WHERE name = 'Webhook Down'").fetchone()
+    conn.close()
+    assert row is not None
+
+
+def test_book_endpoint_calls_webhook_with_full_payload(client, monkeypatch):
+    """The endpoint forwards the assembled booking dict to the webhook."""
+    monkeypatch.setattr(appmod, "SHEETS_WEBHOOK_URL", "https://example.com/exec")
+    captured = {}
+
+    def fake_urlopen(req, timeout=None):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return None
+
+    monkeypatch.setattr(appmod.urllib.request, "urlopen", fake_urlopen)
+    client.post("/api/book", data={
+        "name": "Full Payload", "phone": "440", "email": "fp@example.com",
+        "location": "Chardon", "service": "Full Detail", "vehicle_type": "Sedan",
+        "notes": "gate code 1234",
+    })
+    body = captured["body"]
+    assert body["name"] == "Full Payload"
+    assert body["notes"] == "gate code 1234"
+    assert body["total_estimate"] == 195
+    assert "timestamp" in body
 
 
 # ──────────────────────────────────────────────────────────────────────────

@@ -14,6 +14,46 @@ Website for **Tony's Detailing** — professional mobile auto detailing based in
 
 The site deploys automatically from the `main` branch via Vercel. The entry point is `index.html`.
 
+## Booking notifications & Google Sheets backup
+
+Every booking is written to SQLite and emailed to the shop via Resend. It can
+**also** be mirrored to a Google Sheet as an off-site backup you can sort,
+filter, and export. This is optional and driven entirely by one env var — if
+it's unset, the app skips it silently, and a slow or failing webhook never
+blocks the booking or the email (5-second timeout, errors are logged only).
+
+### 1. Create the sheet and Apps Script
+
+1. Create a new Google Sheet (this is where bookings land). Leave the first tab
+   empty — the script writes a header row on the first booking.
+2. In that sheet, open **Extensions → Apps Script**.
+3. Delete the starter code, paste in the contents of
+   [`tools/sheets-backup.gs`](tools/sheets-backup.gs), and **Save**.
+
+### 2. Deploy it as a Web App
+
+1. Click **Deploy → New deployment**.
+2. Set **Type** (gear icon) to **Web app**.
+3. Configure:
+   - **Execute as:** *Me*
+   - **Who has access:** *Anyone* (this makes it callable by the server; no
+     Google login is required, and only your Flask app knows the URL)
+4. Click **Deploy**, authorize the script when prompted, and copy the
+   **Web app URL** (it ends in `/exec`).
+
+> Re-deploying after editing the script: use **Deploy → Manage deployments →
+> (edit) → New version** so the `/exec` URL stays the same.
+
+### 3. Add the URL to Vercel
+
+1. In Vercel: **Project → Settings → Environment Variables**.
+2. Add `SHEETS_WEBHOOK_URL` = the `/exec` URL, for the environments you want
+   (Production / Preview / Development).
+3. Redeploy so the new variable takes effect.
+
+Submit a test booking; a new row should appear in the sheet within a second or
+two. To turn the backup off, remove the variable and redeploy.
+
 ## Updating photos & video
 
 All swappable media lives in [`static/media/`](static/media/) as named slots.

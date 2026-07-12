@@ -9,8 +9,10 @@ notification to the shop via the Resend API.
 Brand: Tony's Detailing | (216) 903-4783 | tonysdetailing.net@gmail.com
 """
 
+import json
 import os
 import sqlite3
+import urllib.request
 from datetime import datetime
 
 from flask import (
@@ -64,6 +66,11 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 # Resend requires a verified sender domain. onboarding@resend.dev works out of
 # the box for testing; set RESEND_FROM once a domain is verified.
 RESEND_FROM = os.environ.get("RESEND_FROM", "Tony's Detailing <onboarding@resend.dev>")
+
+# Optional Google Sheets backup. When set, each booking is POSTed as JSON to a
+# Google Apps Script web app that appends a row to a spreadsheet. Unset = off.
+SHEETS_WEBHOOK_URL = os.environ.get("SHEETS_WEBHOOK_URL", "")
+SHEETS_WEBHOOK_TIMEOUT = 5  # seconds — a slow/failing webhook must not stall a booking
 
 # ──────────────────────────────────────────────────────────────────────────
 #  Pricing (server-side, authoritative)
@@ -382,6 +389,37 @@ def send_notification_email(booking):
 
 
 # ──────────────────────────────────────────────────────────────────────────
+#  Google Sheets backup (Apps Script webhook)
+# ──────────────────────────────────────────────────────────────────────────
+def send_to_sheets_webhook(booking):
+    """Mirror a booking to a Google Sheet via an Apps Script web app.
+
+    Best-effort backup: POSTs the full booking payload as JSON and returns
+    True on success. A missing URL, timeout, or any other failure is logged
+    and swallowed so it can never block the booking write or the email.
+    """
+    if not SHEETS_WEBHOOK_URL:
+        return False  # feature disabled — skip silently
+
+    try:
+        payload = json.dumps(booking).encode("utf-8")
+        req = urllib.request.Request(
+            SHEETS_WEBHOOK_URL,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        # Apps Script answers with a 302 to googleusercontent.com; the row is
+        # already appended by the time doPost returns, so we just need the call
+        # to complete. urlopen follows the redirect for us.
+        urllib.request.urlopen(req, timeout=SHEETS_WEBHOOK_TIMEOUT)
+        return True
+    except Exception as exc:  # noqa: BLE001 — Sheets backup must never break a booking
+        app.logger.error("Failed to POST booking to Sheets webhook: %s", exc)
+        return False
+
+
+# ──────────────────────────────────────────────────────────────────────────
 #  Routes — booking API
 # ──────────────────────────────────────────────────────────────────────────
 @app.route("/api/book", methods=["POST"])
@@ -471,6 +509,7 @@ def book():
         "visits": visits, "notes": notes, "timestamp": timestamp,
     }
     send_notification_email(booking)
+    send_to_sheets_webhook(booking)
 
     return jsonify(
         {
