@@ -691,45 +691,35 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
   background:var(--bg);
   border-top:1px solid var(--line);
 }
-.cer-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:16px;margin-top:24px;
-}
-.cer-card{
+.cer-tiers{display:flex;flex-direction:column;gap:18px;margin-top:24px;}
+.cer-tier{
   position:relative;
+  display:grid;grid-template-columns:1fr 320px;
   background:var(--bg-3);
   border:1px solid var(--line);
   border-radius:var(--radius-card);
   box-shadow:var(--shadow-card);
-  padding:28px 24px 24px;
-  display:flex;flex-direction:column;
-  transition:transform 220ms var(--ease), border-color 220ms var(--ease), box-shadow 220ms var(--ease);
   overflow:hidden;
+  transition:border-color 220ms var(--ease), box-shadow 220ms var(--ease);
 }
-.cer-card:hover{
-  transform:translateY(-4px);
-  border-color:var(--line-2);
-  box-shadow:0 14px 32px rgba(0,0,0,.10);
-}
-.cer-card::before{
+.cer-tier:hover{border-color:var(--line-2);box-shadow:0 14px 32px rgba(0,0,0,.10);}
+.cer-tier::before{
   content:"";position:absolute;top:0;left:0;right:0;height:2px;
   background:var(--blue);
-  transform:scaleX(.18);transform-origin:left;
+  transform:scaleX(.12);transform-origin:left;
   transition:transform 360ms var(--ease);
 }
-.cer-card:hover::before{transform:scaleX(1);}
-.cer-card.best{
-  border-color:rgba(45,85,144,.32);
-  background:linear-gradient(180deg, rgba(30,58,95,.06), var(--bg-3) 55%);
-}
-.cer-card.best::before{transform:scaleX(1);}
+.cer-tier:hover::before{transform:scaleX(1);}
+.cer-tier.best{border-color:rgba(45,85,144,.32);}
+.cer-tier.best::before{transform:scaleX(1);}
 .cer-flag{
-  position:absolute;top:0;right:0;
+  position:absolute;top:0;right:0;z-index:1;
   font-family:var(--ff-h);font-weight:700;font-size:9px;
   letter-spacing:.14em;text-transform:uppercase;color:#fff;
   background:var(--blue);
   padding:6px 11px;border-radius:0 0 0 4px;
 }
+.cer-body{padding:30px 30px 28px;}
 .cer-term{
   font-family:var(--ff-h);font-weight:700;font-size:10px;
   letter-spacing:.14em;text-transform:uppercase;
@@ -737,16 +727,62 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
 }
 .cer-name{
   font-family:var(--ff-h);font-weight:800;
-  font-size:23px;line-height:1.05;letter-spacing:-.015em;
-  color:var(--fg);margin-bottom:10px;
+  font-size:26px;line-height:1.05;letter-spacing:-.015em;
+  color:var(--fg);margin-bottom:12px;
 }
-.cer-sub{
-  font-size:13px;color:var(--fg-3);line-height:1.6;
-  margin-bottom:20px;
-  /* Keeps the price rows on the same baseline across all three tiers. */
-  min-height:63px;
+.cer-lead{
+  font-size:14px;color:var(--fg-2);line-height:1.65;
+  max-width:60ch;
 }
-.cer-prices{list-style:none;margin-bottom:22px;flex:1;}
+.cer-proc-head{
+  font-family:var(--ff-h);font-weight:700;font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--fg);
+  margin-top:24px;padding-top:20px;border-top:1px solid var(--line);
+}
+.cer-proc{
+  list-style:none;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 26px;margin-top:16px;
+}
+.cer-proc li{
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:13px;color:var(--fg-2);line-height:1.5;
+}
+.cer-proc li .lucide{
+  width:13px;height:13px;color:var(--blue-l);
+  flex-shrink:0;margin-top:3px;stroke-width:2.5;
+}
+.cer-proc li .tx{min-width:0;}
+.cer-proc li .co{color:var(--fg-3);}
+.cer-meta{
+  display:flex;align-items:center;gap:8px;
+  margin-top:18px;
+  font-family:var(--ff-h);font-weight:600;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);
+}
+.cer-meta .lucide{width:12px;height:12px;color:var(--blue-l);}
+.cer-rated{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:18px;padding:10px 14px;
+  border-radius:3px;
+  background:rgba(30,58,95,.06);
+  border:1px solid rgba(30,58,95,.18);
+  font-family:var(--ff-h);font-weight:700;font-size:11px;
+  letter-spacing:.06em;color:var(--blue-l);
+}
+.cer-rated .lucide{width:13px;height:13px;}
+.cer-rail{
+  padding:30px 28px 28px;
+  border-left:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(30,58,95,.045), rgba(30,58,95,.01));
+  display:flex;flex-direction:column;
+}
+.cer-rail-lbl{
+  font-family:var(--ff-h);font-weight:700;font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--fg-4);
+  margin-bottom:12px;
+}
+.cer-prices{list-style:none;}
 .cer-prices li{
   display:flex;align-items:baseline;justify-content:space-between;gap:12px;
   padding:11px 0;border-bottom:1px solid var(--line);
@@ -760,50 +796,23 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
 .cer-step{
   font-family:var(--ff-h);font-weight:600;font-size:10.5px;
   letter-spacing:.06em;text-transform:uppercase;color:var(--blue-l);
-  margin-bottom:18px;
+  margin-top:16px;line-height:1.5;
 }
 .cer-cta{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   font-family:var(--ff-h);font-weight:700;font-size:10px;
   letter-spacing:.1em;text-transform:uppercase;
   color:#fff;background:var(--blue);
-  padding:12px 14px;border-radius:4px;
-  margin-top:auto;
+  padding:13px 14px;border-radius:4px;
+  margin-top:20px;
   transition:background 180ms var(--ease);
 }
 .cer-cta:hover{background:var(--blue-h);}
 .cer-cta .lucide{width:11px;height:11px;}
-.cer-incl{
-  margin-top:18px;
-  background:var(--bg-3);
-  border:1px solid var(--line);
-  border-radius:var(--radius-card);
-  box-shadow:var(--shadow-card);
-  overflow:hidden;
+.cer-fine{
+  font-size:11.5px;color:var(--fg-4);line-height:1.55;
+  margin-top:12px;
 }
-.cer-incl-head{
-  display:flex;align-items:center;gap:10px;
-  padding:18px 22px;
-  background:linear-gradient(180deg, rgba(30,58,95,.08), rgba(30,58,95,.02));
-  border-bottom:1px solid var(--line);
-}
-.cer-incl-head .lucide{width:15px;height:15px;color:var(--blue-l);}
-.cer-incl-head h3{
-  font-family:var(--ff-h);font-weight:700;font-size:13px;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--fg);
-}
-.cer-incl-list{
-  list-style:none;
-  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
-}
-.cer-incl-list li{
-  display:flex;align-items:flex-start;gap:9px;
-  font-size:13px;color:var(--fg-2);line-height:1.45;
-  padding:16px 22px;
-  border-right:1px solid var(--line);
-}
-.cer-incl-list li:last-child{border-right:none;}
-.cer-incl-list li .lucide{width:13px;height:13px;color:var(--blue-l);flex-shrink:0;margin-top:2px;stroke-width:2.5;}
 .cer-note{
   margin-top:18px;padding:16px 20px;
   border-left:2px solid var(--blue);
@@ -812,6 +821,28 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
 }
 .cer-note p{font-size:13px;color:var(--fg-2);line-height:1.6;}
 .cer-note strong{color:var(--fg);font-weight:600;}
+.cer-caution{
+  margin-top:14px;padding:16px 20px;
+  border:1px solid rgba(30,58,95,.20);
+  border-left:2px solid var(--blue);
+  border-radius:0 4px 4px 0;
+  background:var(--bg-3);
+}
+.cer-caution .cau-head{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--ff-h);font-weight:700;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg);
+  margin-bottom:9px;
+}
+.cer-caution .cau-head .lucide{width:14px;height:14px;color:var(--blue-l);}
+.cer-caution p{font-size:12.5px;color:var(--fg-2);line-height:1.65;}
+.cer-caution ul{list-style:none;margin:8px 0 0;}
+.cer-caution li{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:12.5px;color:var(--fg-2);line-height:1.6;padding:3px 0;
+}
+.cer-caution li .lucide{width:12px;height:12px;color:var(--blue-l);flex-shrink:0;margin-top:4px;}
+.cer-caution strong{color:var(--fg);font-weight:600;}
 
 /* ─────────────── SERVICE AREA ─────────────── */
 #area{
@@ -1331,9 +1362,7 @@ footer{
 @media (max-width: 1100px){
   .svc-grid{grid-template-columns:repeat(2,1fr);}
   .pricing-grid{grid-template-columns:1fr;}
-  .cer-incl-list{grid-template-columns:repeat(2,1fr);}
-  .cer-incl-list li:nth-child(2n){border-right:none;}
-  .cer-incl-list li:nth-child(-n+2){border-bottom:1px solid var(--line);}
+  .cer-tier{grid-template-columns:1fr 280px;}
   .contact-layout{grid-template-columns:1fr;}
   .contact-side{flex-direction:row;flex-wrap:wrap;}
   .contact-side .cside-card{flex:1;min-width:240px;}
@@ -1344,6 +1373,9 @@ footer{
   .proc-arrow{display:none;}
 }
 @media (max-width: 900px){
+  .cer-tier{grid-template-columns:1fr;}
+  .cer-proc{grid-template-columns:1fr;}
+  .cer-rail{border-left:none;border-top:1px solid var(--line);}
   .area-layout{grid-template-columns:1fr;gap:40px;}
   .area-diagram{max-width:340px;margin:0 auto;}
 }
@@ -1371,12 +1403,9 @@ footer{
   .hero-phone-pill{display:none;}
   .svc-grid{grid-template-columns:1fr;}
   .svc-card{min-height:auto;}
-  .cer-grid{grid-template-columns:1fr;}
-  .cer-sub{min-height:0;}
-  .cer-incl-list{grid-template-columns:1fr;}
-  .cer-incl-list li{border-right:none;border-bottom:1px solid var(--line);padding:14px 16px;}
-  .cer-incl-list li:last-child{border-bottom:none;}
-  .cer-incl-head{padding:14px 16px;}
+  .cer-body{padding:24px 20px 22px;}
+  .cer-rail{padding:22px 20px;}
+  .cer-note,.cer-caution{padding:14px 16px;}
   .form-grid{grid-template-columns:1fr;}
   .form-actions{flex-direction:column-reverse;}
   .form-actions .btn{width:100%;}
@@ -2190,64 +2219,117 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head">
       <span class="eyebrow">Long-Term Paint Protection</span>
       <h2>Ceramic Coating</h2>
-      <p>Three durability tiers, priced by vehicle size. Every tier gets the same full prep &mdash; wash, clay bar, and iron decontamination &mdash; so the coating bonds to genuinely clean paint.</p>
+      <p>Three tiers, each priced by vehicle size. The 5-Year and Elite tiers run our full coating process &mdash; the same prep and application either way, with a longer-rated coating on the Elite.</p>
     </div>
 
-    <div class="cer-grid">
-      <article class="cer-card">
-        <div class="cer-term">Tier 01 &middot; 2 Years</div>
-        <h3 class="cer-name">2-Year Coating</h3>
-        <p class="cer-sub">Entry-level ceramic protection with a hydrophobic finish that outlasts wax by seasons.</p>
-        <ul class="cer-prices">
-          <li><span class="sz">Sedan</span><span class="amt">$299.99</span></li>
-          <li><span class="sz">SUV / Crossover</span><span class="amt">$349.99</span></li>
-          <li><span class="sz">Large SUV / Truck</span><span class="amt">$399.99</span></li>
-        </ul>
-        <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+    <div class="cer-tiers">
+
+      <!-- Tier 01 — 2-Year -->
+      <article class="cer-tier">
+        <div class="cer-body">
+          <div class="cer-term">Tier 01 &middot; 2 Years</div>
+          <h3 class="cer-name">2-Year Coating</h3>
+          <p class="cer-lead">Entry-level ceramic protection with a hydrophobic finish that outlasts wax by seasons. Decontamination prep and coating application, without the polish step &mdash; the quickest route to real coating protection.</p>
+          <div class="cer-proc-head">Includes</div>
+          <ul class="cer-proc">
+            <li><i data-lucide="check"></i><span class="tx">Full exterior wash</span></li>
+            <li><i data-lucide="check"></i><span class="tx">Clay bar decontamination</span></li>
+            <li><i data-lucide="check"></i><span class="tx">Iron decontamination</span></li>
+            <li><i data-lucide="check"></i><span class="tx">Ceramic coating application</span></li>
+          </ul>
+        </div>
+        <aside class="cer-rail">
+          <div class="cer-rail-lbl">Priced by vehicle size</div>
+          <ul class="cer-prices">
+            <li><span class="sz">Sedan</span><span class="amt">$299.99</span></li>
+            <li><span class="sz">SUV / Crossover</span><span class="amt">$349.99</span></li>
+            <li><span class="sz">Large SUV / Truck</span><span class="amt">$399.99</span></li>
+          </ul>
+          <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+          <p class="cer-fine">2-year rated coating. No polish step included on this tier.</p>
+        </aside>
       </article>
 
-      <article class="cer-card">
-        <div class="cer-term">Tier 02 &middot; 5 Years</div>
-        <h3 class="cer-name">5-Year Coating</h3>
-        <p class="cer-sub">A thicker, harder-wearing layer for owners keeping the vehicle long term.</p>
-        <ul class="cer-prices">
-          <li><span class="sz">Sedan</span><span class="amt">$799.99</span></li>
-          <li><span class="sz">SUV / Crossover</span><span class="amt">$849.99</span></li>
-          <li><span class="sz">Large SUV / Truck</span><span class="amt">$1,049.99</span></li>
+      <!-- Tier 02 — 5-Year -->
+      <article class="cer-tier">
+        <div class="cer-body">
+          <div class="cer-term">Tier 02 &middot; 5 Years</div>
+          <h3 class="cer-name">5-Year Coating</h3>
+          <p class="cer-lead">Our full coating service with a 5-year rated product. Every step below is done by hand before the coating goes on, so it bonds to properly prepped, polished paint rather than to whatever is sitting on top of it.</p>
+        <div class="cer-proc-head">Our Proper Ceramic Coating Service</div>
+        <ul class="cer-proc">
+          <li><i data-lucide="check"></i><span class="tx">Exterior hand wash and foam bath</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Bug splatter removal</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Clay bar service <span class="co">&mdash; micro-contaminant removal from paint</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Wheels and rims deep cleaned</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Isopropyl alcohol wipe down <span class="co">(coating prep)</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Single-stage paint enhancement polish</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Ceramic coating application <span class="co">&mdash; 5-year rated coating</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Free follow-up wash, 1 week after service</span></li>
         </ul>
-        <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+        <div class="cer-meta"><i data-lucide="clock"></i>Estimated job duration &mdash; about 6 hours</div>
+        </div>
+        <aside class="cer-rail">
+          <div class="cer-rail-lbl">Priced by vehicle size</div>
+          <ul class="cer-prices">
+            <li><span class="sz">Sedan</span><span class="amt">$799.99</span></li>
+            <li><span class="sz">SUV / Crossover</span><span class="amt">$849.99</span></li>
+            <li><span class="sz">Large SUV / Truck</span><span class="amt">$1,049.99</span></li>
+          </ul>
+          <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+          <p class="cer-fine">5-year rated coating. Full process, about 6 hours on site.</p>
+        </aside>
       </article>
 
-      <article class="cer-card best">
+      <!-- Tier 03 — Elite Ceramic (8-year rated) -->
+      <article class="cer-tier best">
         <span class="cer-flag">Best Value</span>
-        <div class="cer-term">Tier 03 &middot; 8 Years</div>
-        <h3 class="cer-name">8-Year Coating</h3>
-        <p class="cer-sub">Our longest-lasting coating &mdash; the most protection per dollar on the menu.</p>
-        <ul class="cer-prices">
-          <li><span class="sz">Sedan</span><span class="amt">$1,099.99</span></li>
-          <li><span class="sz">SUV / Crossover</span><span class="amt">$1,149.99</span></li>
-          <li><span class="sz">Large SUV / Truck</span><span class="amt">$1,349.99</span></li>
+        <div class="cer-body">
+          <div class="cer-term">Tier 03 &middot; Elite</div>
+          <h3 class="cer-name">Elite Ceramic</h3>
+          <p class="cer-lead">The same full coating service as our 5-Year tier, finished with DIY Detail's 8-year ceramic coating &mdash; the longest-lasting product we apply.</p>
+        <div class="cer-proc-head">Our Proper Ceramic Coating Service</div>
+        <ul class="cer-proc">
+          <li><i data-lucide="check"></i><span class="tx">Exterior hand wash and foam bath</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Bug splatter removal</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Clay bar service <span class="co">&mdash; micro-contaminant removal from paint</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Wheels and rims deep cleaned</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Isopropyl alcohol wipe down <span class="co">(coating prep)</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Single-stage paint enhancement polish</span></li>
+          <li><i data-lucide="check"></i><span class="tx">Ceramic coating application <span class="co">&mdash; DIY Detail 8-year ceramic coating</span></span></li>
+          <li><i data-lucide="check"></i><span class="tx">Free follow-up wash, 1 week after service</span></li>
         </ul>
-        <div class="cer-step">Just $300 more than the 5-Year &mdash; for three more years of protection.</div>
-        <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+        <div class="cer-meta"><i data-lucide="clock"></i>Estimated job duration &mdash; about 6 hours</div>
+          <div class="cer-rated"><i data-lucide="shield-check"></i>Rated for 8&ndash;10 years with proper maintenance.</div>
+        </div>
+        <aside class="cer-rail">
+          <div class="cer-rail-lbl">Priced by vehicle size</div>
+          <ul class="cer-prices">
+            <li><span class="sz">Sedan</span><span class="amt">$1,099.99</span></li>
+            <li><span class="sz">SUV / Crossover</span><span class="amt">$1,149.99</span></li>
+            <li><span class="sz">Large SUV / Truck</span><span class="amt">$1,349.99</span></li>
+          </ul>
+          <div class="cer-step">Just $300 more than the 5-Year &mdash; for three more years of protection.</div>
+          <a href="booking.html" class="cer-cta">Book<i data-lucide="arrow-right"></i></a>
+          <p class="cer-fine">8-year rated coating (DIY Detail). Full process, about 6 hours on site.</p>
+        </aside>
       </article>
-    </div>
 
-    <div class="cer-incl">
-      <div class="cer-incl-head">
-        <i data-lucide="shield"></i>
-        <h3>Every Coating Includes</h3>
-      </div>
-      <ul class="cer-incl-list">
-        <li><i data-lucide="check"></i>Full exterior wash</li>
-        <li><i data-lucide="check"></i>Clay bar decontamination</li>
-        <li><i data-lucide="check"></i>Iron decontamination</li>
-        <li><i data-lucide="check"></i>Ceramic coating application</li>
-      </ul>
     </div>
 
     <div class="cer-note">
-      <p><strong>No paint correction included.</strong> Coatings lock in the paint's current condition &mdash; they seal and protect, but they don't remove swirls or scratches. If your paint needs correction first, let us know and we'll take a look on arrival.</p>
+      <p><strong>No multi-stage paint correction included.</strong> The 5-Year and Elite tiers include a single-stage enhancement polish, which lifts light swirls and improves gloss &mdash; it is not a full correction and won't remove deeper scratches. Coatings lock in whatever condition the paint is in, so if yours needs correction first, tell us and we'll take a look on arrival.</p>
+    </div>
+
+    <div class="cer-caution">
+      <div class="cau-head"><i data-lucide="alert-triangle"></i>Caring For Your Coating</div>
+      <p>A ceramic coating is durable, but it isn't bulletproof. Three things will damage it:</p>
+      <ul>
+        <li><i data-lucide="x"></i><strong>Automatic and tunnel car washes.</strong> The spinning brushes drag grit across the panel and can scratch straight through the coating and into your clear coat.</li>
+        <li><i data-lucide="x"></i><strong>Clay barring a coated surface.</strong> Clay is an abrasive &mdash; running it over a finished coating strips the coating off.</li>
+        <li><i data-lucide="x"></i><strong>Strong acidic cleaners.</strong> Aggressive wheel and paint chemicals break the coating down early.</li>
+      </ul>
+      <p style="margin-top:9px;"><strong>Hand wash or touchless wash only</strong> once the coating is on. Follow that and you'll get the full rated life out of it.</p>
     </div>
   </div>
 </section>
@@ -2565,7 +2647,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <optgroup label="Ceramic Coating">
                   <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
                   <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
-                  <option value="Ceramic Coating (8-Year)" data-service="Ceramic Coating (8-Year)">Ceramic Coating (8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                  <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
                 </optgroup>
               </select>
             </div>
@@ -2622,7 +2704,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <optgroup label="Ceramic Coating">
                       <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
                       <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
-                      <option value="Ceramic Coating (8-Year)" data-service="Ceramic Coating (8-Year)">Ceramic Coating (8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                      <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
                     </optgroup>
                   </select>
                 </div>
@@ -2869,7 +2951,7 @@ if (bookingForm) {
     "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315},
     "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
     "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
-    "Ceramic Coating (8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
+    "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
   };
   const refreshPrices = (vehicleSel, serviceSel) => {
     const veh = vehicleSel.value;
@@ -2980,7 +3062,7 @@ if (bookingForm) {
 (function(){
   const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
-    '.section-head, .svc-card, .pr-card, .cer-card, .cer-incl, .zone-card, .trust-item, ' +
+    '.section-head, .svc-card, .pr-card, .cer-tier, .zone-card, .trust-item, ' +
     '.hiw-step, .tst-card, .disc-right, .terms-box, .booking-frame, ' +
     '.contact-form-wrap, .contact-side, .proc-step'
   ));

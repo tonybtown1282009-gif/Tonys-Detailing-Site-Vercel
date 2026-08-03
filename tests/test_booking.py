@@ -71,7 +71,7 @@ def test_base_price_matrix():
         "Ceramic Coating (5-Year)": {
             "Sedan": 799.99, "SUV/Crossover": 849.99, "Large SUV/Truck": 1049.99, "Minivan": 949.99,
         },
-        "Ceramic Coating (8-Year)": {
+        "Ceramic Coating (Elite 8-Year)": {
             "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
         },
     }
@@ -103,7 +103,7 @@ def test_headlight_addon_flat_any_size():
 def test_ceramic_tiers_priced_by_size():
     assert appmod.vehicle_cost("Ceramic Coating (2-Year)", "Sedan", [], []) == 299.99
     assert appmod.vehicle_cost("Ceramic Coating (5-Year)", "SUV/Crossover", [], []) == 849.99
-    assert appmod.vehicle_cost("Ceramic Coating (8-Year)", "Large SUV/Truck", [], []) == 1349.99
+    assert appmod.vehicle_cost("Ceramic Coating (Elite 8-Year)", "Large SUV/Truck", [], []) == 1349.99
 
 
 def test_odor_addon_flat():

@@ -77,15 +77,17 @@ BASE_PRICES = {
     "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
     "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
     "Deep Clean": {"Sedan": 280, "SUV/Crossover": 300, "Large SUV/Truck": 330, "Minivan": 315},
-    # Ceramic coatings: wash, clay, iron decon and coating application. Priced
-    # by size like everything else; no paint correction is included.
+    # Ceramic coatings, priced by size like everything else. The 2-Year is prep
+    # + application only; the 5-Year and Elite run the full process (bug and
+    # clay decon, IPA wipe down, single-stage enhancement polish) and take about
+    # six hours. No tier includes multi-stage paint correction.
     "Ceramic Coating (2-Year)": {
         "Sedan": 299.99, "SUV/Crossover": 349.99, "Large SUV/Truck": 399.99, "Minivan": 374.99,
     },
     "Ceramic Coating (5-Year)": {
         "Sedan": 799.99, "SUV/Crossover": 849.99, "Large SUV/Truck": 1049.99, "Minivan": 949.99,
     },
-    "Ceramic Coating (8-Year)": {
+    "Ceramic Coating (Elite 8-Year)": {
         "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
     },
 }
