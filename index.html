@@ -68,9 +68,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Mobile horizontal-panel mode: decided before first paint so the page never
      renders vertically and then flips. No-JS falls back to the normal layout. -->
 <script>try{
-  var d=document.documentElement;
+  var d=document.documentElement, q=location.search;
+  /* ?layout=debug exposes the swipe/scroll switch (sticky, so it survives
+     navigation); ?layout=clean hides it again and resets the mode. */
+  if(/[?&]layout=debug(&|$)/.test(q)){ localStorage.setItem('td_hpanes_debug','1'); }
+  else if(/[?&]layout=clean(&|$)/.test(q)){ localStorage.removeItem('td_hpanes_debug'); localStorage.removeItem('td_hpanes'); }
   if(localStorage.getItem('td_hpanes')!=='off' && window.matchMedia('(max-width:720px)').matches) d.classList.add('hp-on');
   if(localStorage.getItem('td_hpanes_hint')==='seen') d.classList.add('hp-hint-off');
+  if(localStorage.getItem('td_hpanes_debug')==='1') d.classList.add('hp-debug');
 }catch(e){}</script>
 <style>
 /* ─────────────── FONTS ─────────────── */
@@ -1754,10 +1759,11 @@ footer{
     50%{transform:translateX(7px);}
   }
 
-  /* ── PROTOTYPE ONLY: layout switch so the pattern can be compared against
-     the normal vertical page on a real device. Delete this rule and the
-     #hp-toggle element to ship. ── */
-  #hp-toggle{
+  /* ── Layout switch, for comparing the swipe layout against the normal
+     vertical page on a real device. Hidden from visitors: only appears
+     once ?layout=debug has been visited on this device (?layout=clean
+     turns it back off and resets the stored mode). ── */
+  html.hp-debug #hp-toggle{
     display:inline-flex;position:fixed;z-index:193;
     left:12px;bottom:calc(12px + env(safe-area-inset-bottom));
     align-items:center;
@@ -3351,9 +3357,9 @@ tdIcons();
     window.setTimeout(function(){ goToIndex(activeIndex(), false); }, 250);
   });
 
-  /* ── PROTOTYPE ONLY: swipe ⇄ scroll switch, so the two layouts can be
-     compared on a real device. Remove this block and the #hp-toggle
-     element when the pattern is settled. ── */
+  /* ── Swipe ⇄ scroll switch. Only reachable when ?layout=debug has been
+     visited on this device (see the head script); otherwise the button is
+     display:none and this wiring is inert. ── */
   if (toggle){
     var paint = function(){
       var swipe = on();
