@@ -685,6 +685,63 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
 .pr-disclaimer p{font-size:13px;color:var(--fg-2);line-height:1.6;}
 .pr-disclaimer strong{color:var(--fg);font-weight:600;}
 
+/* ─────────────── CERAMIC COATING (teaser) ─────────────── */
+#ceramic{
+  padding:var(--sec-y) 0;
+  background:var(--bg);
+  border-top:1px solid var(--line);
+}
+.cert-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-top:8px;
+}
+.cert-card{
+  position:relative;
+  background:var(--bg-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);
+  padding:30px 26px 28px;
+  text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  overflow:hidden;
+  transition:transform 220ms var(--ease), border-color 220ms var(--ease), box-shadow 220ms var(--ease);
+}
+.cert-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--line-2);
+  box-shadow:0 14px 32px rgba(0,0,0,.10);
+}
+.cert-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--blue);
+  transform:scaleX(.18);transform-origin:left;
+  transition:transform 360ms var(--ease);
+}
+.cert-card:hover::before{transform:scaleX(1);}
+.cert-ico{
+  width:64px;height:64px;border-radius:8px;
+  background:rgba(30,58,95,.07);
+  border:1px solid rgba(30,58,95,.18);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue-l);
+  margin-bottom:20px;
+}
+.cert-ico .lucide{width:30px;height:30px;stroke-width:1.5;}
+.cert-name{
+  font-family:var(--ff-h);font-weight:800;
+  font-size:21px;line-height:1.1;letter-spacing:-.015em;
+  color:var(--fg);margin-bottom:10px;
+}
+.cert-desc{
+  font-size:13.5px;color:var(--fg-3);line-height:1.6;
+  max-width:30ch;
+}
+.cert-actions{
+  display:flex;justify-content:center;
+  margin-top:32px;
+}
+
 /* ─────────────── SERVICE AREA ─────────────── */
 #area{
   padding:var(--sec-y) 0;
@@ -818,69 +875,6 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
   font-size:12px;color:var(--fg-3);line-height:1.65;font-style:italic;
 }
 .disc-footnote strong{color:var(--fg);font-weight:600;font-style:normal;}
-
-/* ─────────────── FUTURE SERVICES ─────────────── */
-#future{
-  padding:var(--sec-y) 0;
-  background:var(--bg);
-  border-top:1px solid var(--line);
-}
-.fut-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:18px;
-  margin-top:24px;max-width:880px;
-}
-.fut-card{
-  position:relative;
-  background:var(--bg-3);
-  border:1px solid var(--line);
-  border-radius:var(--radius-card);
-  box-shadow:var(--shadow-card);
-  padding:32px 28px;
-  overflow:hidden;
-  transition:border-color 220ms var(--ease), transform 220ms var(--ease), box-shadow 220ms var(--ease);
-}
-.fut-card:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:0 14px 32px rgba(0,0,0,.10);}
-.fut-card::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at top right, rgba(45,85,144,.06), transparent 60%);
-}
-.fut-icon{
-  width:54px;height:54px;border-radius:6px;
-  background:rgba(30,58,95,.07);
-  border:1px solid rgba(30,58,95,.18);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--blue-l);margin-bottom:20px;
-  position:relative;
-}
-.fut-icon .lucide{width:24px;height:24px;stroke-width:1.75;}
-.fut-card h3{
-  font-family:var(--ff-h);font-weight:800;font-size:22px;
-  letter-spacing:-.01em;color:var(--fg);
-  margin-bottom:10px;line-height:1.05;
-}
-.fut-card p{
-  font-size:14px;color:var(--fg-2);line-height:1.6;
-  margin-bottom:20px;
-  max-width:380px;
-}
-.fut-tag{
-  display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--ff-h);font-weight:700;font-size:10px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3);
-  padding:7px 11px;border-radius:2px;
-  border:1px dashed var(--line-2);
-}
-.fut-tag .lucide{width:11px;height:11px;}
-.fut-notify{
-  display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--ff-h);font-weight:700;font-size:10px;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--blue-l);
-  margin-left:8px;cursor:pointer;
-  padding:12px 10px;margin-top:-12px;margin-bottom:-12px;
-  transition:color 150ms var(--ease);
-}
-.fut-notify:hover{color:var(--blue-h);}
-.fut-notify .lucide{width:11px;height:11px;}
 
 /* ─────────────── CONTACT ─────────────── */
 #contact{
@@ -1303,7 +1297,7 @@ footer{
   .hero-phone-pill{display:none;}
   .svc-grid{grid-template-columns:1fr;}
   .svc-card{min-height:auto;}
-  .fut-grid{grid-template-columns:1fr;}
+  .cert-grid{grid-template-columns:1fr;}
   .form-grid{grid-template-columns:1fr;}
   .form-actions{flex-direction:column-reverse;}
   .form-actions .btn{width:100%;}
@@ -1516,7 +1510,7 @@ footer{
 @media (min-width:1024px){
   .hero-h1{font-size:clamp(56px,8.6vw,120px);}
   @supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
-    .svc-card,.fut-card,.cside-card,.tst-card{
+    .svc-card,.cside-card,.tst-card{
       background:var(--v2-glass);
       -webkit-backdrop-filter:blur(16px) saturate(150%);
       backdrop-filter:blur(16px) saturate(150%);
@@ -1524,7 +1518,7 @@ footer{
       box-shadow:0 10px 34px rgba(10,10,10,.07),inset 0 1px 0 rgba(255,255,255,.55);
     }
   }
-  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:translateY(-6px);}
+  .svc-card:not(.dim):hover,.cside-card:hover,.tst-card:hover{transform:translateY(-6px);}
 }
 
 /* Mobile — lightweight & fast: compressed rhythm, tap-friendly, minimal motion */
@@ -1533,8 +1527,8 @@ footer{
   .btn{min-height:48px;}
   .btn.sm{min-height:44px;}
   .svc-cta{min-height:44px;}
-  .svc-card,.fut-card,.cside-card,.tst-card{transition:none;}
-  .svc-card:not(.dim):hover,.fut-card:hover,.cside-card:hover,.tst-card:hover{transform:none;}
+  .svc-card,.cside-card,.tst-card{transition:none;}
+  .svc-card:not(.dim):hover,.cside-card:hover,.tst-card:hover{transform:none;}
   .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
 }
 
@@ -1640,10 +1634,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="/#services">Car Detailing</a>
         <a href="/rv-detailing">RV Detailing</a>
         <a href="/boat-detailing">Boat Detailing</a>
+        <a href="/ceramic-coating">Ceramic Coating</a>
       </div>
     </div>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="deep-clean.html">Deep Clean</a>
+    <a href="ceramic-coating.html">Ceramic Coating</a>
     <a href="#area" data-target="area">Service Area</a>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
@@ -1667,6 +1663,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="/#services">Car Detailing <i data-lucide="arrow-right"></i></a>
     <a href="/rv-detailing">RV Detailing <i data-lucide="arrow-right"></i></a>
     <a href="/boat-detailing">Boat Detailing <i data-lucide="arrow-right"></i></a>
+    <a href="/ceramic-coating">Ceramic Coating <i data-lucide="arrow-right"></i></a>
   </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -1825,7 +1822,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="section-head" style="margin-bottom:0;">
         <span class="eyebrow">What We Offer</span>
         <h2>Services</h2>
-        <p>Four service tiers, from a quick exterior refresh to our most intensive Deep Clean. Each one comes to you &mdash; home, office, or wherever you park.</p>
+        <p>Four service tiers, from an exterior wash-and-seal to our most intensive Deep Clean. Each one comes to you &mdash; home, office, or wherever you park.</p>
       </div>
       <div class="svc-head-actions">
         <a href="booking.html" class="btn sm">
@@ -1844,19 +1841,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <article class="svc-card">
         <div class="svc-icon-wrap"><i data-lucide="droplets"></i></div>
         <div class="svc-tier">Tier 01 &middot; Exterior</div>
-        <h3 class="svc-name">Exterior Detail</h3>
-        <p class="svc-desc">A thorough exterior refresh using professional-grade products and technique.</p>
+        <h3 class="svc-name">Wash, Clay, Seal</h3>
+        <p class="svc-desc">Our exterior-only tier: foam wash, clay bar decontamination, and a spray sealant finish.</p>
         <ul class="svc-feat">
           <li><i data-lucide="check"></i>Foam wash, rinse &amp; hand dry</li>
+          <li><i data-lucide="check"></i>Clay bar decontamination</li>
+          <li><i data-lucide="check"></i>Spray sealant finish</li>
           <li><i data-lucide="check"></i>Tire shine &amp; wheel clean</li>
-          <li><i data-lucide="check"></i>Exterior window clean</li>
-          <li><i data-lucide="check"></i>Door jambs wiped down</li>
-          <li><i data-lucide="check"></i>Exterior trim wipe</li>
+          <li><i data-lucide="check"></i>Exterior window &amp; trim wipe</li>
         </ul>
         <div class="svc-foot">
           <div class="svc-price-row">
             <span class="svc-price-lbl">Starts at</span>
-            <span class="svc-price">$75</span>
+            <span class="svc-price">$140</span>
           </div>
           <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
@@ -1891,7 +1888,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <h3 class="svc-name">Full Detail</h3>
         <p class="svc-desc">The complete package. Interior + exterior plus wax. Best value, and the minimum service for out-of-area trips.</p>
         <ul class="svc-feat">
-          <li><i data-lucide="check"></i>Everything in Exterior Detail</li>
+          <li><i data-lucide="check"></i>Full exterior wash, wheels &amp; glass</li>
           <li><i data-lucide="check"></i>Everything in Interior Detail</li>
           <li><i data-lucide="check"></i>Wax protection coat</li>
           <li><i data-lucide="check"></i>Post-service walk-around</li>
@@ -1992,11 +1989,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </thead>
           <tbody>
             <tr>
-              <td>Exterior Detail</td>
-              <td>$75</td>
-              <td>$90</td>
-              <td>$110</td>
-              <td>$100</td>
+              <td>Wash, Clay, Seal</td>
+              <td>$140</td>
+              <td>$150</td>
+              <td>$180</td>
+              <td>$165</td>
             </tr>
             <tr>
               <td>Interior Detail</td>
@@ -2081,6 +2078,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <span class="price">+$40&ndash;$75</span>
           </li>
+          <li>
+            <div class="l-name">
+              <i data-lucide="flashlight"></i>
+              <div class="col">
+                <span class="nm">Headlight Restoration</span>
+                <span class="ds">Removes yellowing &amp; haze from foggy lenses &middot; flat rate, any vehicle</span>
+              </div>
+            </div>
+            <span class="price">$100 flat</span>
+          </li>
           <li class="not-offered">
             <div class="l-name">
               <i data-lucide="ban"></i>
@@ -2097,6 +2104,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div class="pr-disclaimer">
       <p><strong>Final quote given on arrival.</strong> Prices may shift based on vehicle condition, pet hair, embedded debris, and travel distance. You'll see and approve any adjustments before any work begins.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── CERAMIC COATING (teaser) ─────────────── -->
+<section id="ceramic">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Long-Term Paint Protection</span>
+      <h2>Ceramic Coating Protection</h2>
+      <p>Three durability tiers, each priced by vehicle size. Full decontamination prep on every one.</p>
+    </div>
+
+    <div class="cert-grid">
+      <article class="cert-card">
+        <div class="cert-ico"><i data-lucide="car"></i></div>
+        <h3 class="cert-name">2-Year Ceramic</h3>
+        <p class="cert-desc">Entry-level protection with a hydrophobic finish that outlasts wax by seasons.</p>
+      </article>
+      <article class="cert-card">
+        <div class="cert-ico"><i data-lucide="car"></i></div>
+        <h3 class="cert-name">5-Year Ceramic</h3>
+        <p class="cert-desc">Our full coating process, finished with a harder-wearing 5-year rated product.</p>
+      </article>
+      <article class="cert-card">
+        <div class="cert-ico"><i data-lucide="car"></i></div>
+        <h3 class="cert-name">Elite Ceramic</h3>
+        <p class="cert-desc">Our longest-lasting coating &mdash; rated for 8&ndash;10 years with proper care.</p>
+      </article>
+    </div>
+
+    <div class="cert-actions">
+      <a href="ceramic-coating.html" class="btn lg">Learn More <i data-lucide="arrow-right"></i></a>
     </div>
   </div>
 </section>
@@ -2357,39 +2397,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- ─────────────── FUTURE SERVICES ─────────────── -->
-<section id="future">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">In Development</span>
-      <h2>Coming Soon</h2>
-      <p>Two new services currently being added to the menu. Drop your contact below if you'd like first notice.</p>
-    </div>
-    <div class="fut-grid">
-      <article class="fut-card">
-        <div class="fut-icon"><i data-lucide="flashlight"></i></div>
-        <h3>Headlight Restoration</h3>
-        <p>Removes yellowing and haze from foggy headlight lenses. Improves night-time visibility and brings the front end back to factory clarity.</p>
-        <span class="fut-tag"><i data-lucide="clock"></i>Coming Soon</span>
-        <a href="#contact" class="fut-notify">
-          Notify me
-          <i data-lucide="arrow-right"></i>
-        </a>
-      </article>
-      <article class="fut-card">
-        <div class="fut-icon"><i data-lucide="shield"></i></div>
-        <h3>Ceramic Coating</h3>
-        <p>Long-term paint protection with a hydrophobic finish. Lasts months past traditional wax.</p>
-        <span class="fut-tag"><i data-lucide="clock"></i>Coming Soon</span>
-        <a href="#contact" class="fut-notify">
-          Notify me
-          <i data-lucide="arrow-right"></i>
-        </a>
-      </article>
-    </div>
-  </div>
-</section>
-
 <!-- ─────────────── BOOKING ─────────────── -->
 <section id="booking">
   <div class="wrap">
@@ -2440,10 +2447,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label for="service">Service <span class="req">*</span></label>
               <select id="service" name="service" required>
                 <option value="">Select a service&hellip;</option>
-                <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                 <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                 <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                 <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
+                <optgroup label="Ceramic Coating">
+                  <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
+                  <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
+                  <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                </optgroup>
               </select>
             </div>
             <div class="field full">
@@ -2452,6 +2464,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label class="check"><input type="checkbox" name="addons" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
               </div>
             </div>
             <div class="field full">
@@ -2491,10 +2504,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <label for="service_2">Service</label>
                   <select id="service_2" name="service_2">
                     <option value="">Select a service&hellip;</option>
-                    <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                    <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                     <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                     <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                     <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
+                    <optgroup label="Ceramic Coating">
+                      <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
+                      <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
+                      <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div class="field full">
@@ -2503,6 +2521,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="check"><input type="checkbox" name="addons_2" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
                   </div>
                 </div>
                 <div class="field full">
@@ -2639,10 +2658,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="foot-col">
         <h5>Services</h5>
         <ul>
-          <li><a href="#services">Exterior Detail</a></li>
+          <li><a href="#services">Wash, Clay, Seal</a></li>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
           <li><a href="deep-clean.html">Deep Clean</a></li>
+          <li><a href="ceramic-coating.html">Ceramic Coating</a></li>
           <li><a href="rv-detailing.html">RVs</a></li>
           <li><a href="boat-detailing.html">Boats</a></li>
         </ul>
@@ -2709,7 +2729,7 @@ drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
 }));
 
 // ───────────────── ACTIVE NAV SECTION ───────────────────
-const sections = ['hero','services','pricing','area','disclaimer','future','booking','contact']
+const sections = ['hero','services','pricing','ceramic','area','disclaimer','booking','contact']
   .map(id => document.getElementById(id))
   .filter(Boolean);
 const navLinks = document.querySelectorAll('#nav .nav-links [data-target]');
@@ -2727,21 +2747,28 @@ sections.forEach(s => io.observe(s));
 const bookingForm = document.getElementById('bf');
 if (bookingForm) {
   // Dynamic pricing: show the exact price for the selected vehicle size
+  // Ceramic tiers carry cents; everything else is whole dollars.
+  const money = n => '$' + n.toLocaleString('en-US', {
+    minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2
+  });
   const PRICES = {
-    "Exterior Detail": {"Sedan":75,"SUV/Crossover":90,"Large SUV/Truck":110,"Minivan":100},
+    "Wash, Clay, Seal": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
     "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
     "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
-    "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315}
+    "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315},
+    "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
+    "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
+    "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
   };
   const refreshPrices = (vehicleSel, serviceSel) => {
     const veh = vehicleSel.value;
     serviceSel.querySelectorAll('option[data-service]').forEach(opt => {
       const svc = opt.dataset.service, table = PRICES[svc];
       if (veh && table && table[veh] != null){
-        opt.textContent = svc + ' — $' + table[veh];
+        opt.textContent = svc + ' — ' + money(table[veh]);
       } else {
         const vals = Object.values(table);
-        opt.textContent = svc + ' ($' + Math.min(...vals) + '–$' + Math.max(...vals) + ')';
+        opt.textContent = svc + ' (' + money(Math.min(...vals)) + '–' + money(Math.max(...vals)) + ')';
       }
     });
   };
@@ -2842,7 +2869,7 @@ if (bookingForm) {
 (function(){
   const reduce = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 720px)').matches);
   const targets = Array.from(document.querySelectorAll(
-    '.section-head, .svc-card, .pr-card, .zone-card, .fut-card, .trust-item, ' +
+    '.section-head, .svc-card, .pr-card, .cert-card, .zone-card, .trust-item, ' +
     '.hiw-step, .tst-card, .disc-right, .terms-box, .booking-frame, ' +
     '.contact-form-wrap, .contact-side, .proc-step'
   ));
