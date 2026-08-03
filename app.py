@@ -506,6 +506,7 @@ PUBLIC_PAGES = (
     "/",
     "/booking",
     "/deep-clean",
+    "/ceramic-coating",
     "/rv-detailing",
     "/boat-detailing",
     "/about",
@@ -536,6 +537,12 @@ def booking_page():
 @app.route("/deep-clean.html")
 def deep_clean_page():
     return send_from_directory(BASE_DIR, "deep-clean.html")
+
+
+@app.route("/ceramic-coating")
+@app.route("/ceramic-coating.html")
+def ceramic_coating_page():
+    return send_from_directory(BASE_DIR, "ceramic-coating.html")
 
 
 @app.route("/api/media")
