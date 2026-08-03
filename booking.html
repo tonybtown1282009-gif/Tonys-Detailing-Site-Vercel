@@ -493,10 +493,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label for="service">Service <span class="req">*</span></label>
               <select id="service" name="service" required>
                 <option value="">Select a service&hellip;</option>
-                <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                 <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                 <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                 <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
+                <optgroup label="Ceramic Coating">
+                  <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
+                  <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
+                  <option value="Ceramic Coating (8-Year)" data-service="Ceramic Coating (8-Year)">Ceramic Coating (8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                </optgroup>
               </select>
             </div>
             <div class="field full">
@@ -505,6 +510,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label class="check"><input type="checkbox" name="addons" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
               </div>
             </div>
             <div class="field full">
@@ -544,10 +550,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <label for="service_2">Service</label>
                   <select id="service_2" name="service_2">
                     <option value="">Select a service&hellip;</option>
-                    <option value="Exterior Detail" data-service="Exterior Detail">Exterior Detail ($75&ndash;$110)</option>
+                    <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                     <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                     <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                     <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
+                    <optgroup label="Ceramic Coating">
+                      <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
+                      <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
+                      <option value="Ceramic Coating (8-Year)" data-service="Ceramic Coating (8-Year)">Ceramic Coating (8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div class="field full">
@@ -556,6 +567,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="check"><input type="checkbox" name="addons_2" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$40&ndash;$60</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
                   </div>
                 </div>
                 <div class="field full">
@@ -655,21 +667,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 const form = document.getElementById('bf');
 
 // ── Dynamic pricing: show the exact price for the selected vehicle size ──
+// Ceramic tiers carry cents; everything else is whole dollars.
+const money = n => '$' + n.toLocaleString('en-US', {
+  minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2
+});
 const PRICES = {
-  "Exterior Detail": {"Sedan":75,"SUV/Crossover":90,"Large SUV/Truck":110,"Minivan":100},
+  "Wash, Clay, Seal": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
   "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
   "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
-  "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315}
+  "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315},
+  "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
+  "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
+  "Ceramic Coating (8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
 };
 function refreshPrices(vehicleSel, serviceSel){
   const veh = vehicleSel.value;
   serviceSel.querySelectorAll('option[data-service]').forEach(opt => {
     const svc = opt.dataset.service, table = PRICES[svc];
     if (veh && table && table[veh] != null){
-      opt.textContent = svc + ' — $' + table[veh];
+      opt.textContent = svc + ' — ' + money(table[veh]);
     } else {
       const vals = Object.values(table);
-      opt.textContent = svc + ' ($' + Math.min(...vals) + '–$' + Math.max(...vals) + ')';
+      opt.textContent = svc + ' (' + money(Math.min(...vals)) + '–' + money(Math.max(...vals)) + ')';
     }
   });
 }

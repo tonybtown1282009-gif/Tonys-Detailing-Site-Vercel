@@ -73,10 +73,21 @@ RESEND_FROM = os.environ.get("RESEND_FROM", "Tony's Detailing <onboarding@resend
 VEHICLE_TYPES = ["Sedan", "SUV/Crossover", "Large SUV/Truck", "Minivan"]
 
 BASE_PRICES = {
-    "Exterior Detail": {"Sedan": 75, "SUV/Crossover": 90, "Large SUV/Truck": 110, "Minivan": 100},
+    "Wash, Clay, Seal": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
     "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
     "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
     "Deep Clean": {"Sedan": 280, "SUV/Crossover": 300, "Large SUV/Truck": 330, "Minivan": 315},
+    # Ceramic coatings: wash, clay, iron decon and coating application. Priced
+    # by size like everything else; no paint correction is included.
+    "Ceramic Coating (2-Year)": {
+        "Sedan": 299.99, "SUV/Crossover": 349.99, "Large SUV/Truck": 399.99, "Minivan": 374.99,
+    },
+    "Ceramic Coating (5-Year)": {
+        "Sedan": 799.99, "SUV/Crossover": 849.99, "Large SUV/Truck": 1049.99, "Minivan": 949.99,
+    },
+    "Ceramic Coating (8-Year)": {
+        "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
+    },
 }
 
 # Add-on pricing. Clay & Iron Decontamination scales with vehicle size.
@@ -84,6 +95,7 @@ CLAY_PRICES = {"Sedan": 40, "SUV/Crossover": 50, "Large SUV/Truck": 60, "Minivan
 ADDON_PRICES = {
     "Leather Conditioning": 40,
     "Odor Eliminator": 50,  # mid-point of the advertised $40–$75 range
+    "Headlight Restoration": 100,  # flat rate, any vehicle size
     # "Clay & Iron Decontamination" handled separately (size dependent)
 }
 

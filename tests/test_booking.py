@@ -61,10 +61,19 @@ def test_parse_num_vehicles(raw, expected):
 # ──────────────────────────────────────────────────────────────────────────
 def test_base_price_matrix():
     expected = {
-        "Exterior Detail": {"Sedan": 75, "SUV/Crossover": 90, "Large SUV/Truck": 110, "Minivan": 100},
+        "Wash, Clay, Seal": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
         "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
         "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
         "Deep Clean": {"Sedan": 280, "SUV/Crossover": 300, "Large SUV/Truck": 330, "Minivan": 315},
+        "Ceramic Coating (2-Year)": {
+            "Sedan": 299.99, "SUV/Crossover": 349.99, "Large SUV/Truck": 399.99, "Minivan": 374.99,
+        },
+        "Ceramic Coating (5-Year)": {
+            "Sedan": 799.99, "SUV/Crossover": 849.99, "Large SUV/Truck": 1049.99, "Minivan": 949.99,
+        },
+        "Ceramic Coating (8-Year)": {
+            "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
+        },
     }
     assert appmod.BASE_PRICES == expected
     for service, by_vehicle in expected.items():
@@ -79,9 +88,22 @@ def test_leather_addon_flat():
 def test_clay_iron_addon_scales_with_vehicle():
     expected = {"Sedan": 40, "SUV/Crossover": 50, "Large SUV/Truck": 60, "Minivan": 50}
     for vehicle, clay in expected.items():
-        base = appmod.BASE_PRICES["Exterior Detail"][vehicle]
-        cost = appmod.vehicle_cost("Exterior Detail", vehicle, ["Clay & Iron Decontamination"], [])
+        base = appmod.BASE_PRICES["Wash, Clay, Seal"][vehicle]
+        cost = appmod.vehicle_cost("Wash, Clay, Seal", vehicle, ["Clay & Iron Decontamination"], [])
         assert cost == base + clay, f"{vehicle}: expected {base + clay}, got {cost}"
+
+
+def test_headlight_addon_flat_any_size():
+    for vehicle in appmod.VEHICLE_TYPES:
+        base = appmod.BASE_PRICES["Full Detail"][vehicle]
+        cost = appmod.vehicle_cost("Full Detail", vehicle, ["Headlight Restoration"], [])
+        assert cost == base + 100, f"{vehicle}: expected {base + 100}, got {cost}"
+
+
+def test_ceramic_tiers_priced_by_size():
+    assert appmod.vehicle_cost("Ceramic Coating (2-Year)", "Sedan", [], []) == 299.99
+    assert appmod.vehicle_cost("Ceramic Coating (5-Year)", "SUV/Crossover", [], []) == 849.99
+    assert appmod.vehicle_cost("Ceramic Coating (8-Year)", "Large SUV/Truck", [], []) == 1349.99
 
 
 def test_odor_addon_flat():
@@ -116,7 +138,7 @@ def test_single_vehicle_no_discount():
 
 
 def test_referral_requires_full_detail_minimum():
-    for service in ("Exterior Detail", "Interior Detail"):
+    for service in ("Wash, Clay, Seal", "Interior Detail"):
         total, summary = appmod.calculate_estimate("1", "A Friend", veh(service, "Sedan"))
         assert "Referral" not in summary
         assert total == appmod.BASE_PRICES[service]["Sedan"]
@@ -151,22 +173,22 @@ def test_two_vehicles_multi_discount():
 
 
 def test_three_plus_prices_second_vehicle_twice():
-    # v1 Full SUV 215 + v2 Exterior Sedan 75 x 2 = 365, less 10% = 328.5
+    # v1 Full SUV 215 + v2 Wash/Clay/Seal Sedan 140 x 2 = 495, less 10% = 445.5
     total, summary = appmod.calculate_estimate(
-        "3+", "", veh("Full Detail", "SUV/Crossover"), veh("Exterior Detail", "Sedan")
+        "3+", "", veh("Full Detail", "SUV/Crossover"), veh("Wash, Clay, Seal", "Sedan")
     )
-    assert total == 328.5
+    assert total == 445.5
     assert "Multi-vehicle 10%" in summary
 
 
 def test_referral_eligible_via_second_vehicle():
-    # v1 Exterior Sedan 75 (not eligible) + v2 Full Sedan 195 (eligible) = 270
-    # multi 27, referral 35 => 270 - 62 = 208
+    # v1 Wash/Clay/Seal Sedan 140 (not eligible) + v2 Full Sedan 195 (eligible) = 335
+    # multi 33.5, referral 35 => 335 - 68.5 = 266.5
     total, summary = appmod.calculate_estimate(
-        "2", "Bob", veh("Exterior Detail", "Sedan"), veh("Full Detail", "Sedan")
+        "2", "Bob", veh("Wash, Clay, Seal", "Sedan"), veh("Full Detail", "Sedan")
     )
-    assert total == 208.0
-    assert "Multi-vehicle 10% (-$27.00)" in summary
+    assert total == 266.5
+    assert "Multi-vehicle 10% (-$33.50)" in summary
     assert "Referral (-$35.00)" in summary
 
 
@@ -188,9 +210,9 @@ def test_full_stack_two_vehicles_with_addons():
 def test_second_vehicle_ignored_when_count_one():
     # num=1 should ignore the v2 dict entirely
     total, summary = appmod.calculate_estimate(
-        "1", "", veh("Exterior Detail", "Sedan"), veh("Deep Clean", "Large SUV/Truck")
+        "1", "", veh("Wash, Clay, Seal", "Sedan"), veh("Deep Clean", "Large SUV/Truck")
     )
-    assert total == 75
+    assert total == 140
     assert summary == "None"
 
 
@@ -296,7 +318,7 @@ def test_book_endpoint_persists_second_vehicle(client):
 def test_book_endpoint_clears_v2_when_single(client):
     client.post("/api/book", data={
         "name": "Solo", "phone": "111", "location": "Chardon",
-        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Exterior Detail",
+        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Wash, Clay, Seal",
         "vehicle_type_2": "Minivan", "service_2": "Deep Clean",  # should be dropped
     })
     conn = appmod.get_db()
@@ -304,7 +326,7 @@ def test_book_endpoint_clears_v2_when_single(client):
     conn.close()
     assert row["vehicle_type_2"] == ""
     assert row["service_2"] == ""
-    assert row["total_estimate"] == 75  # only vehicle 1 counted
+    assert row["total_estimate"] == 140  # only vehicle 1 counted
 
 
 def test_book_endpoint_applies_and_persists_expecting_discount(client):
@@ -358,7 +380,7 @@ def test_loyalty_visits_increment(client):
     for expected in (1, 2, 3):
         res = client.post("/api/book", data={
             "name": "Repeat", "phone": "440", "email": "Loyal@Example.com",
-            "location": "Chardon", "service": "Exterior Detail", "vehicle_type": "Sedan",
+            "location": "Chardon", "service": "Wash, Clay, Seal", "vehicle_type": "Sedan",
         })
         assert res.get_json()["visits"] == expected
 
