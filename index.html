@@ -65,6 +65,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script src="/assets/lucide-1.23.0.min.js" defer></script>
 <script>function tdIcons(){if(window.lucide){lucide.createIcons();}else{document.addEventListener('DOMContentLoaded',function(){if(window.lucide)lucide.createIcons();});}}</script>
 <script>try{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}catch(e){}</script>
+<!-- Mobile horizontal-panel mode: decided before first paint so the page never
+     renders vertically and then flips. No-JS falls back to the normal layout. -->
+<script>try{
+  var d=document.documentElement, q=location.search;
+  /* ?layout=debug exposes the swipe/scroll switch (sticky, so it survives
+     navigation); ?layout=clean hides it again and resets the mode. */
+  if(/[?&]layout=debug(&|$)/.test(q)){ localStorage.setItem('td_hpanes_debug','1'); }
+  else if(/[?&]layout=clean(&|$)/.test(q)){ localStorage.removeItem('td_hpanes_debug'); localStorage.removeItem('td_hpanes'); }
+  if(localStorage.getItem('td_hpanes')!=='off' && window.matchMedia('(max-width:720px)').matches) d.classList.add('hp-on');
+  if(localStorage.getItem('td_hpanes_hint')==='seen') d.classList.add('hp-hint-off');
+  if(localStorage.getItem('td_hpanes_debug')==='1') d.classList.add('hp-debug');
+}catch(e){}</script>
 <style>
 /* ─────────────── FONTS ─────────────── */
 @font-face{font-family:'Inter';src:url('fonts/Inter-Regular.woff2') format('woff2'),url('fonts/Inter-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
@@ -1610,6 +1622,159 @@ footer{
 #drawer .drawer-dd-list a{padding-left:18px;font-size:13px;font-weight:600;}
 #drawer .drawer-dd-list a:last-child{border-bottom:1px solid var(--line);}
 #drawer .drawer-dd-list a .lucide{width:14px;height:14px;}
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE HORIZONTAL PANEL MODE  —  PROTOTYPE
+   Each major section becomes one full-screen, scroll-snapped panel that the
+   user swipes left/right through. Everything here is scoped to
+   `html.hp-on` (set by JS only at the ≤720px breakpoint) AND wrapped in the
+   mobile media query, so the desktop layout is byte-for-byte unchanged.
+   ═══════════════════════════════════════════════════════════════════════ */
+#hp-progress,#hp-hint,#hp-dots,#hp-toggle{display:none;}
+
+@media (max-width:720px){
+
+  /* ── The horizontal track ── */
+  html.hp-on,html.hp-on body{height:100%;overflow:hidden;}
+  html.hp-on body{overscroll-behavior:none;}
+
+  html.hp-on #panes{
+    position:fixed;
+    top:calc(var(--promo-h) + var(--nav-h));left:0;right:0;
+    height:calc(100vh - var(--promo-h) - var(--nav-h));
+    height:calc(100dvh - var(--promo-h) - var(--nav-h));
+    display:flex;flex-flow:row nowrap;
+    overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  html.hp-on #panes::-webkit-scrollbar{display:none;}
+
+  /* Snap is released while a field is focused — otherwise the iOS keyboard
+     resizing the viewport fights the snap and drags the panel sideways
+     mid-typing. Restored on blur. */
+  html.hp-on.hp-nosnap #panes{scroll-snap-type:none;scroll-behavior:auto;}
+
+  /* ── One section = one panel. Panels scroll vertically on their own. ── */
+  html.hp-on #panes > section,
+  html.hp-on #panes > footer{
+    flex:0 0 100%;width:100%;min-width:100%;max-width:100%;
+    height:100%;
+    scroll-snap-align:start;
+    overflow-x:hidden;overflow-y:auto;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    border-top:none;
+    padding-top:64px;    /* clears the Book Now pill pinned top-right */
+    padding-bottom:78px; /* clears the dots bar */
+  }
+
+  /* Hero centres when it fits and scrolls from the top when it doesn't
+     (auto margins instead of justify-content:center, which clips overflow). */
+  html.hp-on #panes > #hero{
+    min-height:0;
+    justify-content:flex-start;
+    padding-left:var(--pad-x);padding-right:var(--pad-x);
+  }
+  html.hp-on #panes > #hero .hero-inner{margin-top:auto;margin-bottom:auto;}
+  /* The "Scroll ↓" cue points the wrong way once the page moves sideways. */
+  html.hp-on #panes > #hero .hero-scroll{display:none;}
+
+  /* ── Kill the nested horizontal scrollers. A sideways-scrolling strip
+     inside a sideways-scrolling track makes the swipe gesture ambiguous
+     (and iOS will not reliably chain the two), so on mobile the reviews
+     and gallery strips stack vertically instead. ── */
+  html.hp-on .tst-strip,
+  html.hp-on .work-strip{
+    flex-direction:column;
+    overflow:visible;
+    scroll-snap-type:none;
+    padding:4px 0 0;
+  }
+  html.hp-on .tst-strip > .tst-card,
+  html.hp-on .work-strip > .work-item{width:100%;flex:0 0 auto;}
+  html.hp-on .tst-fade,
+  html.hp-on .tst-arrow{display:none;}
+
+  /* ── Progress bar, sits flush under the nav ── */
+  html.hp-on #hp-progress{
+    display:block;position:fixed;z-index:196;
+    top:calc(var(--promo-h) + var(--nav-h));left:0;right:0;height:2px;
+    background:var(--line);
+  }
+  html.hp-on #hp-progress span{
+    display:block;height:100%;width:0;
+    background:linear-gradient(90deg,var(--blue-p),var(--blue-h));
+    transition:width 140ms linear;
+  }
+
+  /* ── Dot navigation ── */
+  html.hp-on #hp-dots{
+    display:flex;position:fixed;z-index:191;
+    left:0;right:0;bottom:0;
+    justify-content:center;align-items:center;
+    padding:12px 8px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.94) 45%);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  }
+  html.hp-on #hp-dots button{
+    -webkit-appearance:none;appearance:none;border:0;background:none;
+    width:17px;height:26px;padding:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  html.hp-on #hp-dots button::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--line-2);
+    transition:background 180ms var(--ease),transform 180ms var(--ease);
+  }
+  html.hp-on #hp-dots button[aria-current="true"]::before{
+    background:var(--blue);transform:scale(1.55);
+  }
+
+  /* ── First-visit swipe affordance ── */
+  html.hp-on #hp-hint{
+    display:flex;position:fixed;z-index:192;
+    bottom:62px;right:12px;
+    align-items:center;gap:7px;
+    padding:9px 15px;border-radius:999px;
+    background:rgba(17,17,17,.88);color:#fff;
+    font-family:var(--ff-h);font-weight:700;font-size:10.5px;
+    letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+    box-shadow:0 6px 20px rgba(0,0,0,.32);
+    pointer-events:none;
+    animation:hpHintNudge 2.4s var(--ease) infinite;
+  }
+  html.hp-on #hp-hint i{width:15px;height:15px;}
+  html.hp-on.hp-hint-off #hp-hint{display:none;}
+  @keyframes hpHintNudge{
+    0%,100%{transform:translateX(0);}
+    50%{transform:translateX(7px);}
+  }
+
+  /* ── Layout switch, for comparing the swipe layout against the normal
+     vertical page on a real device. Hidden from visitors: only appears
+     once ?layout=debug has been visited on this device (?layout=clean
+     turns it back off and resets the stored mode). ── */
+  html.hp-debug #hp-toggle{
+    display:inline-flex;position:fixed;z-index:193;
+    left:12px;bottom:calc(12px + env(safe-area-inset-bottom));
+    align-items:center;
+    height:30px;padding:0 12px;
+    border:1px solid var(--line-2);border-radius:999px;
+    background:rgba(255,255,255,.94);color:var(--fg-3);
+    font-family:var(--ff-h);font-weight:700;font-size:9.5px;
+    letter-spacing:.08em;text-transform:uppercase;line-height:1;
+    cursor:pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html.hp-on #panes{scroll-behavior:auto;}
+    html.hp-on #hp-hint{animation:none;}
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1675,6 +1840,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     Call (216) 903-4783
   </a>
 </div>
+
+<!-- Mobile horizontal-panel prototype chrome (hidden on desktop) -->
+<div id="hp-progress" aria-hidden="true"><span></span></div>
+<div id="hp-hint" aria-hidden="true"><i data-lucide="chevrons-right"></i> Swipe to explore</div>
+<nav id="hp-dots" aria-label="Section navigation"></nav>
+<button type="button" id="hp-toggle" aria-pressed="true">Layout: Swipe</button>
+
+<!-- #panes: layout-neutral wrapper. Desktop keeps the normal vertical block flow;
+     at the mobile breakpoint it becomes a horizontal scroll-snap track. -->
+<div id="panes">
 
 <!-- ─────────────── HERO ─────────────── -->
 <section id="hero">
@@ -2697,6 +2872,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </footer>
 
+</div><!-- /#panes -->
+
 <script>
 // ───────────────── PROMO BANNER DISMISS ───────────────────
 (function(){
@@ -2855,7 +3032,8 @@ if (bookingForm) {
       bookingForm.style.display = 'none';
       document.getElementById('bs').classList.add('show');
       tdIcons();
-      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+      if (window.hpGoTo) hpGoTo('booking');
+      else document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = orig;
@@ -3043,6 +3221,191 @@ tdIcons();
   strip.addEventListener('scroll', update, {passive: true});
   window.addEventListener('resize', update);
   update();
+})();
+
+/* ═════════════ MOBILE HORIZONTAL PANEL MODE — PROTOTYPE ═════════════
+   Drives the swipe-between-sections layout at ≤720px. Every branch below
+   is a no-op unless html.hp-on is set, so desktop behaviour is untouched. */
+(function(){
+  var doc    = document.documentElement;
+  var panes  = document.getElementById('panes');
+  var dotsEl = document.getElementById('hp-dots');
+  var barEl  = document.querySelector('#hp-progress span');
+  var toggle = document.getElementById('hp-toggle');
+  var navEl  = document.getElementById('nav');
+  if (!panes) return;
+
+  var mq     = window.matchMedia('(max-width: 720px)');
+  var slides = Array.prototype.slice.call(panes.children)
+                    .filter(function(el){ return el.matches('section, footer'); });
+  var on     = function(){ return doc.classList.contains('hp-on'); };
+
+  /* Readable names for the dot buttons — falls back to the section id. */
+  var LABELS = {
+    hero:'Home', trust:'Why Us', process:'Process', services:'Services',
+    howworks:'How It Works', pricing:'Pricing', area:'Service Area',
+    disclaimer:'Good To Know', testimonials:'Reviews', gallery:'Our Work',
+    future:'Coming Soon', booking:'Book Now', contact:'Contact', terms:'Terms'
+  };
+  var labelFor = function(el, i){
+    if (el.tagName === 'FOOTER') return 'More';
+    return LABELS[el.id] || el.id || ('Section ' + (i + 1));
+  };
+
+  /* ── Dot navigation ── */
+  slides.forEach(function(el, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', labelFor(el, i));
+    b.addEventListener('click', function(){ goToIndex(i); });
+    dotsEl.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsEl.children);
+
+  function activeIndex(){
+    var w = panes.clientWidth || 1;
+    return Math.max(0, Math.min(slides.length - 1, Math.round(panes.scrollLeft / w)));
+  }
+
+  function goToIndex(i, smooth){
+    if (!on()) { slides[i].scrollIntoView({ behavior: 'smooth' }); return; }
+    var el = slides[i];
+    if (!el) return;
+    el.scrollTop = 0;                       // land at the top of the panel
+    panes.scrollTo({ left: el.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
+    dismissHint();
+  }
+
+  /* Public hook used by the booking form's success handler. */
+  window.hpGoTo = function(id){
+    var i = slides.findIndex(function(s){ return s.id === id; });
+    if (i < 0) { var t = document.getElementById(id); if (t) t.scrollIntoView({behavior:'smooth'}); return; }
+    goToIndex(i);
+  };
+
+  /* ── Progress bar / active dot / nav elevation ── */
+  var raf = 0;
+  function sync(){
+    raf = 0;
+    var i = activeIndex();
+    dots.forEach(function(d, n){
+      if (n === i) d.setAttribute('aria-current', 'true');
+      else d.removeAttribute('aria-current');
+    });
+    var max = panes.scrollWidth - panes.clientWidth;
+    barEl.style.width = (max > 0 ? (panes.scrollLeft / max) * 100 : 0) + '%';
+    if (navEl) navEl.classList.toggle('s', panes.scrollLeft > 40);
+    if (panes.scrollLeft > 40) dismissHint();
+  }
+  panes.addEventListener('scroll', function(){
+    if (!on() || raf) return;
+    raf = requestAnimationFrame(sync);
+  }, { passive: true });
+
+  /* ── One-time swipe affordance: clears on the first swipe, or after 5s. ── */
+  function dismissHint(){
+    if (doc.classList.contains('hp-hint-off')) return;
+    doc.classList.add('hp-hint-off');
+    try { localStorage.setItem('td_hpanes_hint', 'seen'); } catch (e) {}
+  }
+  window.setTimeout(dismissHint, 5000);
+
+  /* ── In-page anchors (nav drawer, Book Now pill, hero CTAs, footer links).
+     Native anchor jumps into a horizontal scroll container are inconsistent
+     across mobile browsers, so drive the track explicitly instead. ── */
+  document.addEventListener('click', function(e){
+    if (!on()) return;
+    var a = e.target.closest && e.target.closest('a[href*="#"]');
+    if (!a || a.target === '_blank') return;
+    var href = a.getAttribute('href') || '';
+    var hash = href.slice(href.indexOf('#'));
+    // Only handle links that stay on this page.
+    if (href.indexOf('#') > 0 && !/^\/?(index\.html)?#/.test(href)) return;
+    if (hash.length < 2) return;
+    var target = document.getElementById(hash.slice(1));
+    if (!target) return;
+    var pane = target.closest('#panes > section, #panes > footer');
+    if (!pane) return;
+    e.preventDefault();
+    var i = slides.indexOf(pane);
+    if (i > -1) goToIndex(i);
+    if (target !== pane) {
+      // Deep link to something inside a panel — settle horizontally first.
+      window.setTimeout(function(){
+        pane.scrollTop = Math.max(0, target.offsetTop - pane.offsetTop - 16);
+      }, 380);
+    }
+    if (history.replaceState) history.replaceState(null, '', hash);
+  });
+
+  /* Arriving with a hash (e.g. /#services from another page). */
+  function applyInitialHash(){
+    if (!on() || !location.hash) return;
+    var t = document.getElementById(location.hash.slice(1));
+    if (!t) return;
+    var pane = t.closest('#panes > section, #panes > footer');
+    var i = pane ? slides.indexOf(pane) : -1;
+    if (i > -1) goToIndex(i, false);
+  }
+  window.addEventListener('load', function(){ applyInitialHash(); sync(); });
+  window.addEventListener('hashchange', applyInitialHash);
+
+  /* ── Forms: release snap while a field is focused ──
+     On iOS the software keyboard resizes the visual viewport, and a
+     `mandatory` snap re-snaps mid-edit, which can slide the booking/quote
+     form sideways under the user. Snapping resumes on blur. */
+  var FIELD = 'input, select, textarea';
+  document.addEventListener('focusin', function(e){
+    if (on() && e.target.matches && e.target.matches(FIELD)) doc.classList.add('hp-nosnap');
+  });
+  document.addEventListener('focusout', function(){
+    window.setTimeout(function(){
+      var a = document.activeElement;
+      if (a && a.matches && a.matches(FIELD)) return;   // moved to the next field
+      if (!doc.classList.contains('hp-nosnap')) return;
+      doc.classList.remove('hp-nosnap');
+      // Re-align to whatever panel we ended up on.
+      var el = slides[activeIndex()];
+      if (on() && el) panes.scrollTo({ left: el.offsetLeft, behavior: 'smooth' });
+    }, 120);
+  });
+
+  /* ── Breakpoint changes (rotation, desktop resize) ── */
+  function applyMode(){
+    var want = mq.matches;
+    try { if (localStorage.getItem('td_hpanes') === 'off') want = false; } catch (e) {}
+    if (want === on()) return;
+    doc.classList.toggle('hp-on', want);
+    if (!want){ doc.classList.remove('hp-nosnap'); if (navEl) navEl.classList.remove('s'); }
+    else { requestAnimationFrame(sync); }
+  }
+  (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(applyMode);
+  window.addEventListener('orientationchange', function(){
+    window.setTimeout(function(){ goToIndex(activeIndex(), false); }, 250);
+  });
+
+  /* ── Swipe ⇄ scroll switch. Only reachable when ?layout=debug has been
+     visited on this device (see the head script); otherwise the button is
+     display:none and this wiring is inert. ── */
+  if (toggle){
+    var paint = function(){
+      var swipe = on();
+      toggle.textContent = 'Layout: ' + (swipe ? 'Swipe' : 'Scroll');
+      toggle.setAttribute('aria-pressed', String(swipe));
+    };
+    toggle.addEventListener('click', function(){
+      var swipe = !on();
+      try { localStorage.setItem('td_hpanes', swipe ? 'on' : 'off'); } catch (e) {}
+      doc.classList.toggle('hp-on', swipe);
+      doc.classList.remove('hp-nosnap');
+      if (navEl && !swipe) navEl.classList.remove('s');
+      if (swipe) requestAnimationFrame(sync);
+      paint();
+    });
+    paint();
+  }
+
+  sync();
 })();
 </script>
 </body>
