@@ -93,7 +93,7 @@ BASE_PRICES = {
 }
 
 # Add-on pricing. Clay & Iron Decontamination scales with vehicle size.
-CLAY_PRICES = {"Sedan": 40, "SUV/Crossover": 50, "Large SUV/Truck": 60, "Minivan": 50}
+CLAY_PRICES = {"Sedan": 60, "SUV/Crossover": 70, "Large SUV/Truck": 80, "Minivan": 70}
 ADDON_PRICES = {
     "Leather Conditioning": 40,
     "Odor Eliminator": 50,  # mid-point of the advertised $40–$75 range
@@ -198,7 +198,7 @@ def vehicle_cost(service, vehicle_type, addons, upcharges):
     addon_total = 0
     for addon in addons:
         if addon == "Clay & Iron Decontamination":
-            addon_total += CLAY_PRICES.get(vehicle, 50)
+            addon_total += CLAY_PRICES.get(vehicle, 70)
         else:
             addon_total += ADDON_PRICES.get(addon, 0)
 

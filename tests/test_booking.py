@@ -86,7 +86,7 @@ def test_leather_addon_flat():
 
 
 def test_clay_iron_addon_scales_with_vehicle():
-    expected = {"Sedan": 40, "SUV/Crossover": 50, "Large SUV/Truck": 60, "Minivan": 50}
+    expected = {"Sedan": 60, "SUV/Crossover": 70, "Large SUV/Truck": 80, "Minivan": 70}
     for vehicle, clay in expected.items():
         base = appmod.BASE_PRICES["Wash, Clay, Seal"][vehicle]
         cost = appmod.vehicle_cost("Wash, Clay, Seal", vehicle, ["Clay & Iron Decontamination"], [])
@@ -111,12 +111,12 @@ def test_odor_addon_flat():
 
 
 def test_all_addons_stack():
-    # Sedan Full 195 + leather 40 + clay 40 + odor 50 = 325
+    # Sedan Full 195 + leather 40 + clay 60 + odor 50 = 345
     cost = appmod.vehicle_cost(
         "Full Detail", "Sedan",
         ["Leather Conditioning", "Clay & Iron Decontamination", "Odor Eliminator"], [],
     )
-    assert cost == 325
+    assert cost == 345
 
 
 def test_upcharges_sum():
@@ -193,18 +193,18 @@ def test_referral_eligible_via_second_vehicle():
 
 
 def test_full_stack_two_vehicles_with_addons():
-    # v1 Full SUV 215 + leather 40 + clay(SUV) 50 = 305
+    # v1 Full SUV 215 + leather 40 + clay(SUV) 70 = 325
     # v2 Interior Sedan 120 + pet hair 30 = 150
-    # subtotal 455, multi 45.5, referral 35 => 374.5
+    # subtotal 475, multi 47.5, referral 35 => 392.5
     total, summary = appmod.calculate_estimate(
         "2", "Bob",
         veh("Full Detail", "SUV/Crossover", ["Leather Conditioning", "Clay & Iron Decontamination"]),
         veh("Interior Detail", "Sedan", [], ["Pet Hair"]),
     )
-    assert total == 374.5
-    assert "Multi-vehicle 10% (-$45.50)" in summary
+    assert total == 392.5
+    assert "Multi-vehicle 10% (-$47.50)" in summary
     assert "Referral (-$35.00)" in summary
-    assert "Total saved: $80.50" in summary
+    assert "Total saved: $82.50" in summary
 
 
 def test_second_vehicle_ignored_when_count_one():
@@ -291,7 +291,7 @@ def test_book_endpoint_success_two_vehicles(client):
     assert res.status_code == 200
     data = res.get_json()
     assert data["ok"] is True
-    assert data["total_estimate"] == 374.5
+    assert data["total_estimate"] == 392.5
     assert "Referral" in data["discount_applied"]
 
 
