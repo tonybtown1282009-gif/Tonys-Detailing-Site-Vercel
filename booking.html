@@ -297,6 +297,17 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
 .expecting-check .ctxt strong{font-weight:700;color:#fff;}
 .expecting-check .cprice{color:var(--blue-ll);font-weight:700;font-size:12px;margin-left:2px;}
 
+/* Maintenance plan scope note */
+.maintenance-note[hidden]{display:none !important;}
+.mnote-box{
+  background:linear-gradient(180deg,rgba(45,85,144,.20),rgba(30,58,95,.06));
+  border:1.5px solid rgba(77,117,168,.45);border-radius:6px;
+  padding:15px 16px;
+}
+.mnote-box p{font-family:var(--ff-b);font-size:13px;color:var(--fg-2);line-height:1.5;margin:0;}
+.mnote-box p + p{margin-top:8px;}
+.mnote-box strong{font-weight:700;color:#fff;}
+
 @media (max-width:880px){
   .book-layout{grid-template-columns:1fr;}
   .book-side{flex-direction:row;flex-wrap:wrap;}
@@ -473,6 +484,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label for="location">Where are you located? (City/Address area) <span class="req">*</span></label>
               <input id="location" name="location" type="text" placeholder="Chardon, OH — near the square" autocomplete="street-address" required>
             </div>
+            <div class="field full">
+              <label class="check"><input type="checkbox" id="outside_radius" name="outside_radius" value="1"><span class="ctxt">Outside our standard service radius <span class="cprice">+$15 travel fee</span></span></label>
+            </div>
             <div class="field">
               <label for="num_vehicles">Number of Vehicles</label>
               <select id="num_vehicles" name="num_vehicles">
@@ -491,7 +505,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="Minivan">Minivan</option>
               </select>
             </div>
-            <div class="field full">
+            <div class="field">
+              <label for="plan_type">Plan Type</label>
+              <select id="plan_type" name="plan_type">
+                <option value="">One-Time Service</option>
+                <option value="Monthly Maintenance Visit">Monthly Maintenance Plan</option>
+                <option value="Biweekly Maintenance Visit">Biweekly Maintenance Plan</option>
+              </select>
+            </div>
+            <div class="field full" id="service-field">
               <label for="service">Service <span class="req">*</span></label>
               <select id="service" name="service" required>
                 <option value="">Select a service&hellip;</option>
@@ -504,9 +526,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
                   <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
                 </optgroup>
+                <optgroup label="Maintenance Plan">
+                  <option value="Monthly Maintenance Visit" data-service="Monthly Maintenance Visit">Monthly Maintenance Visit ($150&ndash;$180)</option>
+                  <option value="Biweekly Maintenance Visit" data-service="Biweekly Maintenance Visit">Biweekly Maintenance Visit ($140&ndash;$170)</option>
+                </optgroup>
               </select>
             </div>
-            <div class="field full">
+            <div class="field full maintenance-note" id="maintenanceNote" hidden>
+              <div class="mnote-box">
+                <p><strong>Maintenance visit scope:</strong> spray-down wheel &amp; hand wash, dry (no clay/prewash/decon); interior vacuum only (no extraction), mats cleaned, dry microfiber wipe-down (spray only if visibly soiled), and interior + exterior glass.</p>
+                <p>Maintenance visits do not include extraction, stain treatment, pet hair removal, or odor treatment. If a visit requires any of these, it will be quoted as a standalone detail instead.</p>
+              </div>
+            </div>
+            <div class="field full" id="addons-field">
               <label>Add-Ons</label>
               <div class="check-grid">
                 <label class="check"><input type="checkbox" name="addons" value="Leather Conditioning"><span class="ctxt">Leather Conditioning <span class="cprice">+$40</span></span></label>
@@ -515,7 +547,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label class="check"><input type="checkbox" name="addons" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
               </div>
             </div>
-            <div class="field full">
+            <div class="field full" id="upcharges-field">
               <label>Condition Upcharges</label>
               <div class="check-grid">
                 <label class="check"><input type="checkbox" name="upcharges" value="Pet Hair"><span class="ctxt">Pet Hair</span></label>
@@ -680,7 +712,9 @@ const PRICES = {
   "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315},
   "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
   "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
-  "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
+  "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99},
+  "Monthly Maintenance Visit": {"Sedan":150,"SUV/Crossover":160,"Large SUV/Truck":180,"Minivan":170},
+  "Biweekly Maintenance Visit": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":170,"Minivan":160}
 };
 function refreshPrices(vehicleSel, serviceSel){
   const veh = vehicleSel.value;
@@ -743,13 +777,57 @@ svc2.addEventListener('change', () => toggleExpecting(svc2, exp2));
 toggleExpecting(svc1, exp1);
 toggleSecondVehicle();
 
-// ── Pre-select a service from the URL (e.g. deep-clean.html → ?service=Deep+Clean) ──
+// ── Maintenance Plan selector: syncs with the Service field so pricing
+// auto-calculates the same way the one-time tiers do, and hides the add-ons/
+// upcharges that maintenance visits don't offer (extraction, stain
+// treatment, pet hair, odor — those get quoted as a standalone detail).
+const planSel = document.getElementById('plan_type');
+const addonsField = document.getElementById('addons-field');
+const upchargesField = document.getElementById('upcharges-field');
+const maintenanceNote = document.getElementById('maintenanceNote');
+const MAINTENANCE_SERVICES = ['Monthly Maintenance Visit', 'Biweekly Maintenance Visit'];
+function syncMaintenanceUI(){
+  const isMaintenance = MAINTENANCE_SERVICES.includes(svc1.value);
+  setShown(addonsField, !isMaintenance);
+  setShown(upchargesField, !isMaintenance);
+  setShown(maintenanceNote, isMaintenance);
+  if (isMaintenance){
+    addonsField.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+    upchargesField.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+    if (planSel.value !== svc1.value) planSel.value = svc1.value;
+  } else if (planSel.value){
+    planSel.value = '';
+  }
+}
+planSel.addEventListener('change', () => {
+  if (planSel.value) svc1.value = planSel.value;
+  else if (MAINTENANCE_SERVICES.includes(svc1.value)) svc1.value = '';
+  syncMaintenanceUI();
+  toggleExpecting(svc1, exp1);
+  refreshPrices(veh1, svc1);
+});
+svc1.addEventListener('change', syncMaintenanceUI);
+syncMaintenanceUI();
+
+// ── Pre-select a service from the URL (e.g. deep-clean.html → ?service=Deep+Clean,
+// or index.html#maintenance → ?plan=Monthly+Maintenance+Visit) ──
 (function(){
-  const wanted = new URLSearchParams(window.location.search).get('service');
+  const params = new URLSearchParams(window.location.search);
+  const wantedPlan = params.get('plan');
+  if (wantedPlan && MAINTENANCE_SERVICES.includes(wantedPlan)){
+    planSel.value = wantedPlan;
+    svc1.value = wantedPlan;
+    syncMaintenanceUI();
+    toggleExpecting(svc1, exp1);
+    refreshPrices(veh1, svc1);
+    return;
+  }
+  const wanted = params.get('service');
   if (!wanted) return;
   const match = Array.from(svc1.options).find(o => o.value === wanted);
   if (match){
     svc1.value = wanted;
+    syncMaintenanceUI();
     toggleExpecting(svc1, exp1);
     refreshPrices(veh1, svc1);
   }

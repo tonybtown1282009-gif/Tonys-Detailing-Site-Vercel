@@ -74,6 +74,8 @@ def test_base_price_matrix():
         "Ceramic Coating (Elite 8-Year)": {
             "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
         },
+        "Monthly Maintenance Visit": {"Sedan": 150, "SUV/Crossover": 160, "Large SUV/Truck": 180, "Minivan": 170},
+        "Biweekly Maintenance Visit": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 170, "Minivan": 160},
     }
     assert appmod.BASE_PRICES == expected
     for service, by_vehicle in expected.items():
@@ -277,6 +279,55 @@ def test_expecting_and_referral_stack():
 
 
 # ──────────────────────────────────────────────────────────────────────────
+#  calculate_estimate — maintenance plans + travel fee
+# ──────────────────────────────────────────────────────────────────────────
+def test_maintenance_plan_priced_by_size():
+    expected = {
+        "Monthly Maintenance Visit": {"Sedan": 150, "SUV/Crossover": 160, "Large SUV/Truck": 180, "Minivan": 170},
+        "Biweekly Maintenance Visit": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 170, "Minivan": 160},
+    }
+    for service, by_vehicle in expected.items():
+        for vehicle, price in by_vehicle.items():
+            total, summary = appmod.calculate_estimate("1", "", veh(service, vehicle))
+            assert total == price
+            assert summary == "None"
+
+
+def test_travel_fee_added_outside_radius():
+    total, summary = appmod.calculate_estimate(
+        "1", "", veh("Monthly Maintenance Visit", "Sedan"), outside_radius=True
+    )
+    assert total == 165
+    assert "Travel fee, outside standard radius (+$15.00)" in summary
+
+
+def test_travel_fee_not_added_by_default():
+    total, summary = appmod.calculate_estimate("1", "", veh("Monthly Maintenance Visit", "Sedan"))
+    assert total == 150
+    assert "Travel fee" not in summary
+
+
+def test_travel_fee_flat_regardless_of_vehicle_count():
+    # v1 + v2 Biweekly Sedan (140 each) - 10% multi = 252, travel fee is once, not per vehicle.
+    total, summary = appmod.calculate_estimate(
+        "2", "", veh("Biweekly Maintenance Visit", "Sedan"), veh("Biweekly Maintenance Visit", "Sedan"),
+        outside_radius=True,
+    )
+    assert total == 252 + 15
+    assert "Travel fee, outside standard radius (+$15.00)" in summary
+
+
+def test_travel_fee_stacks_with_referral_and_discounts():
+    # Referral only applies to Full Detail/Deep Clean, so a maintenance plan
+    # visit ignores it — travel fee still applies on top of the base price.
+    total, summary = appmod.calculate_estimate(
+        "1", "A Friend", veh("Monthly Maintenance Visit", "Sedan"), outside_radius=True
+    )
+    assert total == 165
+    assert "Referral" not in summary
+
+
+# ──────────────────────────────────────────────────────────────────────────
 #  /api/book endpoint
 # ──────────────────────────────────────────────────────────────────────────
 def test_book_endpoint_success_two_vehicles(client):
@@ -364,6 +415,24 @@ def test_book_endpoint_ignores_expecting_when_not_deep_clean(client):
     assert row["expecting_discount_1"] == 0
 
 
+def test_book_endpoint_maintenance_plan_with_travel_fee(client):
+    res = client.post("/api/book", data={
+        "name": "Recurring Rita", "phone": "440", "location": "Beachwood",
+        "num_vehicles": "1", "vehicle_type": "SUV/Crossover",
+        "service": "Monthly Maintenance Visit", "outside_radius": "1",
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["total_estimate"] == 175  # 160 + 15 travel fee
+    assert "Travel fee" in data["discount_applied"]
+
+    conn = appmod.get_db()
+    row = conn.execute("SELECT * FROM bookings WHERE name = 'Recurring Rita'").fetchone()
+    conn.close()
+    assert row["outside_radius"] == 1
+    assert row["service"] == "Monthly Maintenance Visit"
+
+
 @pytest.mark.parametrize("payload", [
     {"phone": "1", "location": "x"},        # missing name
     {"name": "n", "location": "x"},         # missing phone
@@ -394,7 +463,7 @@ def test_schema_has_new_columns():
     conn.close()
     for c in (
         "location", "vehicle_type_2", "service_2", "addons_2", "upcharges_2",
-        "expecting_discount_1", "expecting_discount_2",
+        "expecting_discount_1", "expecting_discount_2", "outside_radius",
     ):
         assert c in cols
 
