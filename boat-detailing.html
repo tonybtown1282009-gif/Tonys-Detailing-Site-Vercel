@@ -429,6 +429,10 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
 #drawer .drawer-dd-list a:last-child{border-bottom:1px solid var(--line);}
 #drawer .drawer-dd-list a .lucide{width:14px;height:14px;}
 </style>
+<!-- Mobile app shell (≤720px): vertical page, horizontal card rails, sticky
+     header + bottom tab bar, safe areas, dark mode. Loaded last so its
+     same-specificity rules win over the desktop styles above. -->
+<link rel="stylesheet" href="/static/mobile-app.css">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -462,6 +466,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="nav-right">
     <a href="tel:+12169034783" class="nav-phone" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i>(216) 903-4783</a>
     <a href="#cta" class="btn sm">Get a Quote</a>
+    <!-- Mobile-only call button: the desktop nav-phone link is hidden at this
+         breakpoint, so keep the number one 44×44 tap away. -->
+    <a href="tel:+12169034783" class="m-call" aria-label="Call (216) 903-4783" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i></a>
     <button class="hbg" id="hbg" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -867,5 +874,14 @@ tdIcons();
   }
 })();
 </script>
+
+<!-- Fixed bottom tab bar — mobile only. `aria-current` marks this page. -->
+<nav id="mtabs" aria-label="Primary">
+  <a href="/"><i data-lucide="house"></i><span>Home</span></a>
+  <a href="/#services"><i data-lucide="sparkles"></i><span>Services</span></a>
+  <a href="/#pricing"><i data-lucide="tag"></i><span>Pricing</span></a>
+  <a href="/gallery"><i data-lucide="images"></i><span>Gallery</span></a>
+  <a href="/booking"><i data-lucide="calendar-check"></i><span>Book</span></a>
+</nav>
 </body>
 </html>

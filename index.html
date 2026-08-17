@@ -65,18 +65,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script src="/assets/lucide-1.23.0.min.js" defer></script>
 <script>function tdIcons(){if(window.lucide){lucide.createIcons();}else{document.addEventListener('DOMContentLoaded',function(){if(window.lucide)lucide.createIcons();});}}</script>
 <script>try{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}catch(e){}</script>
-<!-- Mobile horizontal-panel mode: decided before first paint so the page never
-     renders vertically and then flips. No-JS falls back to the normal layout. -->
-<script>try{
-  var d=document.documentElement, q=location.search;
-  /* ?layout=debug exposes the swipe/scroll switch (sticky, so it survives
-     navigation); ?layout=clean hides it again and resets the mode. */
-  if(/[?&]layout=debug(&|$)/.test(q)){ localStorage.setItem('td_hpanes_debug','1'); }
-  else if(/[?&]layout=clean(&|$)/.test(q)){ localStorage.removeItem('td_hpanes_debug'); localStorage.removeItem('td_hpanes'); }
-  if(localStorage.getItem('td_hpanes')!=='off' && window.matchMedia('(max-width:720px)').matches) d.classList.add('hp-on');
-  if(localStorage.getItem('td_hpanes_hint')==='seen') d.classList.add('hp-hint-off');
-  if(localStorage.getItem('td_hpanes_debug')==='1') d.classList.add('hp-debug');
-}catch(e){}</script>
 <style>
 /* ─────────────── FONTS ─────────────── */
 @font-face{font-family:'Inter';src:url('fonts/Inter-Regular.woff2') format('woff2'),url('fonts/Inter-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
@@ -302,33 +290,6 @@ a{color:inherit;text-decoration:none;}
 .hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
 .hbg.open span:nth-child(2){opacity:0;}
 .hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
-
-/* ─────────────── MOBILE FLOATING "BOOK NOW" CTA ─────────────── */
-/* Hidden on desktop — the nav links / Email Me CTA already cover booking there.
-   Shown only on the mobile breakpoint where the row collapses to the hamburger. */
-.mobile-book-fab{
-  display:none;
-  position:fixed;
-  /* Pinned just below the fixed nav bar, tracking the promo-banner state so it
-     never overlaps the logo or the hamburger (which pack to the LEFT once the
-     nav links collapse). Sits in the top-right, stays put while scrolling. */
-  top:calc(var(--promo-h) + var(--nav-h) + 10px);
-  right:var(--pad-x);
-  z-index:190; /* above page content, below the drawer (195) so the open menu covers it */
-  height:44px;padding:0 18px;
-  align-items:center;justify-content:center;
-  font-family:var(--ff-h);font-weight:700;
-  font-size:11px;letter-spacing:.06em;text-transform:uppercase;line-height:1;
-  color:#fff;background:var(--blue);
-  border-radius:8px;
-  /* light ring + neutral shadow keep the pill readable on the dark navy hero
-     as well as on the light content sections below it */
-  border:1px solid rgba(255,255,255,.28);
-  box-shadow:0 4px 16px rgba(0,0,0,.32);
-  transition:background 180ms var(--ease), transform 160ms var(--ease), box-shadow 180ms var(--ease);
-}
-.mobile-book-fab:hover{background:var(--blue-h);box-shadow:0 6px 20px rgba(0,0,0,.36);}
-.mobile-book-fab:active{transform:scale(.97);background:var(--blue-p);}
 
 #drawer{
   position:fixed;top:calc(var(--nav-h) + var(--promo-h));left:0;right:0;z-index:195;
@@ -1305,7 +1266,6 @@ footer{
   .nav-phone{display:none;}
   .nav-right .btn{display:none;}
   .hbg{display:flex;}
-  .mobile-book-fab{display:inline-flex;}
   .hero-phone-pill{display:none;}
   .svc-grid{grid-template-columns:1fr;}
   .svc-card{min-height:auto;}
@@ -1622,160 +1582,11 @@ footer{
 #drawer .drawer-dd-list a{padding-left:18px;font-size:13px;font-weight:600;}
 #drawer .drawer-dd-list a:last-child{border-bottom:1px solid var(--line);}
 #drawer .drawer-dd-list a .lucide{width:14px;height:14px;}
-/* ═══════════════════════════════════════════════════════════════════════
-   MOBILE HORIZONTAL PANEL MODE  —  PROTOTYPE
-   Each major section becomes one full-screen, scroll-snapped panel that the
-   user swipes left/right through. Everything here is scoped to
-   `html.hp-on` (set by JS only at the ≤720px breakpoint) AND wrapped in the
-   mobile media query, so the desktop layout is byte-for-byte unchanged.
-   ═══════════════════════════════════════════════════════════════════════ */
-#hp-progress,#hp-hint,#hp-dots,#hp-toggle{display:none;}
-
-@media (max-width:720px){
-
-  /* ── The horizontal track ── */
-  html.hp-on,html.hp-on body{height:100%;overflow:hidden;}
-  html.hp-on body{overscroll-behavior:none;}
-
-  html.hp-on #panes{
-    position:fixed;
-    top:calc(var(--promo-h) + var(--nav-h));left:0;right:0;
-    height:calc(100vh - var(--promo-h) - var(--nav-h));
-    height:calc(100dvh - var(--promo-h) - var(--nav-h));
-    display:flex;flex-flow:row nowrap;
-    overflow-x:auto;overflow-y:hidden;
-    scroll-snap-type:x mandatory;
-    scroll-behavior:smooth;
-    overscroll-behavior-x:contain;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  html.hp-on #panes::-webkit-scrollbar{display:none;}
-
-  /* Snap is released while a field is focused — otherwise the iOS keyboard
-     resizing the viewport fights the snap and drags the panel sideways
-     mid-typing. Restored on blur. */
-  html.hp-on.hp-nosnap #panes{scroll-snap-type:none;scroll-behavior:auto;}
-
-  /* ── One section = one panel. Panels scroll vertically on their own. ── */
-  html.hp-on #panes > section,
-  html.hp-on #panes > footer{
-    flex:0 0 100%;width:100%;min-width:100%;max-width:100%;
-    height:100%;
-    scroll-snap-align:start;
-    overflow-x:hidden;overflow-y:auto;
-    overscroll-behavior-y:contain;
-    -webkit-overflow-scrolling:touch;
-    border-top:none;
-    padding-top:64px;    /* clears the Book Now pill pinned top-right */
-    padding-bottom:78px; /* clears the dots bar */
-  }
-
-  /* Hero centres when it fits and scrolls from the top when it doesn't
-     (auto margins instead of justify-content:center, which clips overflow). */
-  html.hp-on #panes > #hero{
-    min-height:0;
-    justify-content:flex-start;
-    padding-left:var(--pad-x);padding-right:var(--pad-x);
-  }
-  html.hp-on #panes > #hero .hero-inner{margin-top:auto;margin-bottom:auto;}
-  /* The "Scroll ↓" cue points the wrong way once the page moves sideways. */
-  html.hp-on #panes > #hero .hero-scroll{display:none;}
-
-  /* ── Kill the nested horizontal scrollers. A sideways-scrolling strip
-     inside a sideways-scrolling track makes the swipe gesture ambiguous
-     (and iOS will not reliably chain the two), so on mobile the reviews
-     and gallery strips stack vertically instead. ── */
-  html.hp-on .tst-strip,
-  html.hp-on .work-strip{
-    flex-direction:column;
-    overflow:visible;
-    scroll-snap-type:none;
-    padding:4px 0 0;
-  }
-  html.hp-on .tst-strip > .tst-card,
-  html.hp-on .work-strip > .work-item{width:100%;flex:0 0 auto;}
-  html.hp-on .tst-fade,
-  html.hp-on .tst-arrow{display:none;}
-
-  /* ── Progress bar, sits flush under the nav ── */
-  html.hp-on #hp-progress{
-    display:block;position:fixed;z-index:196;
-    top:calc(var(--promo-h) + var(--nav-h));left:0;right:0;height:2px;
-    background:var(--line);
-  }
-  html.hp-on #hp-progress span{
-    display:block;height:100%;width:0;
-    background:linear-gradient(90deg,var(--blue-p),var(--blue-h));
-    transition:width 140ms linear;
-  }
-
-  /* ── Dot navigation ── */
-  html.hp-on #hp-dots{
-    display:flex;position:fixed;z-index:191;
-    left:0;right:0;bottom:0;
-    justify-content:center;align-items:center;
-    padding:12px 8px calc(12px + env(safe-area-inset-bottom));
-    background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.94) 45%);
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  }
-  html.hp-on #hp-dots button{
-    -webkit-appearance:none;appearance:none;border:0;background:none;
-    width:17px;height:26px;padding:0;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-  }
-  html.hp-on #hp-dots button::before{
-    content:"";width:6px;height:6px;border-radius:50%;
-    background:var(--line-2);
-    transition:background 180ms var(--ease),transform 180ms var(--ease);
-  }
-  html.hp-on #hp-dots button[aria-current="true"]::before{
-    background:var(--blue);transform:scale(1.55);
-  }
-
-  /* ── First-visit swipe affordance ── */
-  html.hp-on #hp-hint{
-    display:flex;position:fixed;z-index:192;
-    bottom:62px;right:12px;
-    align-items:center;gap:7px;
-    padding:9px 15px;border-radius:999px;
-    background:rgba(17,17,17,.88);color:#fff;
-    font-family:var(--ff-h);font-weight:700;font-size:10.5px;
-    letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
-    box-shadow:0 6px 20px rgba(0,0,0,.32);
-    pointer-events:none;
-    animation:hpHintNudge 2.4s var(--ease) infinite;
-  }
-  html.hp-on #hp-hint i{width:15px;height:15px;}
-  html.hp-on.hp-hint-off #hp-hint{display:none;}
-  @keyframes hpHintNudge{
-    0%,100%{transform:translateX(0);}
-    50%{transform:translateX(7px);}
-  }
-
-  /* ── Layout switch, for comparing the swipe layout against the normal
-     vertical page on a real device. Hidden from visitors: only appears
-     once ?layout=debug has been visited on this device (?layout=clean
-     turns it back off and resets the stored mode). ── */
-  html.hp-debug #hp-toggle{
-    display:inline-flex;position:fixed;z-index:193;
-    left:12px;bottom:calc(12px + env(safe-area-inset-bottom));
-    align-items:center;
-    height:30px;padding:0 12px;
-    border:1px solid var(--line-2);border-radius:999px;
-    background:rgba(255,255,255,.94);color:var(--fg-3);
-    font-family:var(--ff-h);font-weight:700;font-size:9.5px;
-    letter-spacing:.08em;text-transform:uppercase;line-height:1;
-    cursor:pointer;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    html.hp-on #panes{scroll-behavior:auto;}
-    html.hp-on #hp-hint{animation:none;}
-  }
-}
-
 </style>
+<!-- Mobile app shell (≤720px): vertical page, horizontal card rails, sticky
+     header + bottom tab bar, safe areas, dark mode. Loaded last so its
+     same-specificity rules win over the desktop styles above. -->
+<link rel="stylesheet" href="/static/mobile-app.css">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -1815,13 +1626,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       (216) 903-4783
     </a>
     <a href="#contact" class="btn sm">Email Me</a>
+    <!-- Mobile-only call button: the desktop nav-phone link is hidden at this
+         breakpoint, so keep the number one 44×44 tap away. -->
+    <a href="tel:+12169034783" class="m-call" aria-label="Call (216) 903-4783" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i></a>
     <button class="hbg" id="hbg" aria-label="Open menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
-<!-- Mobile-only floating Book Now CTA (points to the same #booking anchor as the nav/drawer) -->
-<a href="#booking" class="mobile-book-fab" aria-label="Book Now">Book Now</a>
 <div id="drawer">
   <button type="button" class="drawer-dd-btn" id="drawerSvcBtn" aria-expanded="false" aria-controls="drawerSvcList">Services <i data-lucide="chevron-down"></i></button>
   <div class="drawer-dd-list" id="drawerSvcList" hidden>
@@ -1841,14 +1653,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </a>
 </div>
 
-<!-- Mobile horizontal-panel prototype chrome (hidden on desktop) -->
-<div id="hp-progress" aria-hidden="true"><span></span></div>
-<div id="hp-hint" aria-hidden="true"><i data-lucide="chevrons-right"></i> Swipe to explore</div>
-<nav id="hp-dots" aria-label="Section navigation"></nav>
-<button type="button" id="hp-toggle" aria-pressed="true">Layout: Swipe</button>
+<!-- Fixed bottom tab bar — mobile only. `aria-current` marks this page. -->
+<nav id="mtabs" aria-label="Primary">
+  <a href="/" aria-current="page"><i data-lucide="house"></i><span>Home</span></a>
+  <a href="/#services"><i data-lucide="sparkles"></i><span>Services</span></a>
+  <a href="/#pricing"><i data-lucide="tag"></i><span>Pricing</span></a>
+  <a href="/gallery"><i data-lucide="images"></i><span>Gallery</span></a>
+  <a href="/booking"><i data-lucide="calendar-check"></i><span>Book</span></a>
+</nav>
 
-<!-- #panes: layout-neutral wrapper. Desktop keeps the normal vertical block flow;
-     at the mobile breakpoint it becomes a horizontal scroll-snap track. -->
 <div id="panes">
 
 <!-- ─────────────── HERO ─────────────── -->
@@ -1914,7 +1727,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ─────────────── TRUST BADGES ─────────────── -->
 <section id="trust">
   <div class="wrap">
-    <div class="trust-strip">
+    <!-- Rail headers for the two sections that carry no desktop .section-head.
+         Hidden above 720px. -->
+    <div class="m-railhead"><h2>Why Us</h2></div>
+    <div class="trust-strip m-rail">
       <div class="trust-item">
         <div class="trust-ico"><i data-lucide="badge-check"></i></div>
         <div class="t-txt">
@@ -1950,7 +1766,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ─────────────── PROCESS / TRUST STRIP ─────────────── -->
 <section id="process">
   <div class="wrap">
-    <div class="proc-strip">
+    <div class="m-railhead"><h2>Our Process</h2></div>
+    <div class="proc-strip m-rail">
       <div class="proc-step">
         <div class="proc-ico"><i data-lucide="search"></i></div>
         <div class="proc-txt">
@@ -1997,6 +1814,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="section-head" style="margin-bottom:0;">
         <span class="eyebrow">What We Offer</span>
         <h2>Services</h2>
+        <a href="#pricing" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
         <p>Four service tiers, from an exterior wash-and-seal to our most intensive Deep Clean. Each one comes to you &mdash; home, office, or wherever you park.</p>
       </div>
       <div class="svc-head-actions">
@@ -2011,7 +1829,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
 
-    <div class="svc-grid">
+    <div class="svc-grid m-rail">
       <!-- Exterior -->
       <article class="svc-card">
         <div class="svc-icon-wrap"><i data-lucide="droplets"></i></div>
@@ -2110,21 +1928,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2>How It Works</h2>
       <p>Three easy steps between you and a showroom-clean vehicle &mdash; no trips, no hassle.</p>
     </div>
-    <div class="hiw-grid">
+    <div class="hiw-grid m-rail">
       <div class="hiw-step">
-        <span class="hiw-num">01</span>
+        <span class="hiw-num" aria-hidden="true">01</span>
         <div class="hiw-ico"><i data-lucide="calendar-check"></i></div>
         <h3>Book Online or Call</h3>
         <p>Pick your service and tell us where you're parked. We'll confirm within 24 hours.</p>
       </div>
       <div class="hiw-step">
-        <span class="hiw-num">02</span>
+        <span class="hiw-num" aria-hidden="true">02</span>
         <div class="hiw-ico"><i data-lucide="truck"></i></div>
         <h3>We Come To You</h3>
         <p>We arrive at your home or office ready to work &mdash; we just need access to an outlet and, in some cases, a water spigot.</p>
       </div>
       <div class="hiw-step">
-        <span class="hiw-num">03</span>
+        <span class="hiw-num" aria-hidden="true">03</span>
         <div class="hiw-ico"><i data-lucide="sparkles"></i></div>
         <h3>Sit Back &amp; Enjoy a Clean Car</h3>
         <p>Relax while we work. You approve the final result &mdash; clean, precise, every time.</p>
@@ -2165,31 +1983,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <tbody>
             <tr>
               <td>Wash, Clay, Seal</td>
-              <td>$140</td>
-              <td>$150</td>
-              <td>$180</td>
-              <td>$165</td>
+              <td data-label="Sedan">$140</td>
+              <td data-label="SUV / Crossover">$150</td>
+              <td data-label="Lg. SUV / Truck">$180</td>
+              <td data-label="Minivan">$165</td>
             </tr>
             <tr>
               <td>Interior Detail</td>
-              <td>$120</td>
-              <td>$135</td>
-              <td>$155</td>
-              <td>$145</td>
+              <td data-label="Sedan">$120</td>
+              <td data-label="SUV / Crossover">$135</td>
+              <td data-label="Lg. SUV / Truck">$155</td>
+              <td data-label="Minivan">$145</td>
             </tr>
             <tr>
               <td>Full Detail</td>
-              <td>$195</td>
-              <td>$215</td>
-              <td>$240</td>
-              <td>$225</td>
+              <td data-label="Sedan">$195</td>
+              <td data-label="SUV / Crossover">$215</td>
+              <td data-label="Lg. SUV / Truck">$240</td>
+              <td data-label="Minivan">$225</td>
             </tr>
             <tr>
               <td>Deep Clean</td>
-              <td>$280</td>
-              <td>$300</td>
-              <td>$330</td>
-              <td>$315</td>
+              <td data-label="Sedan">$280</td>
+              <td data-label="SUV / Crossover">$300</td>
+              <td data-label="Lg. SUV / Truck">$330</td>
+              <td data-label="Minivan">$315</td>
             </tr>
           </tbody>
         </table>
@@ -2289,10 +2107,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">Long-Term Paint Protection</span>
       <h2>Ceramic Coating Protection</h2>
+      <a href="ceramic-coating.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>Three durability tiers, each priced by vehicle size. Full decontamination prep on every one.</p>
     </div>
 
-    <div class="cert-grid">
+    <div class="cert-grid m-rail">
       <article class="cert-card">
         <div class="cert-ico"><i data-lucide="car"></i></div>
         <h3 class="cert-name">2-Year Ceramic</h3>
@@ -2380,7 +2199,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </svg>
       </div>
 
-      <div class="area-rules">
+      <div class="area-rules m-rail">
         <div class="zone-card primary">
           <div class="zone-marker">15</div>
           <div class="zone-body">
@@ -2417,7 +2236,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>We take pride in delivering the best possible result on every vehicle &mdash; but there are limits to what a single service can resolve. We tell you up front, on arrival, what's realistic.</p>
       </div>
       <div class="disc-right">
-        <ul class="disc-list">
+        <ul class="disc-list m-rail">
           <li>
             <div class="di"><i data-lucide="paintbrush"></i></div>
             <div>
@@ -2459,6 +2278,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">What Clients Say</span>
       <h2>Trusted By Local Drivers</h2>
+      <a href="reviews.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>Real results, right in the driveway &mdash; straight from our Google reviews.</p>
     </div>
     <div class="tst-scroll-wrap">
@@ -2466,7 +2286,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="tst-arrow r" type="button" aria-label="Scroll reviews right"><i data-lucide="chevron-right"></i></button>
       <div class="tst-fade l" aria-hidden="true"></div>
       <div class="tst-fade r" aria-hidden="true"></div>
-      <div class="tst-strip" role="region" aria-label="Customer reviews — scroll sideways for more">
+      <div class="tst-strip m-rail" role="region" aria-label="Customer reviews — scroll sideways for more">
       <article class="tst-card">
         <div class="tst-stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <p class="tst-quote">Excellent job. Very meticulous. Will hire Tony to do my wife's car soon!</p>
@@ -2529,10 +2349,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">The Gallery</span>
       <h2>Our Work</h2>
+      <a href="gallery.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>A look at the vehicles we bring back to showroom clean &mdash; scroll through, or open the full gallery.</p>
     </div>
     <div class="work-strip-wrap">
-      <div class="work-strip" role="region" aria-label="Our work — gallery preview, scroll sideways for more">
+      <div class="work-strip m-rail" role="region" aria-label="Our work — gallery preview, scroll sideways for more">
         <figure class="work-item"><img src="/static/gallery/placeholder-7.jpg" alt="Tony's Detailing work photo 7" loading="lazy" decoding="async"></figure>
         <figure class="work-item"><img src="/static/gallery/placeholder-8.jpg" alt="Tony's Detailing work photo 8" loading="lazy" decoding="async"></figure>
         <figure class="work-item"><img src="/static/gallery/placeholder-9.jpg" alt="Tony's Detailing work photo 9" loading="lazy" decoding="async"></figure>
@@ -3032,8 +2853,7 @@ if (bookingForm) {
       bookingForm.style.display = 'none';
       document.getElementById('bs').classList.add('show');
       tdIcons();
-      if (window.hpGoTo) hpGoTo('booking');
-      else document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = orig;
@@ -3221,191 +3041,6 @@ tdIcons();
   strip.addEventListener('scroll', update, {passive: true});
   window.addEventListener('resize', update);
   update();
-})();
-
-/* ═════════════ MOBILE HORIZONTAL PANEL MODE — PROTOTYPE ═════════════
-   Drives the swipe-between-sections layout at ≤720px. Every branch below
-   is a no-op unless html.hp-on is set, so desktop behaviour is untouched. */
-(function(){
-  var doc    = document.documentElement;
-  var panes  = document.getElementById('panes');
-  var dotsEl = document.getElementById('hp-dots');
-  var barEl  = document.querySelector('#hp-progress span');
-  var toggle = document.getElementById('hp-toggle');
-  var navEl  = document.getElementById('nav');
-  if (!panes) return;
-
-  var mq     = window.matchMedia('(max-width: 720px)');
-  var slides = Array.prototype.slice.call(panes.children)
-                    .filter(function(el){ return el.matches('section, footer'); });
-  var on     = function(){ return doc.classList.contains('hp-on'); };
-
-  /* Readable names for the dot buttons — falls back to the section id. */
-  var LABELS = {
-    hero:'Home', trust:'Why Us', process:'Process', services:'Services',
-    howworks:'How It Works', pricing:'Pricing', area:'Service Area',
-    disclaimer:'Good To Know', testimonials:'Reviews', gallery:'Our Work',
-    future:'Coming Soon', booking:'Book Now', contact:'Contact', terms:'Terms'
-  };
-  var labelFor = function(el, i){
-    if (el.tagName === 'FOOTER') return 'More';
-    return LABELS[el.id] || el.id || ('Section ' + (i + 1));
-  };
-
-  /* ── Dot navigation ── */
-  slides.forEach(function(el, i){
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.setAttribute('aria-label', labelFor(el, i));
-    b.addEventListener('click', function(){ goToIndex(i); });
-    dotsEl.appendChild(b);
-  });
-  var dots = Array.prototype.slice.call(dotsEl.children);
-
-  function activeIndex(){
-    var w = panes.clientWidth || 1;
-    return Math.max(0, Math.min(slides.length - 1, Math.round(panes.scrollLeft / w)));
-  }
-
-  function goToIndex(i, smooth){
-    if (!on()) { slides[i].scrollIntoView({ behavior: 'smooth' }); return; }
-    var el = slides[i];
-    if (!el) return;
-    el.scrollTop = 0;                       // land at the top of the panel
-    panes.scrollTo({ left: el.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
-    dismissHint();
-  }
-
-  /* Public hook used by the booking form's success handler. */
-  window.hpGoTo = function(id){
-    var i = slides.findIndex(function(s){ return s.id === id; });
-    if (i < 0) { var t = document.getElementById(id); if (t) t.scrollIntoView({behavior:'smooth'}); return; }
-    goToIndex(i);
-  };
-
-  /* ── Progress bar / active dot / nav elevation ── */
-  var raf = 0;
-  function sync(){
-    raf = 0;
-    var i = activeIndex();
-    dots.forEach(function(d, n){
-      if (n === i) d.setAttribute('aria-current', 'true');
-      else d.removeAttribute('aria-current');
-    });
-    var max = panes.scrollWidth - panes.clientWidth;
-    barEl.style.width = (max > 0 ? (panes.scrollLeft / max) * 100 : 0) + '%';
-    if (navEl) navEl.classList.toggle('s', panes.scrollLeft > 40);
-    if (panes.scrollLeft > 40) dismissHint();
-  }
-  panes.addEventListener('scroll', function(){
-    if (!on() || raf) return;
-    raf = requestAnimationFrame(sync);
-  }, { passive: true });
-
-  /* ── One-time swipe affordance: clears on the first swipe, or after 5s. ── */
-  function dismissHint(){
-    if (doc.classList.contains('hp-hint-off')) return;
-    doc.classList.add('hp-hint-off');
-    try { localStorage.setItem('td_hpanes_hint', 'seen'); } catch (e) {}
-  }
-  window.setTimeout(dismissHint, 5000);
-
-  /* ── In-page anchors (nav drawer, Book Now pill, hero CTAs, footer links).
-     Native anchor jumps into a horizontal scroll container are inconsistent
-     across mobile browsers, so drive the track explicitly instead. ── */
-  document.addEventListener('click', function(e){
-    if (!on()) return;
-    var a = e.target.closest && e.target.closest('a[href*="#"]');
-    if (!a || a.target === '_blank') return;
-    var href = a.getAttribute('href') || '';
-    var hash = href.slice(href.indexOf('#'));
-    // Only handle links that stay on this page.
-    if (href.indexOf('#') > 0 && !/^\/?(index\.html)?#/.test(href)) return;
-    if (hash.length < 2) return;
-    var target = document.getElementById(hash.slice(1));
-    if (!target) return;
-    var pane = target.closest('#panes > section, #panes > footer');
-    if (!pane) return;
-    e.preventDefault();
-    var i = slides.indexOf(pane);
-    if (i > -1) goToIndex(i);
-    if (target !== pane) {
-      // Deep link to something inside a panel — settle horizontally first.
-      window.setTimeout(function(){
-        pane.scrollTop = Math.max(0, target.offsetTop - pane.offsetTop - 16);
-      }, 380);
-    }
-    if (history.replaceState) history.replaceState(null, '', hash);
-  });
-
-  /* Arriving with a hash (e.g. /#services from another page). */
-  function applyInitialHash(){
-    if (!on() || !location.hash) return;
-    var t = document.getElementById(location.hash.slice(1));
-    if (!t) return;
-    var pane = t.closest('#panes > section, #panes > footer');
-    var i = pane ? slides.indexOf(pane) : -1;
-    if (i > -1) goToIndex(i, false);
-  }
-  window.addEventListener('load', function(){ applyInitialHash(); sync(); });
-  window.addEventListener('hashchange', applyInitialHash);
-
-  /* ── Forms: release snap while a field is focused ──
-     On iOS the software keyboard resizes the visual viewport, and a
-     `mandatory` snap re-snaps mid-edit, which can slide the booking/quote
-     form sideways under the user. Snapping resumes on blur. */
-  var FIELD = 'input, select, textarea';
-  document.addEventListener('focusin', function(e){
-    if (on() && e.target.matches && e.target.matches(FIELD)) doc.classList.add('hp-nosnap');
-  });
-  document.addEventListener('focusout', function(){
-    window.setTimeout(function(){
-      var a = document.activeElement;
-      if (a && a.matches && a.matches(FIELD)) return;   // moved to the next field
-      if (!doc.classList.contains('hp-nosnap')) return;
-      doc.classList.remove('hp-nosnap');
-      // Re-align to whatever panel we ended up on.
-      var el = slides[activeIndex()];
-      if (on() && el) panes.scrollTo({ left: el.offsetLeft, behavior: 'smooth' });
-    }, 120);
-  });
-
-  /* ── Breakpoint changes (rotation, desktop resize) ── */
-  function applyMode(){
-    var want = mq.matches;
-    try { if (localStorage.getItem('td_hpanes') === 'off') want = false; } catch (e) {}
-    if (want === on()) return;
-    doc.classList.toggle('hp-on', want);
-    if (!want){ doc.classList.remove('hp-nosnap'); if (navEl) navEl.classList.remove('s'); }
-    else { requestAnimationFrame(sync); }
-  }
-  (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(applyMode);
-  window.addEventListener('orientationchange', function(){
-    window.setTimeout(function(){ goToIndex(activeIndex(), false); }, 250);
-  });
-
-  /* ── Swipe ⇄ scroll switch. Only reachable when ?layout=debug has been
-     visited on this device (see the head script); otherwise the button is
-     display:none and this wiring is inert. ── */
-  if (toggle){
-    var paint = function(){
-      var swipe = on();
-      toggle.textContent = 'Layout: ' + (swipe ? 'Swipe' : 'Scroll');
-      toggle.setAttribute('aria-pressed', String(swipe));
-    };
-    toggle.addEventListener('click', function(){
-      var swipe = !on();
-      try { localStorage.setItem('td_hpanes', swipe ? 'on' : 'off'); } catch (e) {}
-      doc.classList.toggle('hp-on', swipe);
-      doc.classList.remove('hp-nosnap');
-      if (navEl && !swipe) navEl.classList.remove('s');
-      if (swipe) requestAnimationFrame(sync);
-      paint();
-    });
-    paint();
-  }
-
-  sync();
 })();
 </script>
 </body>
