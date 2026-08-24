@@ -64,7 +64,6 @@ def test_base_price_matrix():
         "Wash, Clay, Seal": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
         "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
         "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
-        "Deep Clean": {"Sedan": 280, "SUV/Crossover": 300, "Large SUV/Truck": 330, "Minivan": 315},
         "Ceramic Coating (2-Year)": {
             "Sedan": 299.99, "SUV/Crossover": 349.99, "Large SUV/Truck": 399.99, "Minivan": 374.99,
         },
@@ -146,13 +145,10 @@ def test_referral_requires_full_detail_minimum():
         assert total == appmod.BASE_PRICES[service]["Sedan"]
 
 
-def test_referral_applies_to_full_and_deep():
+def test_referral_applies_to_full_detail():
     total, summary = appmod.calculate_estimate("1", "A Friend", veh("Full Detail", "Sedan"))
     assert total == 160  # 195 - 35
     assert "Referral (-$35.00)" in summary
-    total2, summary2 = appmod.calculate_estimate("1", "A Friend", veh("Deep Clean", "Sedan"))
-    assert total2 == 245  # 280 - 35
-    assert "Referral" in summary2
 
 
 def test_referral_ignored_when_blank():
@@ -212,70 +208,10 @@ def test_full_stack_two_vehicles_with_addons():
 def test_second_vehicle_ignored_when_count_one():
     # num=1 should ignore the v2 dict entirely
     total, summary = appmod.calculate_estimate(
-        "1", "", veh("Wash, Clay, Seal", "Sedan"), veh("Deep Clean", "Large SUV/Truck")
+        "1", "", veh("Wash, Clay, Seal", "Sedan"), veh("Full Detail", "Large SUV/Truck")
     )
     assert total == 140
     assert summary == "None"
-
-
-# ──────────────────────────────────────────────────────────────────────────
-#  calculate_estimate — expecting / new-parent $50 Deep Clean discount
-# ──────────────────────────────────────────────────────────────────────────
-def test_expecting_discount_on_deep_clean():
-    # Deep Clean Sedan 280 - 50 = 230
-    total, summary = appmod.calculate_estimate(
-        "1", "", veh("Deep Clean", "Sedan"), expecting1=True
-    )
-    assert total == 230
-    assert "Expecting/new parent (-$50.00)" in summary
-
-
-def test_expecting_discount_ignored_for_non_deep_clean():
-    # Checkbox set but service is Full Detail -> no discount
-    total, summary = appmod.calculate_estimate(
-        "1", "", veh("Full Detail", "Sedan"), expecting1=True
-    )
-    assert total == 195
-    assert "Expecting" not in summary
-
-
-def test_expecting_discount_defaults_off():
-    total, summary = appmod.calculate_estimate("1", "", veh("Deep Clean", "Sedan"))
-    assert total == 280
-    assert summary == "None"
-
-
-def test_expecting_discount_via_second_vehicle():
-    # v1 Full Sedan 195 + v2 Deep Clean Sedan 280 = 475
-    # multi 10% = 47.5; expecting on v2 = 50 => 475 - 47.5 - 50 = 377.5
-    total, summary = appmod.calculate_estimate(
-        "2", "", veh("Full Detail", "Sedan"), veh("Deep Clean", "Sedan"),
-        expecting2=True,
-    )
-    assert total == 377.5
-    assert "Expecting/new parent (-$50.00)" in summary
-    assert "Multi-vehicle 10%" in summary
-
-
-def test_expecting_discount_scales_for_three_plus():
-    # v1 Deep Clean Sedan 280 + v2 Deep Clean Sedan 280 x2 = 840
-    # multi 10% = 84; expecting v1 50 + v2 50x2 = 150 => 840 - 84 - 150 = 606
-    total, summary = appmod.calculate_estimate(
-        "3+", "", veh("Deep Clean", "Sedan"), veh("Deep Clean", "Sedan"),
-        expecting1=True, expecting2=True,
-    )
-    assert total == 606.0
-    assert "Expecting/new parent (-$150.00)" in summary
-
-
-def test_expecting_and_referral_stack():
-    # Deep Clean Sedan 280, referral 35 + expecting 50 => 195
-    total, summary = appmod.calculate_estimate(
-        "1", "A Friend", veh("Deep Clean", "Sedan"), expecting1=True
-    )
-    assert total == 195
-    assert "Referral (-$35.00)" in summary
-    assert "Expecting/new parent (-$50.00)" in summary
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -318,8 +254,8 @@ def test_travel_fee_flat_regardless_of_vehicle_count():
 
 
 def test_travel_fee_stacks_with_referral_and_discounts():
-    # Referral only applies to Full Detail/Deep Clean, so a maintenance plan
-    # visit ignores it — travel fee still applies on top of the base price.
+    # Referral only applies to Full Detail, so a maintenance plan visit
+    # ignores it — travel fee still applies on top of the base price.
     total, summary = appmod.calculate_estimate(
         "1", "A Friend", veh("Monthly Maintenance Visit", "Sedan"), outside_radius=True
     )
@@ -350,7 +286,7 @@ def test_book_endpoint_persists_second_vehicle(client):
     client.post("/api/book", data={
         "name": "Carl", "phone": "2165551234", "location": "Munson",
         "num_vehicles": "2", "vehicle_type": "Sedan", "service": "Full Detail",
-        "vehicle_type_2": "Minivan", "service_2": "Deep Clean",
+        "vehicle_type_2": "Minivan", "service_2": "Interior Detail",
         "addons_2": ["Odor Eliminator"], "upcharges_2": ["Smoke/Odor"],
     })
     conn = appmod.get_db()
@@ -358,19 +294,19 @@ def test_book_endpoint_persists_second_vehicle(client):
     conn.close()
     assert row["location"] == "Munson"
     assert row["vehicle_type_2"] == "Minivan"
-    assert row["service_2"] == "Deep Clean"
+    assert row["service_2"] == "Interior Detail"
     assert row["addons_2"] == "Odor Eliminator"
     assert row["upcharges_2"] == "Smoke/Odor"
-    # v1 Full Sedan 195 + v2 Deep Clean Minivan (315 + odor 50 + smoke 40 = 405)
-    # subtotal 600, multi 10% 60 => 540
-    assert row["total_estimate"] == 540.0
+    # v1 Full Sedan 195 + v2 Interior Detail Minivan (145 + odor 50 + smoke 40 = 235)
+    # subtotal 430, multi 10% 43 => 387
+    assert row["total_estimate"] == 387.0
 
 
 def test_book_endpoint_clears_v2_when_single(client):
     client.post("/api/book", data={
         "name": "Solo", "phone": "111", "location": "Chardon",
         "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Wash, Clay, Seal",
-        "vehicle_type_2": "Minivan", "service_2": "Deep Clean",  # should be dropped
+        "vehicle_type_2": "Minivan", "service_2": "Full Detail",  # should be dropped
     })
     conn = appmod.get_db()
     row = conn.execute("SELECT * FROM bookings WHERE name = 'Solo'").fetchone()
@@ -378,41 +314,6 @@ def test_book_endpoint_clears_v2_when_single(client):
     assert row["vehicle_type_2"] == ""
     assert row["service_2"] == ""
     assert row["total_estimate"] == 140  # only vehicle 1 counted
-
-
-def test_book_endpoint_applies_and_persists_expecting_discount(client):
-    res = client.post("/api/book", data={
-        "name": "Parent", "phone": "440", "location": "Chardon",
-        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Deep Clean",
-        "expecting_discount_1": "1",
-    })
-    assert res.status_code == 200
-    data = res.get_json()
-    assert data["total_estimate"] == 230  # 280 - 50
-    assert "Expecting" in data["discount_applied"]
-
-    conn = appmod.get_db()
-    row = conn.execute("SELECT * FROM bookings WHERE name = 'Parent'").fetchone()
-    conn.close()
-    assert row["expecting_discount_1"] == 1
-    assert row["expecting_discount_2"] == 0
-
-
-def test_book_endpoint_ignores_expecting_when_not_deep_clean(client):
-    res = client.post("/api/book", data={
-        "name": "NotEligible", "phone": "440", "location": "Chardon",
-        "num_vehicles": "1", "vehicle_type": "Sedan", "service": "Full Detail",
-        "expecting_discount_1": "1",
-    })
-    data = res.get_json()
-    assert data["total_estimate"] == 195  # no discount
-    assert "Expecting" not in data["discount_applied"]
-
-    conn = appmod.get_db()
-    row = conn.execute("SELECT * FROM bookings WHERE name = 'NotEligible'").fetchone()
-    conn.close()
-    # Stored flag is normalized to off because the service doesn't qualify.
-    assert row["expecting_discount_1"] == 0
 
 
 def test_book_endpoint_maintenance_plan_with_travel_fee(client):
@@ -463,7 +364,7 @@ def test_schema_has_new_columns():
     conn.close()
     for c in (
         "location", "vehicle_type_2", "service_2", "addons_2", "upcharges_2",
-        "expecting_discount_1", "expecting_discount_2", "outside_radius",
+        "outside_radius",
     ):
         assert c in cols
 
@@ -477,13 +378,6 @@ def test_home_serves_index(client):
 def test_booking_page_serves(client):
     assert client.get("/booking").status_code == 200
     assert client.get("/booking.html").status_code == 200
-
-
-def test_deep_clean_page_serves(client):
-    res = client.get("/deep-clean")
-    assert res.status_code == 200
-    assert b"Deep Clean" in res.data
-    assert client.get("/deep-clean.html").status_code == 200
 
 
 def test_rv_detailing_page_serves(client):
@@ -539,7 +433,7 @@ def test_content_pages_serve(client, path, marker):
 def test_content_pages_have_unique_titles(client):
     import re
     titles = {}
-    for path in ("/", "/booking", "/deep-clean", "/rv-detailing", "/boat-detailing",
+    for path in ("/", "/booking", "/rv-detailing", "/boat-detailing",
                  "/about", "/gallery", "/reviews", "/faq"):
         html = client.get(path).data.decode("utf-8")
         m = re.search(r"<title>(.*?)</title>", html, re.S)
