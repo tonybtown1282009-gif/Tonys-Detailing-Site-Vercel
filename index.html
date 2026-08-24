@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   "@type": "AutoWash",
   "@id": "https://tonys-detailing.vercel.app/#business",
   "name": "Tony's Detailing",
-  "description": "Owner-operated mobile auto detailing. Exterior, interior, full details, deep cleans, plus RV and boat detailing — we come to you.",
+  "description": "Owner-operated mobile auto detailing. Exterior, interior, full details, plus RV and boat detailing — we come to you.",
   "url": "https://tonys-detailing.vercel.app/",
   "telephone": "+12169034783",
   "email": "tonysdetailing.net@gmail.com",
@@ -453,7 +453,7 @@ a{color:inherit;text-decoration:none;}
   margin-bottom:56px;flex-wrap:wrap;
 }
 .svc-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(3,1fr);
   gap:14px;
 }
 .svc-card{
@@ -1448,30 +1448,6 @@ footer{
 .tst-who .nm{font-family:var(--ff-h);font-weight:700;font-size:13.5px;color:var(--fg);line-height:1.2;}
 .tst-who .veh{font-size:12px;color:var(--fg-3);line-height:1.3;margin-top:2px;}
 
-/* ─────────────── EXPECTING / NEW-PARENT CALLOUT (form) ─────────────── */
-.expecting-field[hidden]{display:none !important;}
-.expecting-check{
-  display:flex;align-items:center;gap:13px;cursor:pointer;
-  background:linear-gradient(180deg, rgba(30,58,95,.06), rgba(30,58,95,.02));
-  border:1.5px solid rgba(30,58,95,.22);border-radius:6px;
-  padding:15px 16px;transition:border-color 150ms var(--ease), background 150ms var(--ease);
-}
-.expecting-check:hover{border-color:var(--blue);}
-.expecting-check:has(input:checked){border-color:var(--blue);background:rgba(30,58,95,.10);}
-.expecting-check input{
-  appearance:none;-webkit-appearance:none;width:20px;height:20px;flex-shrink:0;
-  border:1.5px solid var(--line-2);border-radius:4px;background:#fff;
-  cursor:pointer;position:relative;transition:background 150ms var(--ease),border-color 150ms var(--ease);
-}
-.expecting-check input:checked{background:var(--blue);border-color:var(--blue);}
-.expecting-check input:checked::after{
-  content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
-  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
-}
-.expecting-check .ctxt{font-family:var(--ff-b);font-size:13.5px;color:var(--fg);line-height:1.4;}
-.expecting-check .ctxt strong{font-weight:700;color:var(--fg);}
-.expecting-check .cprice{color:var(--blue);font-weight:700;font-size:12px;margin-left:2px;}
-
 /* ─────────────── NEW-SECTION RESPONSIVE ─────────────── */
 @media (max-width: 1000px){
   .trust-strip{grid-template-columns:1fr 1fr;}
@@ -1621,7 +1597,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
     <a href="#pricing" data-target="pricing">Pricing</a>
-    <a href="deep-clean.html">Deep Clean</a>
     <a href="ceramic-coating.html">Ceramic Coating</a>
     <a href="#maintenance" data-target="maintenance">Maintenance Plan</a>
     <a href="#area" data-target="area">Service Area</a>
@@ -1651,7 +1626,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="/ceramic-coating">Ceramic Coating <i data-lucide="arrow-right"></i></a>
   </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
-  <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#maintenance">Maintenance Plan <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -1824,7 +1798,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="eyebrow">What We Offer</span>
         <h2>Services</h2>
         <a href="#pricing" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
-        <p>Four service tiers, from an exterior wash-and-seal to our most intensive Deep Clean. Each one comes to you &mdash; home, office, or wherever you park.</p>
+        <p>Three service tiers, from an exterior wash-and-seal to our complete Full Detail. Each one comes to you &mdash; home, office, or wherever you park.</p>
       </div>
       <div class="svc-head-actions">
         <a href="booking.html" class="btn sm">
@@ -1901,27 +1875,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="svc-price">$195</span>
           </div>
           <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
-        </div>
-      </article>
-
-      <!-- Deep -->
-      <article class="svc-card">
-        <div class="svc-icon-wrap"><i data-lucide="sparkles"></i></div>
-        <div class="svc-tier">Tier 04 &middot; Deep Clean</div>
-        <h3 class="svc-name">Deep Clean</h3>
-        <p class="svc-desc">Our most intensive service. A complete reset &mdash; clay &amp; iron decon, carpet shampoo, full steam clean, and odor elimination. <a href="deep-clean.html" style="color:var(--blue-l);font-weight:600;">Learn more &rsaquo;</a></p>
-        <ul class="svc-feat">
-          <li><i data-lucide="check"></i>Everything in Full Detail</li>
-          <li><i data-lucide="check"></i>Clay &amp; iron decontamination</li>
-          <li><i data-lucide="check"></i>Carpet shampoo &amp; steam extraction</li>
-          <li><i data-lucide="check"></i>Odor elimination treatment</li>
-        </ul>
-        <div class="svc-foot">
-          <div class="svc-price-row">
-            <span class="svc-price-lbl">Starts at</span>
-            <span class="svc-price">$280</span>
-          </div>
-          <a href="deep-clean.html" class="svc-cta">Details<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -2010,13 +1963,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <td data-label="SUV / Crossover">$215</td>
               <td data-label="Lg. SUV / Truck">$240</td>
               <td data-label="Minivan">$225</td>
-            </tr>
-            <tr>
-              <td>Deep Clean</td>
-              <td data-label="Sedan">$280</td>
-              <td data-label="SUV / Crossover">$300</td>
-              <td data-label="Lg. SUV / Truck">$330</td>
-              <td data-label="Minivan">$315</td>
             </tr>
           </tbody>
         </table>
@@ -2571,7 +2517,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                 <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                 <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
-                <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
                 <optgroup label="Ceramic Coating">
                   <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
                   <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
@@ -2598,14 +2543,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
             </div>
 
-            <!-- Expecting / new-parent discount (shown only for Deep Clean) -->
-            <div class="field full expecting-field" id="expecting1-field" hidden>
-              <label class="expecting-check">
-                <input type="checkbox" name="expecting_discount_1" value="1">
-                <span class="ctxt"><strong>Expecting or New Parent</strong> &mdash; take <span class="cprice">$50 off</span> your Deep Clean. Welcome, little one!</span>
-              </label>
-            </div>
-
             <!-- Second vehicle (shown when 2+ vehicles selected) -->
             <div class="field full v2-section" id="vehicle2-section" hidden>
               <div class="v2-head">Second Vehicle</div>
@@ -2628,7 +2565,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
                     <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                     <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
-                    <option value="Deep Clean" data-service="Deep Clean">Deep Clean ($280&ndash;$330)</option>
                     <optgroup label="Ceramic Coating">
                       <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
                       <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
@@ -2653,13 +2589,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="check"><input type="checkbox" name="upcharges_2" value="Smoke/Odor"><span class="ctxt">Smoke / Odor</span></label>
                     <label class="check"><input type="checkbox" name="upcharges_2" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
                   </div>
-                </div>
-                <!-- Expecting / new-parent discount for vehicle 2 (Deep Clean only) -->
-                <div class="field full expecting-field" id="expecting2-field" hidden>
-                  <label class="expecting-check">
-                    <input type="checkbox" name="expecting_discount_2" value="1">
-                    <span class="ctxt"><strong>Expecting or New Parent</strong> &mdash; take <span class="cprice">$50 off</span> this Deep Clean too.</span>
-                  </label>
                 </div>
               </div>
             </div>
@@ -2782,7 +2711,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><a href="#services">Wash, Clay, Seal</a></li>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
-          <li><a href="deep-clean.html">Deep Clean</a></li>
           <li><a href="ceramic-coating.html">Ceramic Coating</a></li>
           <li><a href="rv-detailing.html">RVs</a></li>
           <li><a href="boat-detailing.html">Boats</a></li>
@@ -2878,7 +2806,6 @@ if (bookingForm) {
     "Wash, Clay, Seal": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
     "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
     "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
-    "Deep Clean":      {"Sedan":280,"SUV/Crossover":300,"Large SUV/Truck":330,"Minivan":315},
     "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
     "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
     "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99}
@@ -2912,19 +2839,6 @@ if (bookingForm) {
     el.style.display = shown ? '' : 'none';
   };
 
-  // Expecting / new-parent checkbox — only relevant when Deep Clean is chosen.
-  const exp1 = document.getElementById('expecting1-field');
-  const exp2 = document.getElementById('expecting2-field');
-  const toggleExpecting = (serviceSel, field) => {
-    if (!field) return;
-    const show = serviceSel.value === 'Deep Clean';
-    setShown(field, show);
-    if (!show){
-      const cb = field.querySelector('input[type=checkbox]');
-      if (cb) cb.checked = false;
-    }
-  };
-
   // Second-vehicle section: show/hide based on number of vehicles
   const numSel = document.getElementById('num_vehicles');
   const v2section = document.getElementById('vehicle2-section');
@@ -2936,13 +2850,8 @@ if (bookingForm) {
       v2section.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
       refreshPrices(veh2, svc2);
     }
-    // Re-evaluate the second vehicle's expecting checkbox each time.
-    toggleExpecting(svc2, exp2);
   };
   numSel.addEventListener('change', toggleSecondVehicle);
-  svc1.addEventListener('change', () => toggleExpecting(svc1, exp1));
-  svc2.addEventListener('change', () => toggleExpecting(svc2, exp2));
-  toggleExpecting(svc1, exp1);
   toggleSecondVehicle();
 
   bookingForm.addEventListener('submit', async function(e){
