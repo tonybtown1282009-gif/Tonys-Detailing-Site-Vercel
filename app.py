@@ -90,7 +90,24 @@ BASE_PRICES = {
     "Ceramic Coating (Elite 8-Year)": {
         "Sedan": 1099.99, "SUV/Crossover": 1149.99, "Large SUV/Truck": 1349.99, "Minivan": 1249.99,
     },
+    # Maintenance plan visits — recurring upkeep between full details, separate
+    # from the one-time tiers above. Lighter scope (see MAINTENANCE_SCOPE_NOTE),
+    # so priced lower than a Wash, Clay, Seal at the same size. Minivan is
+    # interpolated between SUV and Large SUV/Truck, matching the other rows.
+    "Monthly Maintenance Visit": {"Sedan": 150, "SUV/Crossover": 160, "Large SUV/Truck": 180, "Minivan": 170},
+    "Biweekly Maintenance Visit": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 170, "Minivan": 160},
 }
+
+MAINTENANCE_SERVICES = {"Monthly Maintenance Visit", "Biweekly Maintenance Visit"}
+MAINTENANCE_SCOPE_NOTE = (
+    "Maintenance visits do not include extraction, stain treatment, pet hair "
+    "removal, or odor treatment. If a visit requires any of these, it will be "
+    "quoted as a standalone detail instead."
+)
+
+# Flat travel fee added per visit when the address falls outside the standard
+# service radius (see the Service Area section on the site).
+TRAVEL_FEE = 15
 
 # Add-on pricing. Clay & Iron Decontamination scales with vehicle size.
 CLAY_PRICES = {"Sedan": 60, "SUV/Crossover": 70, "Large SUV/Truck": 80, "Minivan": 70}
@@ -169,6 +186,7 @@ def init_db():
         "upcharges_2": "TEXT",
         "expecting_discount_1": "INTEGER DEFAULT 0",
         "expecting_discount_2": "INTEGER DEFAULT 0",
+        "outside_radius": "INTEGER DEFAULT 0",
     }
     for column, col_type in new_columns.items():
         if column not in existing:
@@ -208,7 +226,7 @@ def vehicle_cost(service, vehicle_type, addons, upcharges):
 
 def calculate_estimate(
     num_vehicles, referred_by, vehicle1, vehicle2=None,
-    expecting1=False, expecting2=False,
+    expecting1=False, expecting2=False, outside_radius=False,
 ):
     """
     Returns (total_estimate, discount_summary).
@@ -223,6 +241,9 @@ def calculate_estimate(
     courtesy per Deep Clean vehicle where the customer checked the box. All can
     stack. The referral and expecting credits are applied as flat amounts after
     the multi-vehicle percentage.
+
+    The travel fee is a flat $15 charge per visit (not per vehicle) when the
+    address falls outside the standard service radius, added after discounts.
     """
     count = parse_num_vehicles(num_vehicles)
 
@@ -261,8 +282,14 @@ def calculate_estimate(
 
     total = max(0.0, round(subtotal - discount_total, 2))
 
+    if outside_radius:
+        total = round(total + TRAVEL_FEE, 2)
+        notes.append(f"Travel fee, outside standard radius (+${TRAVEL_FEE:.2f})")
+
     if notes:
-        discount_summary = "; ".join(notes) + f" | Total saved: ${discount_total:.2f}"
+        discount_summary = "; ".join(notes)
+        if discount_total:
+            discount_summary += f" | Total saved: ${discount_total:.2f}"
     else:
         discount_summary = "None"
 
@@ -358,6 +385,7 @@ def send_notification_email(booking):
             {row("Phone", booking["phone"])}
             {row("Email", booking["email"])}
             {row("Location", booking.get("location"))}
+            {row("Outside Service Radius", "Yes — +$15 travel fee" if booking.get("outside_radius") else "No")}
             {row("# Vehicles", booking["num_vehicles"])}
             {section("Vehicle 1")}
             {row("Vehicle Type", booking["vehicle_type"])}
@@ -423,6 +451,7 @@ def book():
     addons = [a.strip() for a in form.getlist("addons") if a.strip()]
     upcharges = [u.strip() for u in form.getlist("upcharges") if u.strip()]
     expecting_1 = checkbox("expecting_discount_1")
+    outside_radius = checkbox("outside_radius")
 
     # Vehicle 2 (only meaningful when 2+ vehicles are booked)
     vehicle_type_2 = (form.get("vehicle_type_2") or "").strip()
@@ -445,7 +474,7 @@ def book():
 
     total_estimate, discount_applied = calculate_estimate(
         num_vehicles, referred_by, v1, v2,
-        expecting1=expecting_1, expecting2=expecting_2,
+        expecting1=expecting_1, expecting2=expecting_2, outside_radius=outside_radius,
     )
 
     conn = get_db()
@@ -457,16 +486,16 @@ def book():
         INSERT INTO bookings (
             name, phone, email, location, vehicle_type, service, addons, upcharges,
             vehicle_type_2, service_2, addons_2, upcharges_2,
-            expecting_discount_1, expecting_discount_2,
+            expecting_discount_1, expecting_discount_2, outside_radius,
             num_vehicles, referred_by, discount_applied, total_estimate,
             visits, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             name, phone, email, location, vehicle_type, service,
             ", ".join(addons), ", ".join(upcharges),
             vehicle_type_2, service_2, ", ".join(addons_2), ", ".join(upcharges_2),
-            int(expecting_1), int(expecting_2),
+            int(expecting_1), int(expecting_2), int(outside_radius),
             num_vehicles, referred_by, discount_applied, total_estimate, visits, timestamp,
         ),
     )
@@ -480,6 +509,7 @@ def book():
         "vehicle_type_2": vehicle_type_2, "service_2": service_2,
         "addons_2": ", ".join(addons_2), "upcharges_2": ", ".join(upcharges_2),
         "expecting_discount_1": expecting_1, "expecting_discount_2": expecting_2,
+        "outside_radius": outside_radius,
         "num_vehicles": num_vehicles, "referred_by": referred_by,
         "discount_applied": discount_applied, "total_estimate": total_estimate,
         "visits": visits, "notes": notes, "timestamp": timestamp,

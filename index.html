@@ -715,6 +715,13 @@ table.ptbl tr.soon td:first-child{color:var(--fg-3);}
   margin-top:32px;
 }
 
+/* ─────────────── MAINTENANCE PLAN ─────────────── */
+#maintenance{
+  padding:var(--sec-y) 0;
+  background:var(--bg-2);
+  border-top:1px solid var(--line);
+}
+
 /* ─────────────── SERVICE AREA ─────────────── */
 #area{
   padding:var(--sec-y) 0;
@@ -1616,6 +1623,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="deep-clean.html">Deep Clean</a>
     <a href="ceramic-coating.html">Ceramic Coating</a>
+    <a href="#maintenance" data-target="maintenance">Maintenance Plan</a>
     <a href="#area" data-target="area">Service Area</a>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
@@ -1644,6 +1652,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="deep-clean.html">Deep Clean <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <a href="#maintenance">Maintenance Plan <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#contact">Contact <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
@@ -2131,6 +2140,122 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div class="cert-actions">
       <a href="ceramic-coating.html" class="btn lg">Learn More <i data-lucide="arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── MAINTENANCE PLAN ─────────────── -->
+<section id="maintenance">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Between Full Details</span>
+      <h2>Maintenance Plans</h2>
+      <p>Recurring upkeep on a monthly or biweekly schedule &mdash; a quick spray-down wash and interior refresh that keeps your vehicle looking sharp. Separate from our one-time service tiers above, and priced by vehicle size.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Plan pricing -->
+      <div class="pr-card">
+        <div class="pr-head">
+          <i data-lucide="calendar-check"></i>
+          <h3>Maintenance Plan Pricing</h3>
+          <span class="pr-pill">Per Visit</span>
+        </div>
+        <table class="ptbl">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Sedan</th>
+              <th>SUV / Crossover</th>
+              <th>Lg. SUV / Truck</th>
+              <th>Minivan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monthly Visit</td>
+              <td>$150</td>
+              <td>$160</td>
+              <td>$180</td>
+              <td>$170</td>
+            </tr>
+            <tr>
+              <td>Biweekly Visit</td>
+              <td>$140</td>
+              <td>$150</td>
+              <td>$170</td>
+              <td>$160</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Travel fee -->
+      <div class="pr-card">
+        <div class="pr-head">
+          <i data-lucide="map-pin"></i>
+          <h3>Travel Fee</h3>
+          <span class="pr-pill">Per Visit</span>
+        </div>
+        <ul class="pr-addons-list">
+          <li>
+            <div class="l-name">
+              <i data-lucide="navigation"></i>
+              <div class="col">
+                <span class="nm">Outside Standard Service Radius</span>
+                <span class="ds">Added per visit when your address falls outside our standard area</span>
+              </div>
+            </div>
+            <span class="price">+$15 flat</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- What's included -->
+      <div class="pr-card" style="grid-column:1/-1;">
+        <div class="pr-head">
+          <i data-lucide="check-circle"></i>
+          <h3>What's Included Every Visit</h3>
+          <span class="pr-pill">Interior + Exterior</span>
+        </div>
+        <ul class="pr-addons-list">
+          <li>
+            <div class="l-name">
+              <i data-lucide="droplets"></i>
+              <div class="col">
+                <span class="nm">Exterior</span>
+                <span class="ds">Spray down wheels, hand wash, dry &mdash; no clay, prewash, or decon</span>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="l-name">
+              <i data-lucide="armchair"></i>
+              <div class="col">
+                <span class="nm">Interior</span>
+                <span class="ds">Vacuum only (no extraction), mats cleaned, dry microfiber wipe-down of surfaces &mdash; spray only if visibly soiled</span>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="l-name">
+              <i data-lucide="sparkle"></i>
+              <div class="col">
+                <span class="nm">Glass</span>
+                <span class="ds">Interior &amp; exterior glass, every visit</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pr-disclaimer">
+      <p><strong>Maintenance visits do not include extraction, stain treatment, pet hair removal, or odor treatment.</strong> If a visit requires any of these, it will be quoted as a standalone detail instead.</p>
+    </div>
+
+    <div class="cert-actions">
+      <a href="booking.html?plan=Monthly%20Maintenance%20Visit" class="btn lg">Book a Maintenance Plan <i data-lucide="arrow-right"></i></a>
     </div>
   </div>
 </section>
@@ -2727,7 +2852,7 @@ drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
 }));
 
 // ───────────────── ACTIVE NAV SECTION ───────────────────
-const sections = ['hero','services','pricing','ceramic','area','disclaimer','booking','contact']
+const sections = ['hero','services','pricing','ceramic','maintenance','area','disclaimer','booking','contact']
   .map(id => document.getElementById(id))
   .filter(Boolean);
 const navLinks = document.querySelectorAll('#nav .nav-links [data-target]');
