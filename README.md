@@ -34,6 +34,40 @@ the gallery section hides entirely until at least one photo is added. The site
 detects what's filled via the `/api/media` endpoint (see `app.py`); details are
 in [`static/media/README.md`](static/media/README.md).
 
+## Mobile layout
+
+Phones (≤720px) get an app-style shell defined in
+[`static/mobile-app.css`](static/mobile-app.css), linked from every page
+*after* that page's inline `<style>` so its same-specificity rules win
+without `!important`. Above 720px the file contributes nothing but a few
+`display:none` rules, so the desktop layout is untouched.
+
+The pattern is the usual native-app one (Instagram / Netflix / DoorDash):
+
+- the page scrolls **vertically only** — `overflow-x:clip` on `html`/`body`;
+- content is stacked full-width sections, 16px gutters, 32px apart;
+- inside a section, the items sit on one **horizontal rail** the user swipes
+  independently of the page;
+- a compact sticky header on top and a fixed 5-item tab bar at the bottom,
+  both respecting `env(safe-area-inset-*)`.
+
+**To turn a section's item list into a rail, add `m-rail` to its container.**
+Cards are `min(78vw, 320px)` with a 12px gap, so the next one peeks in at the
+right edge; the scrollbar is hidden and snapping is `x mandatory` /
+`scroll-snap-align:start`. Add an optional `<a class="m-seeall">` inside the
+section's `.section-head` for the right-aligned "See all" link, or a
+`<div class="m-railhead"><h2>…</h2></div>` for sections that have no desktop
+heading.
+
+Pricing and the booking/contact forms deliberately stay stacked — a
+reference table and a form are not a set of browsable cards, so a swipe rail
+would be the wrong control. The wide price table restacks into one block per
+service via the `data-label` attribute on each price cell.
+
+Dark mode is driven by the existing CSS variables under
+`prefers-color-scheme: dark`, scoped to the mobile shell; the desktop
+stylesheet hard-codes light surfaces throughout and is left alone.
+
 ## Fonts
 
 Pages load `fonts/*.woff2` (small, Latin-subset) and fall back to the full

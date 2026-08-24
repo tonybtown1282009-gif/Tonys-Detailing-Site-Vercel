@@ -47,6 +47,10 @@ p{font-size:15px;line-height:1.65;margin-bottom:26px;}
 .phone{margin-top:26px;font-size:13.5px;color:#9ca3af;}
 .phone a{color:#1e3a5f;font-weight:600;text-decoration:none;}
 </style>
+<!-- Mobile app shell (≤720px): vertical page, horizontal card rails, sticky
+     header + bottom tab bar, safe areas, dark mode. Loaded last so its
+     same-specificity rules win over the desktop styles above. -->
+<link rel="stylesheet" href="/static/mobile-app.css">
 </head>
 <body>
 <div class="card">
@@ -59,5 +63,14 @@ p{font-size:15px;line-height:1.65;margin-bottom:26px;}
   </div>
   <p class="phone">Or call / text <a href="tel:+12169034783">(216) 903-4783</a></p>
 </div>
+
+<!-- Fixed bottom tab bar — mobile only. `aria-current` marks this page. -->
+<nav id="mtabs" aria-label="Primary">
+  <a href="/"><i data-lucide="house"></i><span>Home</span></a>
+  <a href="/#services"><i data-lucide="sparkles"></i><span>Services</span></a>
+  <a href="/#pricing"><i data-lucide="tag"></i><span>Pricing</span></a>
+  <a href="/gallery"><i data-lucide="images"></i><span>Gallery</span></a>
+  <a href="/booking"><i data-lucide="calendar-check"></i><span>Book</span></a>
+</nav>
 </body>
 </html>
