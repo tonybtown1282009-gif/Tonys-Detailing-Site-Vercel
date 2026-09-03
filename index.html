@@ -1522,6 +1522,22 @@ footer{
   .work-item:hover img{transform:scale(1.05);}
 }
 
+/* ─────────────── HEADLIGHT PROMO BAR ─────────────── */
+.promo-bar{display:block;background:#1e3a5f;color:#fff;text-align:center;text-decoration:none;padding:10px var(--pad-x);font-family:var(--ff-b);font-weight:600;font-size:13px;letter-spacing:.01em;transition:background 180ms var(--ease);}
+.promo-bar:hover{background:var(--blue-h);}
+
+/* ─────────────── HEADLIGHT RESTORATION ─────────────── */
+/* Placeholder photos at /images/headlight-before.jpg + -after.jpg — swap in real photos with the same names. */
+#headlight-restoration{padding:var(--sec-y) 0;background:var(--bg-2);border-top:1px solid var(--line);}
+.hl-compare{display:flex;gap:20px;max-width:720px;margin:0 auto;}
+.hl-photo{flex:1 1 0;margin:0;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-card);background:var(--bg-3);}
+.hl-photo img{width:100%;aspect-ratio:4 / 3;object-fit:cover;display:block;}
+.hl-photo figcaption{font-family:var(--ff-h);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;text-align:center;color:var(--fg-2);padding:10px 0;border-top:1px solid var(--line);background:var(--bg-3);}
+.hl-price{text-align:center;font-family:var(--ff-h);font-weight:700;font-size:16px;color:var(--blue);margin-top:28px;}
+@media (max-width:560px){
+  .hl-compare{flex-direction:column;max-width:340px;}
+}
+
 /* ─────────────── SERVICES DROPDOWN ─────────────── */
 .nav-dd{position:relative;}
 .nav-dd-btn{
@@ -1707,6 +1723,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- ─────────────── HEADLIGHT PROMO BAR ─────────────── -->
+<a href="#headlight-restoration" class="promo-bar">✨ Now Offering Headlight Restoration &mdash; Ask About Add-On Pricing</a>
+
 <!-- ─────────────── TRUST BADGES ─────────────── -->
 <section id="trust">
   <div class="wrap">
@@ -1879,6 +1898,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
     </div>
+  </div>
+</section>
+
+<!-- ─────────────── HEADLIGHT RESTORATION ─────────────── -->
+<section id="headlight-restoration">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Add-On Service</span>
+      <h2>Headlight Restoration</h2>
+      <p>Foggy, yellowed headlights restored to clear &mdash; improving nighttime visibility and giving your vehicle a sharper, more finished look.</p>
+    </div>
+    <div class="hl-compare">
+      <figure class="hl-photo">
+        <img src="/images/headlight-before.jpg" alt="Headlight before restoration — foggy and yellowed" loading="lazy" decoding="async">
+        <figcaption>Before</figcaption>
+      </figure>
+      <figure class="hl-photo">
+        <img src="/images/headlight-after.jpg" alt="Headlight after restoration — clear and bright" loading="lazy" decoding="async">
+        <figcaption>After</figcaption>
+      </figure>
+    </div>
+    <p class="hl-price">$100 standalone / $75 as an add-on to any detail</p>
   </div>
 </section>
 
