@@ -377,7 +377,6 @@ def test_home_serves_index(client):
 
 def test_booking_page_serves(client):
     assert client.get("/booking").status_code == 200
-    assert client.get("/booking.html").status_code == 200
 
 
 def test_rv_detailing_page_serves(client):
@@ -387,7 +386,6 @@ def test_rv_detailing_page_serves(client):
     assert b"Full Deep Detail" in res.data
     assert b"$550" in res.data and b"$700" in res.data and b"$1,000" in res.data
     assert b"Contact for Quote" not in res.data
-    assert client.get("/rv-detailing.html").status_code == 200
 
 
 def test_boat_detailing_page_serves(client):
@@ -395,7 +393,6 @@ def test_boat_detailing_page_serves(client):
     assert res.status_code == 200
     assert b"Pontoon" in res.data
     assert b"Contact for Quote" in res.data
-    assert client.get("/boat-detailing.html").status_code == 200
 
 
 def test_home_links_to_rv_and_boat_pages_without_their_content(client):
@@ -403,8 +400,8 @@ def test_home_links_to_rv_and_boat_pages_without_their_content(client):
     carries nothing beyond nav/footer links to them."""
     html = client.get("/").data.decode("utf-8")
 
-    assert 'href="rv-detailing.html"' in html
-    assert 'href="boat-detailing.html"' in html
+    assert 'href="/rv-detailing"' in html
+    assert 'href="/boat-detailing"' in html
 
     # No RV/boat sections, cards, or pricing on the homepage.
     for marker in (
@@ -416,13 +413,13 @@ def test_home_links_to_rv_and_boat_pages_without_their_content(client):
 
 @pytest.mark.parametrize("path,marker", [
     ("/about", b"Owner-Operated"),
-    ("/about.html", b"Meet Tony"),
+    ("/about", b"Meet Tony"),
     ("/gallery", b"Our Work"),
-    ("/gallery.html", b"galGrid"),
+    ("/gallery", b"galGrid"),
     ("/reviews", b"reviews-embed"),
-    ("/reviews.html", b"Trusted By Local Drivers"),
+    ("/reviews", b"Trusted By Local Drivers"),
     ("/faq", b"Frequently Asked"),
-    ("/faq.html", b"FAQPage"),
+    ("/faq", b"FAQPage"),
 ])
 def test_content_pages_serve(client, path, marker):
     res = client.get(path)
@@ -525,7 +522,7 @@ def test_homepage_our_work_strip(client):
         assert f"/static/gallery/placeholder-{i}.jpg" in html
     # The hover overlay links through to the full gallery page.
     assert "work-overlay" in html
-    assert "gallery.html" in html
+    assert 'href="/gallery"' in html
 
 
 def test_gallery_page_grid_lists_all_placeholders(client):
@@ -576,22 +573,46 @@ def test_allowed_static_dirs_still_serve(client):
         assert client.get(path).status_code == 200, path
 
 
-def test_index_html_alias(client):
+def test_index_html_redirects_to_root(client):
     res = client.get("/index.html")
-    assert res.status_code == 200
-    assert b"Tony's Detailing" in res.data
+    assert res.status_code == 301
+    assert res.headers["Location"] == "/"
 
 
 # ──────────────────────────────────────────────────────────────────────────
 #  robots.txt + sitemap.xml
 # ──────────────────────────────────────────────────────────────────────────
-def test_robots_txt(client):
-    res = client.get("/robots.txt")
+def test_robots_txt_on_production_host(client):
+    res = client.get("/robots.txt", headers={"Host": appmod.CANONICAL_HOST})
     assert res.status_code == 200
     body = res.data.decode()
     assert "User-agent: *" in body
+    assert "Allow: /" in body
     assert "Disallow: /api/" in body
-    assert "Sitemap: http://localhost/sitemap.xml" in body
+    # Always the production sitemap, never the requested host.
+    assert f"Sitemap: {appmod.SITE_URL}/sitemap.xml" in body
+
+
+def test_robots_txt_blocks_crawlers_on_preview_hosts(client):
+    """A Vercel preview must not invite crawlers to index a throwaway URL."""
+    res = client.get(
+        "/robots.txt",
+        headers={"Host": "tonys-detailing-git-some-branch.vercel.app"},
+    )
+    assert res.status_code == 200
+    body = res.data.decode()
+    assert body == "User-agent: *\nDisallow: /\n"
+
+
+def test_sitemap_always_names_the_production_domain(client):
+    """Served off a preview host, the sitemap still lists production URLs."""
+    res = client.get(
+        "/sitemap.xml",
+        headers={"Host": "tonys-detailing-git-some-branch.vercel.app"},
+    )
+    body = res.data.decode()
+    assert "some-branch" not in body
+    assert appmod.SITE_URL + "/booking" in body
 
 
 def test_sitemap_lists_every_public_page(client):
@@ -603,7 +624,7 @@ def test_sitemap_lists_every_public_page(client):
     ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = {el.text for el in root.findall("sm:url/sm:loc", ns)}
     expected = {
-        "http://localhost" + ("/" if page == "/" else page)
+        appmod.SITE_URL + ("/" if page == "/" else page)
         for page in appmod.PUBLIC_PAGES
     }
     assert locs == expected
@@ -687,12 +708,11 @@ def test_fonts_are_real_binaries():
 # ──────────────────────────────────────────────────────────────────────────
 #  Service-area (town) pages
 # ──────────────────────────────────────────────────────────────────────────
-def test_area_pages_serve_both_url_forms(client):
+def test_area_pages_serve_at_the_clean_url(client):
     for slug in appmod.AREA_PAGES:
-        for path in (f"/{slug}", f"/{slug}.html"):
-            res = client.get(path)
-            assert res.status_code == 200, path
-            assert b"</html>" in res.data, path
+        res = client.get(f"/{slug}")
+        assert res.status_code == 200, slug
+        assert b"</html>" in res.data, slug
 
 
 def test_area_pages_have_unique_town_h1(client):
@@ -868,8 +888,62 @@ def test_hero_video_is_not_oversized():
 
 
 def test_hero_pages_still_serve_html(client):
-    for path in ("/", "/index.html", "/rv-detailing", "/boat-detailing"):
+    for path in ("/", "/rv-detailing", "/boat-detailing"):
         res = client.get(path)
         assert res.status_code == 200, path
         assert res.mimetype == "text/html", path
         assert b"</html>" in res.data, path
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Canonical URLs
+# ──────────────────────────────────────────────────────────────────────────
+def test_html_form_redirects_to_the_clean_url(client):
+    """Every page has exactly one URL that serves content."""
+    for url, filename in appmod.PAGES:
+        res = client.get(f"/{filename}")
+        assert res.status_code == 301, filename
+        assert res.headers["Location"] == url, filename
+
+
+def test_clean_urls_serve_and_html_forms_never_do(client):
+    for url, filename in appmod.PAGES:
+        assert client.get(url).status_code == 200, url
+        assert client.get(f"/{filename}").status_code == 301, filename
+
+
+def test_no_page_links_to_a_dot_html_url():
+    """Internal links all use the canonical form — no link should eat a 301."""
+    import glob
+    import re
+    offenders = {}
+    for path in glob.glob(os.path.join(appmod.BASE_DIR, "*.html")):
+        html = open(path, encoding="utf-8").read()
+        hits = re.findall(r'href="(?!https?://)[^"]*\.html[^"]*"', html)
+        if hits:
+            offenders[os.path.basename(path)] = sorted(set(hits))
+    assert not offenders, offenders
+
+
+def test_canonical_tags_match_the_registered_urls(client):
+    """<link rel="canonical"> must point at the URL that actually serves."""
+    import re
+    for url, _ in appmod.PAGES:
+        html = client.get(url).data.decode("utf-8")
+        m = re.search(r'<link rel="canonical" href="([^"]+)"', html)
+        if not m:
+            continue
+        expected = appmod.SITE_URL + ("" if url == "/" else url)
+        assert m.group(1).rstrip("/") == expected.rstrip("/"), url
+
+
+def test_sitemap_lists_only_clean_urls(client):
+    body = client.get("/sitemap.xml").data.decode("utf-8")
+    assert ".html" not in body
+
+
+def test_redirect_preserves_the_query_string(client):
+    """/booking.html?plan=... is a link in the wild; the form reads that param."""
+    res = client.get("/booking.html?plan=Monthly%20Maintenance%20Visit")
+    assert res.status_code == 301
+    assert res.headers["Location"] == "/booking?plan=Monthly%20Maintenance%20Visit"

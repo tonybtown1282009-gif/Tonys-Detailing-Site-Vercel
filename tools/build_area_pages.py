@@ -529,24 +529,13 @@ def body(town, pricing_rows):
 def tail_for_towns(tail):
     """Adapt the donor's footer + scripts for a town page.
 
-    The donor tail carries three boat-specific things: a hero-image loader,
-    a dropdown script wired to the Services ids only, and a footer line about
-    boat condition. Each is rewritten here (with asserts, so a change to the
-    donor fails loudly instead of silently shipping a broken page) rather than
-    duplicated by hand across six files.
+    The donor tail carries two boat-specific things: a dropdown script wired
+    to the Services ids only, and a footer line about boat condition. Both are
+    rewritten here (with asserts, so a change to the donor fails loudly
+    instead of silently shipping a broken page) rather than duplicated by hand
+    across six files.
     """
-    # 1. Drop the boat hero-media loader — town pages use the plain gradient.
-    hero_js = re.search(
-        r"<script>\n\(function\(\)\{\n  var host = document"
-        r".getElementById\('heroMedia'\);.*?</script>\n",
-        tail,
-        re.S,
-    )
-    if not hero_js:
-        raise SystemExit("donor hero-media script not found — check the donor")
-    tail = tail.replace(hero_js.group(0), "", 1)
-
-    # 2. Make the dropdown script reusable so it drives Service Area too.
+    # 1. Make the dropdown script reusable so it drives Service Area too.
     swaps = [
         (
             "(function(){\n  var dd = document.getElementById('navSvcDd');",
@@ -578,7 +567,7 @@ def tail_for_towns(tail):
         1,
     )
 
-    # 3. The footer disclaimer is written for boats on the donor page.
+    # 2. The footer disclaimer is written for boats on the donor page.
     old_disclaimer = "Results may vary based on boat condition."
     if old_disclaimer not in tail:
         raise SystemExit("donor footer disclaimer not found — check the donor")
