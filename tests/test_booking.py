@@ -947,3 +947,65 @@ def test_redirect_preserves_the_query_string(client):
     res = client.get("/booking.html?plan=Monthly%20Maintenance%20Visit")
     assert res.status_code == 301
     assert res.headers["Location"] == "/booking?plan=Monthly%20Maintenance%20Visit"
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Service + Offer JSON-LD on the ceramic / RV / boat pages
+# ──────────────────────────────────────────────────────────────────────────
+def _service_graph(client, url):
+    import json, re
+    html = client.get(url).data.decode("utf-8")
+    block = re.search(
+        r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+    )
+    assert block, f"{url} has no JSON-LD"
+    nodes = {n["@type"]: n for n in json.loads(block.group(1))["@graph"]}
+    assert "Service" in nodes and "AutoWash" in nodes, url
+    # The Service hangs off the shared business entity, not a stray one.
+    assert nodes["Service"]["provider"]["@id"] == nodes["AutoWash"]["@id"]
+    assert nodes["AutoWash"]["@id"] == appmod.SITE_URL + "/#business"
+    return html, nodes["Service"]
+
+
+def test_ceramic_offers_match_the_tier_table(client):
+    """Coating prices are published as Offers — they must not drift from the page."""
+    import re
+    html, svc = _service_graph(client, "/ceramic-coating")
+    tiers = svc["hasOfferCatalog"]["itemListElement"]
+    assert [t["name"] for t in tiers] == re.findall(
+        r'<h3 class="cer-name">(.*?)</h3>', html
+    )
+    schema_prices = [o["price"] for t in tiers for o in t["itemListElement"]]
+    page_prices = [
+        amt.replace(",", "")
+        for amt in re.findall(r'<span class="amt">\$([\d,.]+)</span>', html)
+    ]
+    assert schema_prices == page_prices
+
+
+def test_rv_offers_match_the_size_table(client):
+    """RV brackets are ranges — each Offer's low/high comes from the table."""
+    import re
+    html, svc = _service_graph(client, "/rv-detailing")
+    rows = re.findall(
+        r'<td>[^<]*<span class="pr-size">[^<]*</span></td>'
+        r"<td>\$([\d,]+)&ndash;\$([\d,]+)</td>",
+        html,
+    )
+    assert rows, "RV pricing table did not parse"
+    assert [
+        (o["lowPrice"], o["highPrice"])
+        for o in svc["hasOfferCatalog"]["itemListElement"]
+    ] == [(lo.replace(",", ""), hi.replace(",", "")) for lo, hi in rows]
+
+
+def test_boat_offers_carry_no_invented_price(client):
+    """Every boat row reads "Contact for Quote" — the schema must not claim one."""
+    import re
+    html, svc = _service_graph(client, "/boat-detailing")
+    offers = svc["hasOfferCatalog"]["itemListElement"]
+    assert [o["name"] for o in offers] == re.findall(
+        r"<tr><td>([^<]+)</td><td>Contact for Quote</td></tr>", html
+    )
+    for o in offers:
+        assert "price" not in o and "lowPrice" not in o, o["name"]
