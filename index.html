@@ -1538,6 +1538,23 @@ footer{
   .hl-compare{flex-direction:column;max-width:340px;}
 }
 
+/* ─────────────── SERVICE AREA — TOWN LINKS ─────────────── */
+.area-towns{margin-top:44px;padding-top:36px;border-top:1px solid var(--line);}
+.area-towns h3{font-family:var(--ff-h);font-weight:800;font-size:20px;color:var(--fg);letter-spacing:-.01em;margin-bottom:8px;}
+.area-towns > p{font-size:14.5px;color:var(--fg-3);line-height:1.65;margin-bottom:20px;}
+.area-town-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.area-town{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:15px 18px;border:1px solid var(--line-2);border-radius:var(--radius-card);
+  background:var(--bg-3);
+  font-family:var(--ff-h);font-weight:700;font-size:14.5px;color:var(--fg);
+  transition:border-color 160ms var(--ease),background 160ms var(--ease),transform 160ms var(--ease);
+}
+.area-town:hover{border-color:var(--blue);background:rgba(30,58,95,.05);transform:translateY(-2px);}
+.area-town .lucide{width:16px;height:16px;color:var(--blue);flex-shrink:0;}
+@media (max-width:900px){.area-town-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.area-town-grid{grid-template-columns:1fr;}}
+
 /* ─────────────── SERVICES DROPDOWN ─────────────── */
 .nav-dd{position:relative;}
 .nav-dd-btn{
@@ -1615,7 +1632,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#pricing" data-target="pricing">Pricing</a>
     <a href="ceramic-coating.html">Ceramic Coating</a>
     <a href="#maintenance" data-target="maintenance">Maintenance Plan</a>
-    <a href="#area" data-target="area">Service Area</a>
+    <div class="nav-dd" id="navAreaDd">
+      <button type="button" class="nav-dd-btn" data-target="area" aria-expanded="false" aria-controls="navAreaMenu">Service Area <i data-lucide="chevron-down"></i></button>
+      <div class="nav-dd-menu" id="navAreaMenu">
+        <a href="#area">Coverage &amp; Rates</a>
+        <a href="/gates-mills">Gates Mills</a>
+        <a href="/hunting-valley">Hunting Valley</a>
+        <a href="/pepper-pike">Pepper Pike</a>
+        <a href="/moreland-hills">Moreland Hills</a>
+        <a href="/chagrin-falls">Chagrin Falls</a>
+        <a href="/bentleyville">Bentleyville</a>
+      </div>
+    </div>
     <a href="#booking" data-target="booking">Book Now</a>
     <a href="#contact" data-target="contact">Contact</a>
   </div>
@@ -1643,7 +1671,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#maintenance">Maintenance Plan <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
-  <a href="#area">Service Area <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+  <button type="button" class="drawer-dd-btn" id="drawerAreaBtn" aria-expanded="false" aria-controls="drawerAreaList">Service Area <i data-lucide="chevron-down"></i></button>
+  <div class="drawer-dd-list" id="drawerAreaList" hidden>
+    <a href="#area">Coverage &amp; Rates <i data-lucide="arrow-right"></i></a>
+    <a href="/gates-mills">Gates Mills <i data-lucide="arrow-right"></i></a>
+    <a href="/hunting-valley">Hunting Valley <i data-lucide="arrow-right"></i></a>
+    <a href="/pepper-pike">Pepper Pike <i data-lucide="arrow-right"></i></a>
+    <a href="/moreland-hills">Moreland Hills <i data-lucide="arrow-right"></i></a>
+    <a href="/chagrin-falls">Chagrin Falls <i data-lucide="arrow-right"></i></a>
+    <a href="/bentleyville">Bentleyville <i data-lucide="arrow-right"></i></a>
+  </div>
   <a href="#booking">Book Now <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="#contact">Contact <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
   <a href="tel:+12169034783" class="btn" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})">
@@ -2333,6 +2370,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p>Out-of-area bookings considered case-by-case. Travel surcharge starts at $40 and depends on distance and scheduling.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="area-towns">
+      <h3>Towns We Serve</h3>
+      <p>Detailing details, driveway notes, and pricing for the communities we work in most.</p>
+      <div class="area-town-grid m-rail">
+        <a href="/gates-mills" class="area-town">Gates Mills <i data-lucide="arrow-right"></i></a>
+        <a href="/hunting-valley" class="area-town">Hunting Valley <i data-lucide="arrow-right"></i></a>
+        <a href="/pepper-pike" class="area-town">Pepper Pike <i data-lucide="arrow-right"></i></a>
+        <a href="/moreland-hills" class="area-town">Moreland Hills <i data-lucide="arrow-right"></i></a>
+        <a href="/chagrin-falls" class="area-town">Chagrin Falls <i data-lucide="arrow-right"></i></a>
+        <a href="/bentleyville" class="area-town">Bentleyville <i data-lucide="arrow-right"></i></a>
       </div>
     </div>
   </div>
@@ -3032,9 +3082,9 @@ tdIcons();
 })();
 </script>
 <script>
-/* ───────────────── SERVICES DROPDOWN (nav + mobile drawer) ───────────────── */
-(function(){
-  var dd = document.getElementById('navSvcDd');
+/* ──────────────── NAV DROPDOWNS (nav + mobile drawer) ──────────────── */
+function tdDropdown(ddId, dBtnId, dListId){
+  var dd = document.getElementById(ddId);
   if (dd){
     var btn = dd.querySelector('.nav-dd-btn');
     var menu = dd.querySelector('.nav-dd-menu');
@@ -3090,8 +3140,8 @@ tdIcons();
       a.addEventListener('click', function(){ setOpen(false); });
     });
   }
-  var dBtn = document.getElementById('drawerSvcBtn');
-  var dList = document.getElementById('drawerSvcList');
+  var dBtn = document.getElementById(dBtnId);
+  var dList = document.getElementById(dListId);
   if (dBtn && dList){
     dBtn.addEventListener('click', function(){
       var open = dBtn.getAttribute('aria-expanded') === 'true';
@@ -3099,7 +3149,9 @@ tdIcons();
       dList.hidden = open;
     });
   }
-})();
+}
+tdDropdown('navSvcDd', 'drawerSvcBtn', 'drawerSvcList');
+tdDropdown('navAreaDd', 'drawerAreaBtn', 'drawerAreaList');
 
 /* Reviews strip — arrow nav + edge-fade state */
 (function(){

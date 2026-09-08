@@ -682,3 +682,120 @@ def test_fonts_are_real_binaries():
     for path in woff2s:
         with open(path, "rb") as fh:
             assert fh.read(4) == b"wOF2", f"{path} is not a WOFF2"
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Service-area (town) pages
+# ──────────────────────────────────────────────────────────────────────────
+def test_area_pages_serve_both_url_forms(client):
+    for slug in appmod.AREA_PAGES:
+        for path in (f"/{slug}", f"/{slug}.html"):
+            res = client.get(path)
+            assert res.status_code == 200, path
+            assert b"</html>" in res.data, path
+
+
+def test_area_pages_have_unique_town_h1(client):
+    """Each town page needs its own H1 naming the town and the service."""
+    import re
+    seen = {}
+    for slug in appmod.AREA_PAGES:
+        html = client.get(f"/{slug}").data.decode("utf-8")
+        m = re.search(r"<h1[^>]*>(.*?)</h1>", html, re.S)
+        assert m, f"{slug} has no <h1>"
+        h1 = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        town = slug.replace("-", " ")
+        assert town in h1.lower(), f"{slug} H1 omits the town: {h1}"
+        assert "detailing" in h1.lower(), f"{slug} H1 omits the service: {h1}"
+        seen[slug] = h1
+    assert len(set(seen.values())) == len(seen), seen
+
+
+def test_area_pages_seo_field_lengths(client):
+    """Titles and descriptions have to fit what search results actually show."""
+    import re
+    titles, descs = {}, {}
+    for slug in appmod.AREA_PAGES:
+        html = client.get(f"/{slug}").data.decode("utf-8")
+        title = re.search(r"<title>(.*?)</title>", html, re.S).group(1).strip()
+        desc = re.search(
+            r'<meta name="description" content="(.*?)">', html, re.S
+        ).group(1).strip()
+        assert len(title) < 60, f"{slug} title is {len(title)} chars: {title}"
+        assert len(desc) < 160, f"{slug} description is {len(desc)} chars"
+        titles[slug], descs[slug] = title, desc
+    assert len(set(titles.values())) == len(titles), titles
+    assert len(set(descs.values())) == len(descs), descs
+
+
+def test_area_pages_intro_copy_is_not_boilerplate(client):
+    """Guard the one thing a templated town page gets wrong: identical copy."""
+    import re
+    intros = {}
+    for slug in appmod.AREA_PAGES:
+        html = client.get(f"/{slug}").data.decode("utf-8")
+        intro = re.search(r'<p class="hero-sub">(.*?)</p>', html, re.S).group(1)
+        intros[slug] = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", intro)).strip()
+    assert len(set(intros.values())) == len(intros), "town intros are duplicated"
+    # The same paragraph with the town swapped would still be unique, so also
+    # require the wording itself to diverge.
+    for slug, text in intros.items():
+        words = set(text.lower().split())
+        for other, other_text in intros.items():
+            if other == slug:
+                continue
+            overlap = len(words & set(other_text.lower().split())) / len(words)
+            assert overlap < 0.6, f"{slug} and {other} share {overlap:.0%} of words"
+
+
+def test_area_pages_service_and_localbusiness_jsonld(client):
+    import json, re
+    for slug in appmod.AREA_PAGES:
+        html = client.get(f"/{slug}").data.decode("utf-8")
+        block = re.search(
+            r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+        )
+        assert block, f"{slug} has no JSON-LD"
+        graph = json.loads(block.group(1))["@graph"]
+        nodes = {node["@type"]: node for node in graph}
+        assert "Service" in nodes and "AutoWash" in nodes, slug
+        # The Service hangs off the shared business entity, not a stray one.
+        assert nodes["Service"]["provider"]["@id"] == nodes["AutoWash"]["@id"]
+        town = nodes["Service"]["areaServed"]["name"]
+        assert town.lower().replace(" ", "-") == slug, slug
+        assert nodes["AutoWash"]["areaServed"]["name"] == town, slug
+
+
+def test_area_page_pricing_matches_homepage_table(client):
+    """Town pricing is lifted from index.html — it must not drift from it."""
+    import re
+
+    def base_rows(html):
+        body = re.search(
+            r"<h3>Base Pricing by Vehicle Size</h3>.*?<tbody>(.*?)</tbody>",
+            html,
+            re.S,
+        ).group(1)
+        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "|", body)).strip()
+
+    home = base_rows(client.get("/").data.decode("utf-8"))
+    assert "$" in home
+    for slug in appmod.AREA_PAGES:
+        page = base_rows(client.get(f"/{slug}").data.decode("utf-8"))
+        assert page == home, f"{slug} pricing differs from the homepage table"
+
+
+def test_homepage_links_every_area_page(client):
+    """Nav dropdown and the Service Area section both have to carry the towns."""
+    html = client.get("/").data.decode("utf-8")
+    start = html.index('<section id="area">')
+    area_section = html[start : html.index("</section>", start)]
+    for slug in appmod.AREA_PAGES:
+        assert f'href="/{slug}"' in html, f"nav is missing /{slug}"
+        assert f'href="/{slug}"' in area_section, f"#area is missing /{slug}"
+
+
+def test_area_pages_in_sitemap(client):
+    body = client.get("/sitemap.xml").data.decode("utf-8")
+    for slug in appmod.AREA_PAGES:
+        assert f"/{slug}</loc>" in body, slug
