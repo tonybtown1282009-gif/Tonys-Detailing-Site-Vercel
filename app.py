@@ -17,7 +17,9 @@ from flask import (
     Flask,
     abort,
     jsonify,
+    redirect,
     request,
+    Response,
     send_file,
     send_from_directory,
 )
@@ -290,6 +292,85 @@ def media_present(name):
         return False
 
 
+# ──────────────────────────────────────────────────────────────────────────
+#  Hero media (server-rendered)
+#  The hero used to be built client-side from a /api/media fetch, which meant
+#  nothing painted in the hero until that round trip finished. The markup is
+#  stamped into the HTML here instead, so the image is in the document the
+#  browser first parses. The video stays out of the critical path: it ships
+#  with preload="none" and a data-src that a small inline script promotes
+#  after load, on desktop only.
+# ──────────────────────────────────────────────────────────────────────────
+HERO_PLACEHOLDER = '<div class="hero-media" id="heroMedia"></div>'
+
+# page file -> (still image slot, looping video slot or None)
+HERO_SLOTS = {
+    "index.html": ("hero-fallback.jpg", "hero-video.mp4"),
+    "rv-detailing.html": ("rv-hero.jpg", None),
+    "boat-detailing.html": ("boat-hero.jpg", None),
+}
+
+
+def hero_markup(image_slot, video_slot):
+    """Build the hero's inner markup for whichever slots are filled.
+
+    Returns "" when nothing is filled, which leaves the container empty and
+    lets the existing `.hero-media:empty` rule fall back to the gradient.
+    """
+    has_image = media_present(image_slot)
+    parts = []
+    if has_image:
+        # fetchpriority=high: this is the largest contentful paint on the page.
+        parts.append(
+            f'<img src="/static/media/{image_slot}" alt="" '
+            'fetchpriority="high" decoding="async">'
+        )
+    if video_slot and media_present(video_slot):
+        poster = f' poster="/static/media/{image_slot}"' if has_image else ""
+        parts.append(
+            f'<video data-src="/static/media/{video_slot}"{poster} '
+            'preload="none" muted loop playsinline aria-hidden="true"></video>'
+        )
+    return "".join(parts)
+
+
+_page_cache = {}
+
+
+def render_page(filename):
+    """Serve a static page with its hero markup stamped in.
+
+    Cached per file, keyed on the page's mtime and which media slots are
+    filled, so a media swap (drop the file in, push) shows up without a code
+    change and without re-reading the page on every request.
+    """
+    image_slot, video_slot = HERO_SLOTS[filename]
+    path = os.path.join(BASE_DIR, filename)
+    try:
+        key = (
+            os.path.getmtime(path),
+            media_present(image_slot),
+            bool(video_slot) and media_present(video_slot),
+        )
+    except OSError:
+        return send_from_directory(BASE_DIR, filename)
+
+    cached = _page_cache.get(filename)
+    if cached is None or cached[0] != key:
+        with open(path, encoding="utf-8") as fh:
+            html = fh.read()
+        markup = hero_markup(image_slot, video_slot)
+        if markup:
+            html = html.replace(
+                HERO_PLACEHOLDER,
+                HERO_PLACEHOLDER[:-6] + markup + "</div>",
+                1,
+            )
+        cached = (key, html)
+        _page_cache[filename] = cached
+    return Response(cached[1], mimetype="text/html; charset=utf-8")
+
+
 def record_visit_count(conn, email):
     """Loyalty stub: how many times this email has booked, including now."""
     email = (email or "").strip().lower()
@@ -504,40 +585,44 @@ AREA_PAGES = (
     "bentleyville",
 )
 
-PUBLIC_PAGES = (
-    "/",
-    "/booking",
-    "/ceramic-coating",
-    "/rv-detailing",
-    "/boat-detailing",
-    "/about",
-    "/gallery",
-    "/reviews",
-    "/faq",
-) + tuple(f"/{slug}" for slug in AREA_PAGES)
+# Every public page, as (canonical URL, file on disk), in sitemap order.
+# The site is served at clean URLs; the .html form of each is registered as a
+# permanent redirect so old links still land, but nothing on the site links to
+# it and only the clean form is canonical.
+PAGES = (
+    ("/", "index.html"),
+    ("/booking", "booking.html"),
+    ("/ceramic-coating", "ceramic-coating.html"),
+    ("/rv-detailing", "rv-detailing.html"),
+    ("/boat-detailing", "boat-detailing.html"),
+    ("/about", "about.html"),
+    ("/gallery", "gallery.html"),
+    ("/reviews", "reviews.html"),
+    ("/faq", "faq.html"),
+) + tuple((f"/{slug}", f"{slug}.html") for slug in AREA_PAGES)
+
+PUBLIC_PAGES = tuple(url for url, _ in PAGES)
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Canonical site URL
+#  robots.txt and sitemap.xml are absolute-URL documents, so they must name
+#  the production domain no matter which host served the request — otherwise
+#  preview deployments publish a sitemap of their own URLs. Matches the
+#  <link rel="canonical"> tags in the pages.
+# ──────────────────────────────────────────────────────────────────────────
+SITE_URL = "https://tonys-detailing.vercel.app"
+CANONICAL_HOST = SITE_URL.split("://", 1)[1]
+
+
+def is_canonical_host():
+    """True when this request came in on the production domain."""
+    return request.host.split(":", 1)[0] == CANONICAL_HOST
+
 
 # Only these directories are served by the static catch-all. Everything else
 # in the project root (app.py, tests, requirements, any local .env or
 # bookings.db) must never be reachable over HTTP.
 STATIC_DIRS = ("fonts", "assets", "static")
-
-
-@app.route("/")
-@app.route("/index.html")
-def home():
-    return send_from_directory(BASE_DIR, "index.html")
-
-
-@app.route("/booking")
-@app.route("/booking.html")
-def booking_page():
-    return send_from_directory(BASE_DIR, "booking.html")
-
-
-@app.route("/ceramic-coating")
-@app.route("/ceramic-coating.html")
-def ceramic_coating_page():
-    return send_from_directory(BASE_DIR, "ceramic-coating.html")
 
 
 @app.route("/api/media")
@@ -546,76 +631,71 @@ def media_manifest():
     return jsonify({name: media_present(name) for name in MEDIA_SLOTS})
 
 
-@app.route("/rv-detailing")
-@app.route("/rv-detailing.html")
-def rv_detailing_page():
-    return send_from_directory(BASE_DIR, "rv-detailing.html")
+def _serve_page(filename):
+    """Serve one page file, through the hero renderer where that applies."""
+    if filename in HERO_SLOTS:
+        return render_page(filename)
+    return send_from_directory(BASE_DIR, filename)
 
 
-@app.route("/boat-detailing")
-@app.route("/boat-detailing.html")
-def boat_detailing_page():
-    return send_from_directory(BASE_DIR, "boat-detailing.html")
+def _register_page(url, filename):
+    """Register a page at its canonical URL, plus a 301 from the .html form.
+
+    Both forms used to serve the page directly, which left every page
+    reachable at two URLs — a split that search engines have to reconcile and
+    that made internal links inconsistent. Only the clean URL serves content
+    now; /<page>.html permanently redirects to it.
+    """
+    name = filename[: -len(".html")].replace("-", "_")
+
+    def view(_filename=filename):
+        return _serve_page(_filename)
+
+    view.__name__ = f"page_{name}"
+    app.add_url_rule(url, view_func=view)
+
+    def redirect_view(_url=url):
+        # Carry the query string across: /booking.html?plan=... is a link
+        # that exists in the wild, and the booking form reads that param.
+        query = request.query_string.decode()
+        return redirect(f"{_url}?{query}" if query else _url, code=301)
+
+    redirect_view.__name__ = f"page_{name}_html"
+    app.add_url_rule(f"/{filename}", view_func=redirect_view)
 
 
-@app.route("/about")
-@app.route("/about.html")
-def about_page():
-    return send_from_directory(BASE_DIR, "about.html")
-
-
-@app.route("/gallery")
-@app.route("/gallery.html")
-def gallery_page():
-    return send_from_directory(BASE_DIR, "gallery.html")
-
-
-@app.route("/reviews")
-@app.route("/reviews.html")
-def reviews_page():
-    return send_from_directory(BASE_DIR, "reviews.html")
-
-
-@app.route("/faq")
-@app.route("/faq.html")
-def faq_page():
-    return send_from_directory(BASE_DIR, "faq.html")
-
-
-# The town pages are all the same shape, so register them from AREA_PAGES
-# instead of repeating a near-identical view six times. Each gets the same
-# clean-URL/.html pair the hand-written pages have.
-def _register_area_page(slug):
-    def view(_slug=slug):
-        return send_from_directory(BASE_DIR, f"{_slug}.html")
-
-    view.__name__ = f"area_{slug.replace('-', '_')}_page"
-    app.add_url_rule(f"/{slug}", view_func=view)
-    app.add_url_rule(f"/{slug}.html", view_func=view, endpoint=f"{view.__name__}_html")
-
-
-for _slug in AREA_PAGES:
-    _register_area_page(_slug)
+for _url, _filename in PAGES:
+    _register_page(_url, _filename)
 
 
 @app.route("/robots.txt")
 def robots_txt():
-    """Crawler policy, built against whatever host the site is served from."""
-    base = request.url_root.rstrip("/")
-    body = (
-        "User-agent: *\n"
-        "Allow: /\n"
-        "Disallow: /api/\n"
-        f"Sitemap: {base}/sitemap.xml\n"
-    )
+    """Crawler policy.
+
+    Built against the canonical domain, never the requested host. These used
+    to be derived from request.url_root, which meant every Vercel preview
+    deployment served a crawlable robots.txt advertising its own throwaway
+    URL. Previews now tell crawlers to stay out entirely, so a preview can
+    never compete with production in the index.
+    """
+    if is_canonical_host():
+        body = (
+            "User-agent: *\n"
+            "Allow: /\n"
+            "Disallow: /api/\n"
+            f"Sitemap: {SITE_URL}/sitemap.xml\n"
+        )
+    else:
+        body = "User-agent: *\nDisallow: /\n"
     return body, 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
 @app.route("/sitemap.xml")
 def sitemap_xml():
-    base = request.url_root.rstrip("/")
+    # Always the canonical domain: a sitemap that lists preview URLs invites
+    # them into the index and splits ranking signals with production.
     urls = "\n".join(
-        f"  <url><loc>{base + '/' if page == '/' else base + page}</loc></url>"
+        f"  <url><loc>{SITE_URL + '/' if page == '/' else SITE_URL + page}</loc></url>"
         for page in PUBLIC_PAGES
     )
     body = (

@@ -8,8 +8,8 @@ site once its file has real content; empty slots are hidden automatically.
 
 | File | Where it shows | Recommended |
 |------|----------------|-------------|
-| `hero-video.mp4` | Homepage hero background (desktop only). Falls back to `hero-fallback.jpg` if missing, and always uses the image on phones. | MP4, H.264, muted, ~10–20s loop, 1920×1080, keep under ~8 MB |
-| `hero-fallback.jpg` | Homepage hero background when there's no video (and the video's poster while it loads). | JPG, 1920×1080 |
+| `hero-video.mp4` | Homepage hero background (desktop only). Lazy-loaded after the page loads; phones and reduced-motion visitors never download it. | MP4, H.264, no audio track, ~10–20s loop, keep under ~2 MB — run it through `tools/compress_hero_video.py` |
+| `hero-fallback.jpg` | Homepage hero background, and the video's poster. This is what paints first, so keep one here even when the video is filled. | JPG, 1920×1080 |
 | `rv-hero.jpg` | `/rv-detailing` hero background. | JPG, 1920×1080 |
 | `boat-hero.jpg` | `/boat-detailing` hero background. | JPG, 1920×1080 |
 
@@ -20,6 +20,16 @@ site once its file has real content; empty slots are hidden automatically.
 
 ## How it works
 
-The site asks the server (`/api/media`) which of these files exist and are
-non-empty, then shows only those. Keep the **exact same file names** — the site
-looks them up by name.
+The server checks which of these files exist and are non-empty, and stamps the
+right markup straight into the page's HTML before sending it (`render_page` in
+`app.py`). The hero image is therefore in the document the browser first parses
+— it paints without waiting on any request. The result is cached per page and
+re-rendered automatically when a file's size or the page's timestamp changes,
+so replacing a file and pushing is still all it takes.
+
+The video is deliberately kept off that path: it ships as `preload="none"` with
+its URL in `data-src`, and a few lines of script promote it to a real `src`
+after the page has loaded — and only on desktop, with motion allowed. Phones
+and reduced-motion visitors never request it.
+
+Keep the **exact same file names** — the site looks them up by name.

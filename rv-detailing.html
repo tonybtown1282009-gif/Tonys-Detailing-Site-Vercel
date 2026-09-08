@@ -379,7 +379,8 @@ footer{padding:56px 0 28px;background:#0a0a0a;--fg:#fff;--fg-2:rgba(255,255,255,
 }
 
 /* ═══════════════ MEDIA SLOT — hero image ═══════════════ */
-/* Populated at runtime from /api/media; empty container keeps the gradient. */
+/* Hero image is server-rendered (see render_page in app.py); an empty
+   container keeps the gradient. */
 .hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
 .hero-media:empty{display:none;}
 .hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -442,7 +443,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─────────────── NAV ─────────────── -->
 <nav id="nav">
-  <a href="index.html" class="brand" aria-label="Tony's Detailing — home">
+  <a href="/" class="brand" aria-label="Tony's Detailing — home">
     <span class="brand-plate"><img src="assets/logo.png" alt=""></span>
     <span class="brand-text">
       <span class="n">Tony's Detailing</span>
@@ -461,7 +462,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <a href="#pricing">Pricing</a>
     <a href="#limits">Conditions</a>
-    <a href="index.html">Main Site</a>
+    <a href="/">Main Site</a>
   </div>
   <div class="nav-right">
     <a href="tel:+12169034783" class="nav-phone" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i>(216) 903-4783</a>
@@ -482,7 +483,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <a href="#pricing">Pricing <i data-lucide="arrow-right"></i></a>
   <a href="#limits">Conditions <i data-lucide="arrow-right"></i></a>
-  <a href="index.html">Main Site <i data-lucide="arrow-right"></i></a>
+  <a href="/">Main Site <i data-lucide="arrow-right"></i></a>
   <a href="#cta" class="btn" style="margin-top:16px;justify-content:center;">Get an RV Quote</a>
 </div>
 
@@ -658,7 +659,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="mailto:tonysdetailing.net@gmail.com?subject=RV%20%2F%20Camper%20Detailing%20Quote" class="btn xl">Email For A Quote <i data-lucide="mail"></i></a>
         <a href="tel:+12169034783" class="btn ghost lg" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})">Call (216) 903-4783 <i data-lucide="phone"></i></a>
       </div>
-      <div class="cta-note">Booking a car or SUV instead? <a href="index.html#booking">Book a standard detail on our main site</a>.</div>
+      <div class="cta-note">Booking a car or SUV instead? <a href="/#booking">Book a standard detail on our main site</a>.</div>
     </div>
   </div>
 </section>
@@ -667,21 +668,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <footer>
   <div class="wrap">
     <div class="foot-row">
-      <a href="index.html" class="foot-brand brand">
+      <a href="/" class="foot-brand brand">
         <span class="brand-plate"><img src="assets/logo.png" alt="" loading="lazy" decoding="async"></span>
         <span><span class="n">Tony's Detailing</span><span class="s">Chardon &middot; OH</span></span>
       </a>
       <div class="foot-links">
-        <a href="index.html#services">Services</a>
-        <a href="index.html#pricing">Pricing</a>
-        <a href="rv-detailing.html">RVs</a>
-        <a href="boat-detailing.html">Boats</a>
-        <a href="gallery.html">Gallery</a>
-        <a href="reviews.html">Reviews</a>
-        <a href="faq.html">FAQ</a>
-        <a href="about.html">About</a>
-        <a href="booking.html">Book Now</a>
-        <a href="index.html#contact">Contact</a>
+        <a href="/#services">Services</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/rv-detailing">RVs</a>
+        <a href="/boat-detailing">Boats</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/booking">Book Now</a>
+        <a href="/#contact">Contact</a>
       </div>
     </div>
     <div class="foot-bottom">
@@ -760,19 +761,6 @@ tdIcons();
 </script>
 
 <!-- ─────────────── MEDIA SLOT (hero image) ─────────────── -->
-<script>
-(function(){
-  var host = document.getElementById('heroMedia');
-  if (!host) return;
-  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
-    if (media['rv-hero.jpg']){
-      var img = document.createElement('img');
-      img.src = '/static/media/rv-hero.jpg'; img.alt = ''; img.decoding = 'async';
-      host.appendChild(img);
-    }
-  }).catch(function(){ /* no manifest — keep the gradient */ });
-})();
-</script>
 <script>
 /* ───────────────── SERVICES DROPDOWN (nav + mobile drawer) ───────────────── */
 (function(){

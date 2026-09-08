@@ -1495,10 +1495,14 @@ footer{
 }
 
 /* ═══════════════ MEDIA SLOTS — hero video/image + Before/After gallery ═══════════════ */
-/* Populated at runtime from /api/media; empty containers stay hidden (gradient shows). */
+/* Hero media is server-rendered (see render_page in app.py); an empty
+   container stays hidden and the gradient shows. */
 .hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--blue);}
 .hero-media:empty{display:none;}
-.hero-media video,.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media img{width:100%;height:100%;object-fit:cover;display:block;}
+/* The video sits over the server-rendered still, which stays underneath as
+   the poster and as the fallback when autoplay is blocked or refused. */
+.hero-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
 .hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.45) 0%,rgba(15,28,47,.60) 55%,rgba(30,58,95,.78) 100%);}
 
 /* ─────────────── OUR WORK — horizontal gallery strip ─────────────── */
@@ -1630,7 +1634,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
     <a href="#pricing" data-target="pricing">Pricing</a>
-    <a href="ceramic-coating.html">Ceramic Coating</a>
+    <a href="/ceramic-coating">Ceramic Coating</a>
     <a href="#maintenance" data-target="maintenance">Maintenance Plan</a>
     <div class="nav-dd" id="navAreaDd">
       <button type="button" class="nav-dd-btn" data-target="area" aria-expanded="false" aria-controls="navAreaMenu">Service Area <i data-lucide="chevron-down"></i></button>
@@ -1857,7 +1861,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>Three service tiers, from an exterior wash-and-seal to our complete Full Detail. Each one comes to you &mdash; home, office, or wherever you park.</p>
       </div>
       <div class="svc-head-actions">
-        <a href="booking.html" class="btn sm">
+        <a href="/booking" class="btn sm">
           Book Now
           <i data-lucide="calendar-check"></i>
         </a>
@@ -1887,7 +1891,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$140</span>
           </div>
-          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="/booking" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -1909,7 +1913,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$120</span>
           </div>
-          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="/booking" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -1930,7 +1934,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="svc-price-lbl">Starts at</span>
             <span class="svc-price">$195</span>
           </div>
-          <a href="booking.html" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
+          <a href="/booking" class="svc-cta">Book<i data-lucide="arrow-right"></i></a>
         </div>
       </article>
 
@@ -2140,7 +2144,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">Long-Term Paint Protection</span>
       <h2>Ceramic Coating Protection</h2>
-      <a href="ceramic-coating.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
+      <a href="/ceramic-coating" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>Three durability tiers, each priced by vehicle size. Full decontamination prep on every one.</p>
     </div>
 
@@ -2163,7 +2167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="cert-actions">
-      <a href="ceramic-coating.html" class="btn lg">Learn More <i data-lucide="arrow-right"></i></a>
+      <a href="/ceramic-coating" class="btn lg">Learn More <i data-lucide="arrow-right"></i></a>
     </div>
   </div>
 </section>
@@ -2279,7 +2283,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="cert-actions">
-      <a href="booking.html?plan=Monthly%20Maintenance%20Visit" class="btn lg">Book a Maintenance Plan <i data-lucide="arrow-right"></i></a>
+      <a href="/booking?plan=Monthly%20Maintenance%20Visit" class="btn lg">Book a Maintenance Plan <i data-lucide="arrow-right"></i></a>
     </div>
   </div>
 </section>
@@ -2440,7 +2444,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">What Clients Say</span>
       <h2>Trusted By Local Drivers</h2>
-      <a href="reviews.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
+      <a href="/reviews" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>Real results, right in the driveway &mdash; straight from our Google reviews.</p>
     </div>
     <div class="tst-scroll-wrap">
@@ -2511,7 +2515,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head center">
       <span class="eyebrow">The Gallery</span>
       <h2>Our Work</h2>
-      <a href="gallery.html" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
+      <a href="/gallery" class="m-seeall">See all <i data-lucide="chevron-right"></i></a>
       <p>A look at the vehicles we bring back to showroom clean &mdash; scroll through, or open the full gallery.</p>
     </div>
     <div class="work-strip-wrap">
@@ -2558,11 +2562,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <figure class="work-item"><img src="/static/gallery/placeholder-46.jpg" alt="Volvo XC60 mobile detail — foam wash, front end" loading="lazy" decoding="async"></figure>
       </div>
       <div class="work-overlay">
-        <a href="gallery.html" class="btn lg">View All <i data-lucide="arrow-right"></i></a>
+        <a href="/gallery" class="btn lg">View All <i data-lucide="arrow-right"></i></a>
       </div>
     </div>
     <div class="work-strip-cta">
-      <a href="gallery.html" class="btn ghost">View Full Gallery <i data-lucide="arrow-right"></i></a>
+      <a href="/gallery" class="btn ghost">View Full Gallery <i data-lucide="arrow-right"></i></a>
     </div>
   </div>
 </section>
@@ -2814,18 +2818,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><a href="#services">Wash, Clay, Seal</a></li>
           <li><a href="#services">Interior Detail</a></li>
           <li><a href="#services">Full Detail</a></li>
-          <li><a href="ceramic-coating.html">Ceramic Coating</a></li>
-          <li><a href="rv-detailing.html">RVs</a></li>
-          <li><a href="boat-detailing.html">Boats</a></li>
+          <li><a href="/ceramic-coating">Ceramic Coating</a></li>
+          <li><a href="/rv-detailing">RVs</a></li>
+          <li><a href="/boat-detailing">Boats</a></li>
         </ul>
       </div>
       <div class="foot-col">
         <h5>Company</h5>
         <ul>
-          <li><a href="about.html">About</a></li>
-          <li><a href="gallery.html">Gallery</a></li>
-          <li><a href="reviews.html">Reviews</a></li>
-          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/gallery">Gallery</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/faq">FAQ</a></li>
           <li><a href="#pricing">Pricing</a></li>
           <li><a href="#area">Service Area</a></li>
         </ul>
@@ -3050,35 +3054,26 @@ tdIcons();
 
 <!-- ─────────────── MEDIA SLOTS (hero video/image) ─────────────── -->
 <script>
+/* ─── Hero video (lazy) ───────────────────────────────────────────────────
+   The hero image is server-rendered into the document, so it paints without
+   waiting on any request. The video ships as preload="none" with its URL in
+   data-src; promote it to a real src only after load, and only where a
+   looping background video is wanted — never on phones or under
+   reduced-motion, so those visitors never pay for the download. */
 (function(){
-  var MEDIA = '/static/media/';
+  var v = document.querySelector('#heroMedia video[data-src]');
+  if (!v) return;
   var mm = window.matchMedia;
-  var isMobile = mm && mm('(max-width: 720px)').matches;
-  var reduce = mm && mm('(prefers-reduced-motion: reduce)').matches;
-
-  fetch('/api/media').then(function(r){ return r.json(); }).then(function(media){
-    // Hero — use the video on desktop; otherwise fall back to the image; if
-    // neither slot is filled the container stays empty and the gradient shows.
-    var host = document.getElementById('heroMedia');
-    if (host){
-      if (media['hero-video.mp4'] && !isMobile && !reduce){
-        var v = document.createElement('video');
-        v.autoplay = true; v.loop = true; v.muted = true; v.defaultMuted = true;
-        v.setAttribute('muted',''); v.setAttribute('playsinline','');
-        v.playsInline = true; v.preload = 'metadata';
-        if (media['hero-fallback.jpg']) v.poster = MEDIA + 'hero-fallback.jpg';
-        var s = document.createElement('source');
-        s.src = MEDIA + 'hero-video.mp4'; s.type = 'video/mp4';
-        v.appendChild(s);
-        host.appendChild(v);
-        var p = v.play(); if (p && p.catch) p.catch(function(){});
-      } else if (media['hero-fallback.jpg']){
-        var img = document.createElement('img');
-        img.src = MEDIA + 'hero-fallback.jpg'; img.alt = ''; img.decoding = 'async';
-        host.appendChild(img);
-      }
-    }
-  }).catch(function(){ /* no manifest — hero keeps the gradient */ });
+  if (mm && (mm('(max-width: 720px)').matches ||
+             mm('(prefers-reduced-motion: reduce)').matches)) return;
+  var start = function(){
+    v.src = v.getAttribute('data-src');
+    v.removeAttribute('data-src');
+    var p = v.play();
+    if (p && p.catch) p.catch(function(){ /* autoplay blocked — poster stays */ });
+  };
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start, { once: true });
 })();
 </script>
 <script>
