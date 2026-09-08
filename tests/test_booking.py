@@ -799,3 +799,77 @@ def test_area_pages_in_sitemap(client):
     body = client.get("/sitemap.xml").data.decode("utf-8")
     for slug in appmod.AREA_PAGES:
         assert f"/{slug}</loc>" in body, slug
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  Server-rendered hero media
+# ──────────────────────────────────────────────────────────────────────────
+def test_hero_image_is_in_the_served_html(client):
+    """The hero must paint from the document, not from a later fetch."""
+    html = client.get("/").data.decode("utf-8")
+    assert '<div class="hero-media" id="heroMedia"><img' in html
+    assert 'src="/static/media/hero-fallback.jpg"' in html
+    assert 'fetchpriority="high"' in html
+
+
+def test_hero_does_not_fetch_the_media_manifest(client):
+    """No page builds its hero from /api/media any more."""
+    for path in ("/", "/rv-detailing", "/boat-detailing"):
+        html = client.get(path).data.decode("utf-8")
+        assert "fetch('/api/media')" not in html, path
+
+
+def test_hero_video_is_lazy_not_eager(client):
+    """The 1.7MB video must not be a blocking src in the initial HTML."""
+    import re
+    html = client.get("/").data.decode("utf-8")
+    tag = re.search(r"<video[^>]*>", html).group(0)
+    assert 'preload="none"' in tag, tag
+    assert 'data-src="/static/media/hero-video.mp4"' in tag, tag
+    assert " src=" not in tag, "video should carry data-src, not src"
+    assert 'poster="/static/media/hero-fallback.jpg"' in tag, tag
+
+
+def test_empty_media_slot_renders_an_empty_hero(client):
+    """A 0-byte slot leaves the container empty so the gradient shows."""
+    for path, slot in (("/rv-detailing", "rv-hero.jpg"),
+                       ("/boat-detailing", "boat-hero.jpg")):
+        html = client.get(path).data.decode("utf-8")
+        if appmod.media_present(slot):
+            assert f'src="/static/media/{slot}"' in html, path
+        else:
+            assert '<div class="hero-media" id="heroMedia"></div>' in html, path
+
+
+def test_hero_rerenders_when_a_media_slot_changes(client, tmp_path, monkeypatch):
+    """Dropping a file in has to show up without a code change or redeploy."""
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+    appmod._page_cache.clear()
+
+    empty = tmp_path / "rv-hero.jpg"
+    empty.write_bytes(b"")
+    assert '<div class="hero-media" id="heroMedia"></div>' in (
+        client.get("/rv-detailing").data.decode("utf-8")
+    )
+
+    empty.write_bytes(b"\xff\xd8\xff" + b"x" * 128)
+    html = client.get("/rv-detailing").data.decode("utf-8")
+    assert 'src="/static/media/rv-hero.jpg"' in html, "cache did not invalidate"
+    appmod._page_cache.clear()
+
+
+def test_hero_video_is_not_oversized():
+    """Guard the regression that started this: a 12MB autoplaying hero."""
+    path = os.path.join(appmod.MEDIA_DIR, "hero-video.mp4")
+    if not appmod.media_present("hero-video.mp4"):
+        return
+    size_mb = os.path.getsize(path) / (1024 * 1024)
+    assert size_mb < 4, f"hero video is {size_mb:.1f}MB — compress it"
+
+
+def test_hero_pages_still_serve_html(client):
+    for path in ("/", "/index.html", "/rv-detailing", "/boat-detailing"):
+        res = client.get(path)
+        assert res.status_code == 200, path
+        assert res.mimetype == "text/html", path
+        assert b"</html>" in res.data, path

@@ -18,6 +18,7 @@ from flask import (
     abort,
     jsonify,
     request,
+    Response,
     send_file,
     send_from_directory,
 )
@@ -290,6 +291,85 @@ def media_present(name):
         return False
 
 
+# ──────────────────────────────────────────────────────────────────────────
+#  Hero media (server-rendered)
+#  The hero used to be built client-side from a /api/media fetch, which meant
+#  nothing painted in the hero until that round trip finished. The markup is
+#  stamped into the HTML here instead, so the image is in the document the
+#  browser first parses. The video stays out of the critical path: it ships
+#  with preload="none" and a data-src that a small inline script promotes
+#  after load, on desktop only.
+# ──────────────────────────────────────────────────────────────────────────
+HERO_PLACEHOLDER = '<div class="hero-media" id="heroMedia"></div>'
+
+# page file -> (still image slot, looping video slot or None)
+HERO_SLOTS = {
+    "index.html": ("hero-fallback.jpg", "hero-video.mp4"),
+    "rv-detailing.html": ("rv-hero.jpg", None),
+    "boat-detailing.html": ("boat-hero.jpg", None),
+}
+
+
+def hero_markup(image_slot, video_slot):
+    """Build the hero's inner markup for whichever slots are filled.
+
+    Returns "" when nothing is filled, which leaves the container empty and
+    lets the existing `.hero-media:empty` rule fall back to the gradient.
+    """
+    has_image = media_present(image_slot)
+    parts = []
+    if has_image:
+        # fetchpriority=high: this is the largest contentful paint on the page.
+        parts.append(
+            f'<img src="/static/media/{image_slot}" alt="" '
+            'fetchpriority="high" decoding="async">'
+        )
+    if video_slot and media_present(video_slot):
+        poster = f' poster="/static/media/{image_slot}"' if has_image else ""
+        parts.append(
+            f'<video data-src="/static/media/{video_slot}"{poster} '
+            'preload="none" muted loop playsinline aria-hidden="true"></video>'
+        )
+    return "".join(parts)
+
+
+_page_cache = {}
+
+
+def render_page(filename):
+    """Serve a static page with its hero markup stamped in.
+
+    Cached per file, keyed on the page's mtime and which media slots are
+    filled, so a media swap (drop the file in, push) shows up without a code
+    change and without re-reading the page on every request.
+    """
+    image_slot, video_slot = HERO_SLOTS[filename]
+    path = os.path.join(BASE_DIR, filename)
+    try:
+        key = (
+            os.path.getmtime(path),
+            media_present(image_slot),
+            bool(video_slot) and media_present(video_slot),
+        )
+    except OSError:
+        return send_from_directory(BASE_DIR, filename)
+
+    cached = _page_cache.get(filename)
+    if cached is None or cached[0] != key:
+        with open(path, encoding="utf-8") as fh:
+            html = fh.read()
+        markup = hero_markup(image_slot, video_slot)
+        if markup:
+            html = html.replace(
+                HERO_PLACEHOLDER,
+                HERO_PLACEHOLDER[:-6] + markup + "</div>",
+                1,
+            )
+        cached = (key, html)
+        _page_cache[filename] = cached
+    return Response(cached[1], mimetype="text/html; charset=utf-8")
+
+
 def record_visit_count(conn, email):
     """Loyalty stub: how many times this email has booked, including now."""
     email = (email or "").strip().lower()
@@ -525,7 +605,7 @@ STATIC_DIRS = ("fonts", "assets", "static")
 @app.route("/")
 @app.route("/index.html")
 def home():
-    return send_from_directory(BASE_DIR, "index.html")
+    return render_page("index.html")
 
 
 @app.route("/booking")
@@ -549,13 +629,13 @@ def media_manifest():
 @app.route("/rv-detailing")
 @app.route("/rv-detailing.html")
 def rv_detailing_page():
-    return send_from_directory(BASE_DIR, "rv-detailing.html")
+    return render_page("rv-detailing.html")
 
 
 @app.route("/boat-detailing")
 @app.route("/boat-detailing.html")
 def boat_detailing_page():
-    return send_from_directory(BASE_DIR, "boat-detailing.html")
+    return render_page("boat-detailing.html")
 
 
 @app.route("/about")
