@@ -493,6 +493,17 @@ def book():
 # Clean URLs of every public page, in sitemap order. The booking backend and
 # any future custom domain both hang off these, so keep this list in sync
 # when a page is added.
+# Town landing pages, one file per community we serve. Built by
+# tools/build_area_pages.py — add a town there and to this tuple together.
+AREA_PAGES = (
+    "gates-mills",
+    "hunting-valley",
+    "pepper-pike",
+    "moreland-hills",
+    "chagrin-falls",
+    "bentleyville",
+)
+
 PUBLIC_PAGES = (
     "/",
     "/booking",
@@ -503,7 +514,7 @@ PUBLIC_PAGES = (
     "/gallery",
     "/reviews",
     "/faq",
-)
+) + tuple(f"/{slug}" for slug in AREA_PAGES)
 
 # Only these directories are served by the static catch-all. Everything else
 # in the project root (app.py, tests, requirements, any local .env or
@@ -569,6 +580,22 @@ def reviews_page():
 @app.route("/faq.html")
 def faq_page():
     return send_from_directory(BASE_DIR, "faq.html")
+
+
+# The town pages are all the same shape, so register them from AREA_PAGES
+# instead of repeating a near-identical view six times. Each gets the same
+# clean-URL/.html pair the hand-written pages have.
+def _register_area_page(slug):
+    def view(_slug=slug):
+        return send_from_directory(BASE_DIR, f"{_slug}.html")
+
+    view.__name__ = f"area_{slug.replace('-', '_')}_page"
+    app.add_url_rule(f"/{slug}", view_func=view)
+    app.add_url_rule(f"/{slug}.html", view_func=view, endpoint=f"{view.__name__}_html")
+
+
+for _slug in AREA_PAGES:
+    _register_area_page(_slug)
 
 
 @app.route("/robots.txt")
