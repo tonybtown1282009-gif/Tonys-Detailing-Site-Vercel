@@ -712,6 +712,11 @@ def favicon():
     return send_from_directory(os.path.join(BASE_DIR, "assets"), "favicon.ico")
 
 
+@app.route("/google4639bb4a2d8d894a.html")
+def google_site_verification():
+    return send_from_directory(BASE_DIR, "google4639bb4a2d8d894a.html")
+
+
 @app.route("/<path:filename>", methods=["GET"])
 def static_files(filename):
     """Serve site assets (fonts/, assets/, static/) — and nothing else.
