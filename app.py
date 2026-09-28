@@ -9,9 +9,10 @@ notification to the shop via the Resend API.
 Brand: Tony's Detailing | (216) 903-4783 | tonysdetailing.net@gmail.com
 """
 
+import json
 import os
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 
 from flask import (
     Flask,
@@ -61,6 +62,19 @@ MEDIA_SLOTS = (
     "boat-hero.jpg",
 )
 _MEDIA_SET = frozenset(MEDIA_SLOTS)
+
+# Availability calendar — Tony edits static/availability.json (a "blocked_dates"
+# list of YYYY-MM-DD strings) and pushes to update what the booking calendar
+# shows as unavailable. No database involved, so it survives cold starts.
+AVAILABILITY_PATH = os.path.join(BASE_DIR, "static", "availability.json")
+
+# Photo uploads ride along on the booking email (Resend attachments) rather
+# than being stored anywhere — Vercel's serverless filesystem is ephemeral, so
+# there's nowhere durable to keep them. Kept small: Vercel's request body cap
+# is ~4.5MB total on the Hobby plan.
+MAX_PHOTOS = 4
+MAX_PHOTO_BYTES = 4 * 1024 * 1024  # per file
+MAX_TOTAL_PHOTO_BYTES = 4 * 1024 * 1024  # combined, stays under the body cap
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 # Resend requires a verified sender domain. onboarding@resend.dev works out of
@@ -182,6 +196,9 @@ def init_db():
         "addons_2": "TEXT",
         "upcharges_2": "TEXT",
         "outside_radius": "INTEGER DEFAULT 0",
+        "preferred_date": "TEXT",
+        "preferred_time": "TEXT",
+        "photo_count": "INTEGER DEFAULT 0",
     }
     for column, col_type in new_columns.items():
         if column not in existing:
@@ -275,6 +292,51 @@ def calculate_estimate(
         discount_summary = "None"
 
     return total, discount_summary
+
+
+def load_blocked_dates():
+    """Read the blocked-dates list Tony maintains in static/availability.json."""
+    try:
+        with open(AVAILABILITY_PATH, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return {d for d in data.get("blocked_dates", []) if isinstance(d, str)}
+    except (OSError, ValueError):
+        return set()
+
+
+def is_bookable_date(value):
+    """A preferred_date is valid if it parses, isn't in the past, and isn't blocked."""
+    try:
+        parsed = date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return False
+    if parsed < date.today():
+        return False
+    return value not in load_blocked_dates()
+
+
+def collect_photo_attachments(files):
+    """Base64-encode uploaded photos for the Resend email. Returns (attachments, error)."""
+    attachments = []
+    total = 0
+    for f in files[:MAX_PHOTOS]:
+        if not f or not f.filename:
+            continue
+        content = f.read()
+        if not content:
+            continue
+        if len(content) > MAX_PHOTO_BYTES:
+            return [], f"'{f.filename}' is too large (4MB max per photo)."
+        total += len(content)
+        if total > MAX_TOTAL_PHOTO_BYTES:
+            return [], "Photos are too large together (4MB total max). Try fewer or smaller photos."
+        attachments.append(
+            {
+                "filename": f.filename,
+                "content": list(content),
+            }
+        )
+    return attachments, None
 
 
 def media_present(name):
@@ -385,7 +447,7 @@ def record_visit_count(conn, email):
 # ──────────────────────────────────────────────────────────────────────────
 #  Email notification (Resend)
 # ──────────────────────────────────────────────────────────────────────────
-def send_notification_email(booking):
+def send_notification_email(booking, attachments=None):
     """Send a booking notification to the shop. Failures are non-fatal."""
     if not RESEND_API_KEY:
         app.logger.warning("RESEND_API_KEY not set — skipping email notification.")
@@ -438,6 +500,9 @@ def send_notification_email(booking):
             {row("Email", booking["email"])}
             {row("Location", booking.get("location"))}
             {row("Outside Service Radius", "Yes — +$15 travel fee" if booking.get("outside_radius") else "No")}
+            {row("Preferred Date", booking.get("preferred_date"))}
+            {row("Preferred Time", booking.get("preferred_time"))}
+            {row("Photos Attached", booking.get("photo_count") or "0")}
             {row("# Vehicles", booking["num_vehicles"])}
             {section("Vehicle 1")}
             {row("Vehicle Type", booking["vehicle_type"])}
@@ -459,15 +524,16 @@ def send_notification_email(booking):
         </div>
         """
 
-        resend.Emails.send(
-            {
-                "from": RESEND_FROM,
-                "to": [SHOP_EMAIL],
-                "subject": f"New Booking — {booking['name']} ({booking['service']})",
-                "html": html,
-                "reply_to": booking["email"] or None,
-            }
-        )
+        params = {
+            "from": RESEND_FROM,
+            "to": [SHOP_EMAIL],
+            "subject": f"New Booking — {booking['name']} ({booking['service']})",
+            "html": html,
+            "reply_to": booking["email"] or None,
+        }
+        if attachments:
+            params["attachments"] = attachments
+        resend.Emails.send(params)
         return True
     except Exception as exc:  # noqa: BLE001 — email must never break a booking
         app.logger.error("Failed to send Resend email: %s", exc)
@@ -491,6 +557,17 @@ def book():
     num_vehicles = (form.get("num_vehicles") or "1").strip()
     referred_by = (form.get("referred_by") or "").strip()
     notes = (form.get("notes") or "").strip()
+
+    preferred_date = (form.get("preferred_date") or "").strip()
+    preferred_time = (form.get("preferred_time") or "").strip()
+    if preferred_date and not is_bookable_date(preferred_date):
+        return jsonify(
+            {"ok": False, "error": "That date isn't available anymore — please pick another."}
+        ), 400
+
+    photo_attachments, photo_error = collect_photo_attachments(request.files.getlist("photos"))
+    if photo_error:
+        return jsonify({"ok": False, "error": photo_error}), 400
 
     # Checkbox values arrive only when ticked; treat any present value as True.
     def checkbox(name):
@@ -531,8 +608,8 @@ def book():
             name, phone, email, location, vehicle_type, service, addons, upcharges,
             vehicle_type_2, service_2, addons_2, upcharges_2, outside_radius,
             num_vehicles, referred_by, discount_applied, total_estimate,
-            visits, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            visits, timestamp, preferred_date, preferred_time, photo_count
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             name, phone, email, location, vehicle_type, service,
@@ -540,6 +617,7 @@ def book():
             vehicle_type_2, service_2, ", ".join(addons_2), ", ".join(upcharges_2),
             int(outside_radius),
             num_vehicles, referred_by, discount_applied, total_estimate, visits, timestamp,
+            preferred_date, preferred_time, len(photo_attachments),
         ),
     )
     conn.commit()
@@ -555,8 +633,10 @@ def book():
         "num_vehicles": num_vehicles, "referred_by": referred_by,
         "discount_applied": discount_applied, "total_estimate": total_estimate,
         "visits": visits, "notes": notes, "timestamp": timestamp,
+        "preferred_date": preferred_date, "preferred_time": preferred_time,
+        "photo_count": len(photo_attachments),
     }
-    send_notification_email(booking)
+    send_notification_email(booking, attachments=photo_attachments)
 
     return jsonify(
         {
@@ -629,6 +709,12 @@ STATIC_DIRS = ("fonts", "assets", "static")
 def media_manifest():
     """Report which media slots are filled so the frontend can show only those."""
     return jsonify({name: media_present(name) for name in MEDIA_SLOTS})
+
+
+@app.route("/api/availability")
+def availability():
+    """Blocked dates for the booking calendar. Tony edits static/availability.json."""
+    return jsonify({"blocked_dates": sorted(load_blocked_dates())})
 
 
 def _serve_page(filename):

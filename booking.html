@@ -287,6 +287,44 @@ footer{padding:36px 0 28px;background:var(--bg);border-top:1px solid var(--line)
 .mnote-box p + p{margin-top:8px;}
 .mnote-box strong{font-weight:700;color:#fff;}
 
+/* Availability calendar */
+.cal-field{display:flex;flex-direction:column;gap:7px;}
+.cal-box{background:var(--bg-4);border:1.5px solid var(--line);border-radius:6px;padding:14px;}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-head .cal-label{font-family:var(--ff-h);font-weight:700;font-size:13px;color:#fff;letter-spacing:-.01em;}
+.cal-nav{display:flex;gap:6px;}
+.cal-nav button{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line-2);border-radius:4px;color:var(--fg-2);cursor:pointer;transition:border-color 150ms var(--ease),color 150ms var(--ease);}
+.cal-nav button:hover:not(:disabled){border-color:var(--blue-l);color:#fff;}
+.cal-nav button:disabled{opacity:.35;cursor:not-allowed;}
+.cal-nav button .lucide{width:14px;height:14px;}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-dow span{font-family:var(--ff-h);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-4);text-align:center;padding:4px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:var(--ff-b);font-size:13px;color:var(--fg-2);background:transparent;border:1.5px solid transparent;border-radius:5px;cursor:pointer;transition:background 150ms var(--ease),border-color 150ms var(--ease),color 150ms var(--ease);}
+.cal-day:hover:not(.is-disabled):not(.is-empty){border-color:var(--blue-l);color:#fff;}
+.cal-day.is-empty{cursor:default;pointer-events:none;}
+.cal-day.is-disabled{color:var(--fg-4);text-decoration:line-through;cursor:not-allowed;pointer-events:none;opacity:.5;}
+.cal-day.is-selected{background:var(--blue-h);border-color:var(--blue-l);color:#fff;font-weight:700;}
+.cal-selected-note{margin-top:10px;font-size:12.5px;color:var(--blue-ll);font-family:var(--ff-b);min-height:1.4em;}
+.cal-selected-note.is-empty{color:var(--fg-3);}
+
+/* Photo upload */
+.upload-box{background:var(--bg-4);border:1.5px dashed var(--line-2);border-radius:6px;padding:16px;text-align:center;cursor:pointer;transition:border-color 150ms var(--ease),background 150ms var(--ease);}
+.upload-box:hover{border-color:var(--blue-l);background:#1a1a1f;}
+.upload-box.is-drag{border-color:var(--blue-l);background:rgba(30,58,95,.16);}
+.upload-box input[type=file]{display:none;}
+.upload-box .up-label{font-family:var(--ff-h);font-weight:700;font-size:12px;letter-spacing:.04em;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;}
+.upload-box .up-label .lucide{width:16px;height:16px;color:var(--blue-l);}
+.upload-box .up-sub{font-size:11.5px;color:var(--fg-3);margin-top:6px;}
+.upload-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.upload-previews:empty{margin-top:0;}
+.up-thumb{position:relative;width:64px;height:64px;border-radius:5px;overflow:hidden;border:1px solid var(--line-2);background:var(--bg-2);}
+.up-thumb img{width:100%;height:100%;object-fit:cover;}
+.up-thumb .up-remove{position:absolute;top:2px;right:2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.75);border:none;border-radius:50%;color:#fff;cursor:pointer;}
+.up-thumb .up-remove .lucide{width:11px;height:11px;}
+.upload-error{font-size:12px;color:#e08a8a;margin-top:8px;}
+.upload-error:empty{display:none;}
+
 @media (max-width:880px){
   .book-layout{grid-template-columns:1fr;}
   .book-side{flex-direction:row;flex-wrap:wrap;}
@@ -471,6 +509,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="field full">
               <label class="check"><input type="checkbox" id="outside_radius" name="outside_radius" value="1"><span class="ctxt">Outside our standard service radius <span class="cprice">+$15 travel fee</span></span></label>
             </div>
+            <div class="field full cal-field">
+              <label>Preferred Date <span class="req">*</span></label>
+              <div class="cal-box">
+                <div class="cal-head">
+                  <div class="cal-label" id="calLabel">&nbsp;</div>
+                  <div class="cal-nav">
+                    <button type="button" id="calPrev" aria-label="Previous month"><i data-lucide="chevron-left"></i></button>
+                    <button type="button" id="calNext" aria-label="Next month"><i data-lucide="chevron-right"></i></button>
+                  </div>
+                </div>
+                <div class="cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+                <div class="cal-grid" id="calGrid"></div>
+                <div class="cal-selected-note is-empty" id="calNote">Pick a date &mdash; greyed-out days aren't available.</div>
+              </div>
+              <input type="hidden" id="preferred_date" name="preferred_date" required>
+            </div>
+            <div class="field">
+              <label for="preferred_time">Preferred Time</label>
+              <select id="preferred_time" name="preferred_time">
+                <option value="">No preference</option>
+                <option value="Morning (8am–12pm)">Morning (8am&ndash;12pm)</option>
+                <option value="Afternoon (12pm–4pm)">Afternoon (12pm&ndash;4pm)</option>
+                <option value="Evening (4pm–7pm)">Evening (4pm&ndash;7pm)</option>
+              </select>
+            </div>
             <div class="field">
               <label for="num_vehicles">Number of Vehicles</label>
               <select id="num_vehicles" name="num_vehicles">
@@ -538,6 +601,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label class="check"><input type="checkbox" name="upcharges" value="Smoke/Odor"><span class="ctxt">Smoke / Odor</span></label>
                 <label class="check"><input type="checkbox" name="upcharges" value="Excessive Debris"><span class="ctxt">Excessive Debris</span></label>
               </div>
+            </div>
+
+            <div class="field full">
+              <label>Photos <span style="color:var(--fg-4);text-transform:none;letter-spacing:0;font-weight:500;">(optional, up to 4 — pet hair, stains, odor sources, damage)</span></label>
+              <label class="upload-box" id="uploadBox" for="photos">
+                <input type="file" id="photos" name="photos" accept="image/*" multiple>
+                <span class="up-label"><i data-lucide="camera"></i>Tap to add photos</span>
+                <div class="up-sub">Helps us quote accurately &amp; come prepared. 4MB max total.</div>
+              </label>
+              <div class="upload-previews" id="uploadPreviews"></div>
+              <div class="upload-error" id="uploadError"></div>
             </div>
 
             <!-- Second vehicle (shown when 2+ vehicles selected) -->
@@ -824,6 +898,147 @@ if (hbg && drawer){
   targets.forEach(t => obs.observe(t));
 })();
 
+// ── Availability calendar ──
+(function(){
+  const grid = document.getElementById('calGrid');
+  const label = document.getElementById('calLabel');
+  const note = document.getElementById('calNote');
+  const hidden = document.getElementById('preferred_date');
+  const prevBtn = document.getElementById('calPrev');
+  const nextBtn = document.getElementById('calNext');
+  const calBox = document.querySelector('.cal-box');
+  if (!grid) return;
+
+  const HORIZON_DAYS = 60;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + HORIZON_DAYS);
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  let blocked = new Set();
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  function iso(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function render(){
+    grid.innerHTML = '';
+    label.textContent = MONTHS[view.getMonth()] + ' ' + view.getFullYear();
+    const firstDow = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+    const daysInMonth = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+    for (let i = 0; i < firstDow; i++){
+      const empty = document.createElement('div');
+      empty.className = 'cal-day is-empty';
+      grid.appendChild(empty);
+    }
+    for (let d = 1; d <= daysInMonth; d++){
+      const date = new Date(view.getFullYear(), view.getMonth(), d);
+      const key = iso(date);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cal-day';
+      btn.textContent = String(d);
+      const disabled = date < today || date > maxDate || blocked.has(key);
+      if (disabled) btn.classList.add('is-disabled');
+      if (hidden.value === key) btn.classList.add('is-selected');
+      if (!disabled){
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.cal-day.is-selected').forEach(el => el.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+          hidden.value = key;
+          calBox.style.borderColor = '';
+          note.classList.remove('is-empty');
+          note.textContent = date.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'}) + ' selected';
+        });
+      }
+      grid.appendChild(btn);
+    }
+    prevBtn.disabled = view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
+    nextBtn.disabled = view.getFullYear() === maxDate.getFullYear() && view.getMonth() === maxDate.getMonth();
+    tdIcons();
+  }
+
+  prevBtn.addEventListener('click', () => { view.setMonth(view.getMonth() - 1); render(); });
+  nextBtn.addEventListener('click', () => { view.setMonth(view.getMonth() + 1); render(); });
+
+  fetch('/api/availability').then(r => r.ok ? r.json() : {blocked_dates:[]}).then(data => {
+    blocked = new Set(data.blocked_dates || []);
+    render();
+  }).catch(() => render());
+})();
+
+// ── Photo upload: preview, remove, drag & drop, size guard ──
+(function(){
+  const input = document.getElementById('photos');
+  const box = document.getElementById('uploadBox');
+  const previews = document.getElementById('uploadPreviews');
+  const errorEl = document.getElementById('uploadError');
+  if (!input) return;
+  const MAX_FILES = 4;
+  const MAX_TOTAL = 4 * 1024 * 1024;
+
+  function currentFiles(){ return Array.from(input.files || []); }
+
+  function setFiles(files){
+    const dt = new DataTransfer();
+    files.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+  }
+
+  function validate(files){
+    if (files.length > MAX_FILES) return `Up to ${MAX_FILES} photos, please.`;
+    const total = files.reduce((sum, f) => sum + f.size, 0);
+    if (total > MAX_TOTAL) return 'Those photos are too large together (4MB max) — try fewer or smaller ones.';
+    return '';
+  }
+
+  function renderPreviews(){
+    previews.innerHTML = '';
+    currentFiles().forEach((file, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'up-thumb';
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'up-remove';
+      rm.setAttribute('aria-label', 'Remove photo');
+      rm.innerHTML = '<i data-lucide="x"></i>';
+      rm.addEventListener('click', (e) => {
+        e.preventDefault();
+        const files = currentFiles();
+        files.splice(i, 1);
+        setFiles(files);
+        renderPreviews();
+      });
+      thumb.appendChild(img);
+      thumb.appendChild(rm);
+      previews.appendChild(thumb);
+    });
+    tdIcons();
+  }
+
+  input.addEventListener('change', () => {
+    const err = validate(currentFiles());
+    errorEl.textContent = err;
+    if (err){ setFiles([]); previews.innerHTML = ''; return; }
+    renderPreviews();
+  });
+
+  ['dragover','dragleave','drop'].forEach(evt => {
+    box.addEventListener(evt, (e) => {
+      e.preventDefault();
+      box.classList.toggle('is-drag', evt === 'dragover');
+      if (evt === 'drop' && e.dataTransfer.files.length){
+        const files = currentFiles().concat(Array.from(e.dataTransfer.files)).slice(0, MAX_FILES);
+        setFiles(files);
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+})();
+
 form.addEventListener('submit', async function(e){
   e.preventDefault();
   // Require name, phone, location, service
@@ -832,6 +1047,12 @@ form.addEventListener('submit', async function(e){
     const el = document.getElementById(id);
     if(!el.value.trim()){ el.focus(); el.style.borderColor = '#c54343'; return; }
     el.style.borderColor = '';
+  }
+  const dateEl = document.getElementById('preferred_date');
+  if(!dateEl.value){
+    document.querySelector('.cal-box').style.borderColor = '#c54343';
+    document.querySelector('.cal-box').scrollIntoView({behavior:'smooth', block:'center'});
+    return;
   }
 
   const btn = form.querySelector('button[type=submit]');

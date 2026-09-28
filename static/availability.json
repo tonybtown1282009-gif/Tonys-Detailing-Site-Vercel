@@ -1,0 +1,4 @@
+{
+  "_readme": "Dates in blocked_dates are shown as unavailable on the booking calendar (tonys-detailing.vercel.app/booking). Add a date as \"YYYY-MM-DD\" when you're fully booked or off that day, remove it to reopen it, then commit + push (or edit directly on GitHub) to update the live site.",
+  "blocked_dates": []
+}
