@@ -238,7 +238,7 @@ def nav(town):
     return f"""<!-- \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 NAV \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
 <nav id="nav">
   <a href="/" class="brand" aria-label="Tony's Detailing \u2014 home">
-    <span class="brand-plate"><img src="/assets/logo.png" alt=""></span>
+    <span class="brand-plate"><img src="/assets/logo.webp" alt="" width="192" height="128"></span>
     <span class="brand-text">
       <span class="n">Tony's Detailing</span>
       <span class="s">Chardon &middot; OH</span>
@@ -395,13 +395,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 {schema(town)}
-<script src="/assets/lucide-1.23.0.min.js" defer></script>
+<script src="/assets/lucide-1.23.0-subset.min.js" defer></script>
 <script>function tdIcons(){{if(window.lucide){{lucide.createIcons();}}else{{document.addEventListener('DOMContentLoaded',function(){{if(window.lucide)lucide.createIcons();}});}}}}</script>
 <script>try{{if(localStorage.getItem('td_promo15_dismissed')==='1')document.documentElement.classList.add('promo-off');}}catch(e){{}}</script>
 <!-- The shell styles live in an external sheet rather than inline (six pages
      shared one copy), so the fonts it declares are two hops from the HTML.
      Preload the faces used above the fold so they start downloading with the
      stylesheet instead of after it. -->
+<link rel="preload" as="image" type="image/webp" href="/assets/logo.webp">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/Montserrat-ExtraBold.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/Montserrat-SemiBold.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/Inter-Regular.woff2" crossorigin>

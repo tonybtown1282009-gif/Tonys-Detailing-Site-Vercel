@@ -2,3 +2,5 @@
 Flask>=3.0
 resend>=2.0
 python-dotenv>=1.0
+rcssmin>=1.1
+rjsmin>=1.2
