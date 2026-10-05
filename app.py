@@ -9,7 +9,9 @@ notification to the shop via the Resend API.
 Brand: Tony's Detailing | (216) 903-4783 | tonysdetailing.net@gmail.com
 """
 
+import gzip
 import os
+import re
 import sqlite3
 from datetime import datetime
 
@@ -23,6 +25,18 @@ from flask import (
     send_file,
     send_from_directory,
 )
+
+try:
+    from rcssmin import cssmin
+    from rjsmin import jsmin
+except ImportError:  # minifiers are an optimization only — serve as-is without them
+
+    def cssmin(css):
+        return css
+
+    def jsmin(js):
+        return js
+
 
 try:
     from dotenv import load_dotenv
@@ -60,7 +74,10 @@ MEDIA_SLOTS = (
     "rv-hero.jpg",
     "boat-hero.jpg",
 )
-_MEDIA_SET = frozenset(MEDIA_SLOTS)
+# Each still image also has an optimized .webp sibling (tools/optimize_images.py).
+_MEDIA_SET = frozenset(MEDIA_SLOTS) | frozenset(
+    os.path.splitext(n)[0] + ".webp" for n in MEDIA_SLOTS if n.endswith(".jpg")
+)
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 # Resend requires a verified sender domain. onboarding@resend.dev works out of
@@ -311,6 +328,13 @@ HERO_SLOTS = {
 }
 
 
+def hero_image_url(image_slot):
+    """URL of the hero still: the WebP built by tools/optimize_images.py
+    when it exists, otherwise the original file."""
+    webp = os.path.splitext(image_slot)[0] + ".webp"
+    return f"/static/media/{webp if media_present(webp) else image_slot}"
+
+
 def hero_markup(image_slot, video_slot):
     """Build the hero's inner markup for whichever slots are filled.
 
@@ -321,12 +345,13 @@ def hero_markup(image_slot, video_slot):
     parts = []
     if has_image:
         # fetchpriority=high: this is the largest contentful paint on the page.
+        # width/height only reserve the aspect ratio; CSS sizes it to fill.
         parts.append(
-            f'<img src="/static/media/{image_slot}" alt="" '
+            f'<img src="{hero_image_url(image_slot)}" alt="" width="1080" height="1920" '
             'fetchpriority="high" decoding="async">'
         )
     if video_slot and media_present(video_slot):
-        poster = f' poster="/static/media/{image_slot}"' if has_image else ""
+        poster = f' poster="{hero_image_url(image_slot)}"' if has_image else ""
         parts.append(
             f'<video data-src="/static/media/{video_slot}"{poster} '
             'preload="none" muted loop playsinline aria-hidden="true"></video>'
@@ -336,20 +361,53 @@ def hero_markup(image_slot, video_slot):
 
 _page_cache = {}
 
+_STYLE_RE = re.compile(r"(<style\b[^>]*>)(.*?)(</style>)", re.S | re.I)
+_SCRIPT_RE = re.compile(r"(<script\b)([^>]*)(>)(.*?)(</script>)", re.S | re.I)
+_MOBILE_CSS_LINK = '<link rel="stylesheet" href="/static/mobile-app.css">'
+
+
+def _read_static_css(rel_path):
+    with open(os.path.join(BASE_DIR, rel_path), encoding="utf-8") as fh:
+        return fh.read()
+
+
+def optimize_html(html):
+    """Shrink a page for the wire without changing what it renders.
+
+    Inlines the small mobile stylesheet (one less render-blocking request),
+    then minifies every inline <style> and plain inline <script>. JSON-LD and
+    other non-JS script types are left alone. Source files stay readable.
+    """
+    if _MOBILE_CSS_LINK in html:
+        html = html.replace(
+            _MOBILE_CSS_LINK, "<style>" + _read_static_css("static/mobile-app.css") + "</style>", 1
+        )
+    html = _STYLE_RE.sub(lambda m: m.group(1) + cssmin(m.group(2)) + m.group(3), html)
+
+    def script(m):
+        attrs = m.group(2)
+        if "src=" in attrs or ("type=" in attrs and "javascript" not in attrs):
+            return m.group(0)
+        return m.group(1) + attrs + m.group(3) + jsmin(m.group(4)) + m.group(5)
+
+    return _SCRIPT_RE.sub(script, html)
+
 
 def render_page(filename):
-    """Serve a static page with its hero markup stamped in.
+    """Serve a static page, optimized, with its hero markup stamped in.
 
     Cached per file, keyed on the page's mtime and which media slots are
     filled, so a media swap (drop the file in, push) shows up without a code
     change and without re-reading the page on every request.
     """
-    image_slot, video_slot = HERO_SLOTS[filename]
+    image_slot, video_slot = HERO_SLOTS.get(filename, (None, None))
     path = os.path.join(BASE_DIR, filename)
     try:
         key = (
             os.path.getmtime(path),
-            media_present(image_slot),
+            os.path.getmtime(os.path.join(BASE_DIR, "static", "mobile-app.css")),
+            bool(image_slot) and media_present(image_slot),
+            bool(image_slot) and media_present(os.path.splitext(image_slot)[0] + ".webp"),
             bool(video_slot) and media_present(video_slot),
         )
     except OSError:
@@ -359,14 +417,22 @@ def render_page(filename):
     if cached is None or cached[0] != key:
         with open(path, encoding="utf-8") as fh:
             html = fh.read()
-        markup = hero_markup(image_slot, video_slot)
+        markup = hero_markup(image_slot, video_slot) if image_slot else ""
         if markup:
             html = html.replace(
                 HERO_PLACEHOLDER,
                 HERO_PLACEHOLDER[:-6] + markup + "</div>",
                 1,
             )
-        cached = (key, html)
+        if image_slot and media_present(image_slot):
+            # Start the LCP image download during head parsing.
+            html = html.replace(
+                "</head>",
+                f'<link rel="preload" as="image" href="{hero_image_url(image_slot)}" '
+                'fetchpriority="high">\n</head>',
+                1,
+            )
+        cached = (key, optimize_html(html))
         _page_cache[filename] = cached
     return Response(cached[1], mimetype="text/html; charset=utf-8")
 
@@ -633,9 +699,7 @@ def media_manifest():
 
 def _serve_page(filename):
     """Serve one page file, through the hero renderer where that applies."""
-    if filename in HERO_SLOTS:
-        return render_page(filename)
-    return send_from_directory(BASE_DIR, filename)
+    return render_page(filename)
 
 
 def _register_page(url, filename):
@@ -717,6 +781,20 @@ def google_site_verification():
     return send_from_directory(BASE_DIR, "google4639bb4a2d8d894a.html")
 
 
+_css_cache = {}
+
+
+def minified_css(full_path):
+    """Serve a stylesheet minified, cached until the file changes."""
+    mtime = os.path.getmtime(full_path)
+    cached = _css_cache.get(full_path)
+    if cached is None or cached[0] != mtime:
+        with open(full_path, encoding="utf-8") as fh:
+            cached = (mtime, cssmin(fh.read()))
+        _css_cache[full_path] = cached
+    return Response(cached[1], mimetype="text/css")
+
+
 @app.route("/<path:filename>", methods=["GET"])
 def static_files(filename):
     """Serve site assets (fonts/, assets/, static/) — and nothing else.
@@ -734,6 +812,8 @@ def static_files(filename):
         abort(404)
     if not os.path.isfile(full_path):
         abort(404)
+    if full_path.endswith(".css"):
+        return minified_css(full_path)
     return send_file(full_path, conditional=True)
 
 
@@ -748,6 +828,36 @@ def page_not_found(_error):
 # ──────────────────────────────────────────────────────────────────────────
 #  Response headers — caching + security
 # ──────────────────────────────────────────────────────────────────────────
+_COMPRESSIBLE = ("text/", "application/json", "application/javascript", "image/svg+xml", "application/xml")
+
+
+def compress_response(response):
+    """gzip text responses for clients that accept it (and Vary on it).
+
+    Skipped on Vercel, whose edge already compresses text (brotli where the
+    client supports it — smaller than gzip); this covers every other host.
+    """
+    ctype = response.headers.get("Content-Type", "")
+    if not ctype.startswith(_COMPRESSIBLE):
+        return
+    response.headers.add("Vary", "Accept-Encoding")
+    if (
+        response.status_code != 200
+        or response.direct_passthrough
+        or os.environ.get("VERCEL")
+        or "Content-Encoding" in response.headers
+        or "gzip" not in request.headers.get("Accept-Encoding", "")
+    ):
+        return
+    data = response.get_data()
+    if len(data) < 1024:
+        return
+    response.set_data(gzip.compress(data, compresslevel=6, mtime=0))
+    response.headers["Content-Encoding"] = "gzip"
+    response.headers["Content-Length"] = str(len(response.get_data()))
+    response.headers.pop("ETag", None)  # the weak/strong tag described the uncompressed bytes
+
+
 @app.after_request
 def set_headers(response):
     path = request.path
@@ -760,6 +870,10 @@ def set_headers(response):
             response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
         elif path.startswith("/assets/") or path == "/favicon.ico":
             response.headers["Cache-Control"] = "public, max-age=604800, stale-while-revalidate=86400"
+        elif path.startswith(("/static/gallery/", "/static/images/")):
+            # Photos swap in place too, but rarely: a day, then revalidate
+            # in the background for a week.
+            response.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=604800"
         elif path.startswith("/static/"):
             # Media slots are replaced in place (same filename), so keep
             # browser caching short enough for swaps to show up same-day.
@@ -769,6 +883,7 @@ def set_headers(response):
         else:
             response.headers["Cache-Control"] = "no-cache"
 
+    compress_response(response)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"

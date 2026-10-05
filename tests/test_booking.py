@@ -519,7 +519,7 @@ def test_homepage_our_work_strip(client):
     assert "Our Work" in html
     assert "work-strip" in html
     for i in range(7, 35):
-        assert f"/static/gallery/placeholder-{i}.jpg" in html
+        assert f"/static/gallery/placeholder-{i}.webp" in html
     # The hover overlay links through to the full gallery page.
     assert "work-overlay" in html
     assert 'href="/gallery"' in html
@@ -528,7 +528,7 @@ def test_homepage_our_work_strip(client):
 def test_gallery_page_grid_lists_all_placeholders(client):
     html = client.get("/gallery").data.decode("utf-8")
     for i in range(7, 35):
-        assert f"/static/gallery/placeholder-{i}.jpg" in html
+        assert f"/static/gallery/placeholder-{i}.webp" in html
 
 
 def test_unknown_path_404(client):
@@ -567,7 +567,7 @@ def test_allowed_static_dirs_still_serve(client):
         "/assets/favicon-32x32.png",
         "/assets/favicon-16x16.png",
         "/assets/apple-touch-icon.png",
-        "/assets/lucide-1.23.0.min.js",
+        "/assets/lucide-1.23.0-subset.min.js",
         "/favicon.ico",
     ):
         assert client.get(path).status_code == 200, path
@@ -635,9 +635,9 @@ def test_sitemap_lists_every_public_page(client):
 # ──────────────────────────────────────────────────────────────────────────
 def test_cache_headers_by_path_type(client):
     assert "immutable" in client.get("/fonts/Inter-Regular.woff2").headers["Cache-Control"]
-    assert "immutable" in client.get("/assets/lucide-1.23.0.min.js").headers["Cache-Control"]
+    assert "immutable" in client.get("/assets/lucide-1.23.0-subset.min.js").headers["Cache-Control"]
     assert "max-age=604800" in client.get("/assets/logo.png").headers["Cache-Control"]
-    assert "max-age=3600" in client.get("/static/gallery/placeholder-7.jpg").headers["Cache-Control"]
+    assert "max-age=86400" in client.get("/static/gallery/placeholder-7.jpg").headers["Cache-Control"]
     assert client.get("/").headers["Cache-Control"] == "no-cache"
     assert client.get("/api/media").headers["Cache-Control"] == "no-store"
 
@@ -676,7 +676,7 @@ def test_every_page_has_seo_head_tags(client):
         assert 'rel="icon"' in html, page
         assert "woff2" in html, page
         assert "unpkg.com" not in html, page
-        assert "/assets/lucide-1.23.0.min.js" in html, page
+        assert "/assets/lucide-1.23.0-subset.min.js" in html, page
 
 
 def test_homepage_has_localbusiness_jsonld(client):
@@ -828,7 +828,7 @@ def test_hero_image_is_in_the_served_html(client):
     """The hero must paint from the document, not from a later fetch."""
     html = client.get("/").data.decode("utf-8")
     assert '<div class="hero-media" id="heroMedia"><img' in html
-    assert 'src="/static/media/hero-fallback.jpg"' in html
+    assert 'src="/static/media/hero-fallback.webp"' in html
     assert 'fetchpriority="high"' in html
 
 
@@ -847,7 +847,7 @@ def test_hero_video_is_lazy_not_eager(client):
     assert 'preload="none"' in tag, tag
     assert 'data-src="/static/media/hero-video.mp4"' in tag, tag
     assert " src=" not in tag, "video should carry data-src, not src"
-    assert 'poster="/static/media/hero-fallback.jpg"' in tag, tag
+    assert 'poster="/static/media/hero-fallback.webp"' in tag, tag
 
 
 def test_empty_media_slot_renders_an_empty_hero(client):

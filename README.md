@@ -86,11 +86,18 @@ repeat.
 
 ## Icons
 
-Icons are [Lucide](https://lucide.dev), self-hosted at
-`assets/lucide-<version>.min.js` and pinned so a CDN release can't change or
-break them. To upgrade: download the new `dist/umd/lucide.min.js` from the
-`lucide` npm package, add it under the new versioned name, and update the
-`<script src>` tag in each page.
+Icons are [Lucide](https://lucide.dev), self-hosted as a trimmed bundle at
+`assets/lucide-<version>-subset.min.js` (only the icons the pages use) and
+pinned so a CDN release can't change or break them. After adding a new
+`data-lucide="..."` icon, rebuild it with `tools/build_icons.mjs` (usage in
+the file header) — an icon missing from the bundle renders blank.
+
+## Images
+
+Pages load `.webp` versions of the photos and logo (the JPG/PNG files remain
+the editable sources). After swapping a source photo, re-run
+`python tools/optimize_images.py` to regenerate its `.webp`. Pages are
+minified at serve time (inline CSS/JS, `static/*.css`) and cached per file.
 
 ## SEO & serving notes
 

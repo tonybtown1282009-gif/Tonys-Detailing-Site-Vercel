@@ -4,6 +4,16 @@
     { "src": "app.py", "use": "@vercel/python" }
   ],
   "routes": [
+    {
+      "src": "/fonts/(.*)",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" },
+      "continue": true
+    },
+    {
+      "src": "/assets/lucide-(.*)",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" },
+      "continue": true
+    },
     { "src": "/(.*)", "dest": "app.py" }
   ]
 }
