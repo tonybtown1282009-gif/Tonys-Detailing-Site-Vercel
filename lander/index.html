@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lander</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; }
+  /* Canvas keeps a 16:10 aspect ratio and fits the window */
+  canvas { width: min(100vw, 160vh); height: min(62.5vw, 100vh); display: block; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+"use strict";
+
+/* =====================================================================
+   TWEAKABLE CONSTANTS
+   Physics is done in metres and seconds; PX_PER_M converts to screen.
+   ===================================================================== */
+const CONFIG = {
+  PX_PER_M:      10,     // screen pixels per metre (world is 96 m x 60 m)
+
+  // --- Physics ---
+  GRAVITY:       1.62,   // m/s^2 on level 1 (1.62 = the Moon)
+  THRUST:        4.0,    // m/s^2 of acceleration from the main engine
+  ROT_SPEED:     140,    // deg/s turn rate while holding Left/Right
+
+  // --- Fuel ---
+  FUEL_MAX:      100,    // fuel units on level 1
+  FUEL_BURN:     9,      // units burned per second of thrust
+
+  // --- Safe landing limits ---
+  SAFE_VY:       2.0,    // max vertical speed at touchdown (m/s)
+  SAFE_VX:       1.0,    // max horizontal speed at touchdown (m/s)
+  SAFE_ANGLE:    8,      // max tilt from upright at touchdown (deg)
+
+  // --- Progression (levels alternate: gravity up, then fuel down) ---
+  GRAVITY_STEP:  0.15,   // +15% gravity each time gravity increases
+  FUEL_STEP:     0.12,   // -12% fuel each time fuel decreases
+  FUEL_MIN:      30,     // fuel never drops below this
+
+  // --- Start conditions ---
+  START_ALT_PX:  60,     // spawn height from top of screen (px)
+  START_VX_MAX:  3.0,    // random initial sideways drift up to this (m/s)
+
+  // --- Landing pads: smaller = more points (width in px) ---
+  PAD_SIZES: [
+    { w: 110, mult: 1 },
+    { w: 75,  mult: 2 },
+    { w: 50,  mult: 4 },
+  ],
+
+  // --- Scoring ---
+  SCORE_BASE:    100,    // base points x pad multiplier x level
+  FUEL_BONUS:    2,      // points per leftover fuel unit
+
+  // --- Loop ---
+  PHYSICS_HZ:    120,    // fixed physics steps per second
+};
+
+/* =====================================================================
+   SETUP
+   ===================================================================== */
+const W = 960, H = 600;              // logical canvas size
+const STEP = 1 / CONFIG.PHYSICS_HZ;  // fixed timestep (s)
+const M = CONFIG.PX_PER_M;
+const DEG = Math.PI / 180;
+const HS_KEY = "lander.highScore";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", resize);
+resize();
+
+const rand  = (a, b) => a + Math.random() * (b - a);
+const pick  = arr => arr[Math.floor(Math.random() * arr.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// High score in localStorage (can throw in private mode / blocked storage)
+function loadHighScore() {
+  try { return parseInt(localStorage.getItem(HS_KEY), 10) || 0; } catch (e) { return 0; }
+}
+function saveHighScore(v) {
+  try { localStorage.setItem(HS_KEY, String(v)); } catch (e) { /* ignore */ }
+}
+
+/* =====================================================================
+   LANDER SHAPE (local coords in px, origin = centre of mass, y down)
+   ===================================================================== */
+const FEET = [{ x: -12, y: 10 }, { x: 12, y: 10 }];
+const HULL = [ // points that crash the ship if they touch the ground
+  { x: -10, y: 0 }, { x: 10, y: 0 }, { x: -7, y: -14 }, { x: 7, y: -14 }, { x: 0, y: -17 },
+];
+
+/* =====================================================================
+   GAME STATE
+   ===================================================================== */
+let state = "start";   // start | playing | paused | landed | crashed | gameover
+let level, score, highScore = loadHighScore();
+let gravity, fuelMax;  // per-level values (px/s^2, units)
+let ship, terrain, pads, particles, stars;
+let message = "", stateTimer = 0, banner = "", bannerTimer = 0;
+const keys = {};
+
+function makeStars() {
+  stars = [];
+  for (let i = 0; i < 160; i++) {
+    stars.push({ x: rand(0, W), y: rand(0, H), r: rand(0.4, 1.6), phase: rand(0, 6.28) });
+  }
+}
+
+/* Jagged terrain built as a polyline, with 1–2 flat pads spliced in. */
+function generateTerrain() {
+  const regions = Math.random() < 0.5 ? [[0.2, 0.8]] : [[0.08, 0.45], [0.55, 0.92]];
+  pads = regions.map(([a, b]) => {
+    const size = pick(CONFIG.PAD_SIZES);
+    const x1 = rand(a * W, b * W - size.w);
+    return { x1, x2: x1 + size.w, y: rand(H * 0.6, H - 50), mult: size.mult };
+  });
+
+  terrain = [];
+  let x = 0, y = rand(H * 0.55, H - 40), i = 0;
+  terrain.push({ x, y });
+  while (x < W) {
+    const pad = pads[i];
+    if (pad && pad.x1 - x < 40) {        // close to next pad: add the flat section
+      terrain.push({ x: pad.x1, y: pad.y }, { x: pad.x2, y: pad.y });
+      x = pad.x2; y = pad.y; i++;
+      continue;
+    }
+    x = Math.min(x + rand(12, 36), W);   // steps < 40 so we never skip a pad
+    y = clamp(y + rand(-45, 45), H * 0.45, H - 20);
+    terrain.push({ x, y });
+  }
+}
+
+// Ground height (screen y) at a given x, by linear interpolation
+function groundY(x) {
+  if (x <= 0) return terrain[0].y;
+  for (let k = 0; k < terrain.length - 1; k++) {
+    const a = terrain[k], b = terrain[k + 1];
+    if (x <= b.x) return a.y + (b.y - a.y) * ((x - a.x) / (b.x - a.x));
+  }
+  return terrain[terrain.length - 1].y;
+}
+
+const padAt = x => pads.find(p => x >= p.x1 && x <= p.x2);
+
+function startLevel() {
+  // Even levels raise gravity, odd levels (after 1) cut fuel
+  const gravSteps = Math.floor(level / 2);
+  const fuelSteps = Math.floor((level - 1) / 2);
+  gravity = CONFIG.GRAVITY * Math.pow(1 + CONFIG.GRAVITY_STEP, gravSteps) * M;
+  fuelMax = Math.max(CONFIG.FUEL_MIN, CONFIG.FUEL_MAX * Math.pow(1 - CONFIG.FUEL_STEP, fuelSteps));
+
+  generateTerrain();
+  particles = [];
+  ship = {
+    x: rand(W * 0.3, W * 0.7), y: CONFIG.START_ALT_PX,
+    vx: rand(-CONFIG.START_VX_MAX, CONFIG.START_VX_MAX) * M, vy: 0,
+    angle: 0, fuel: fuelMax, thrusting: false, alive: true,
+  };
+  if (level === 1) banner = "LEVEL 1";
+  else banner = `LEVEL ${level}  —  ${level % 2 === 0 ? "GRAVITY ↑" : "FUEL ↓"}`;
+  bannerTimer = 2.5;
+  state = "playing";
+}
+
+function newGame() {
+  level = 1; score = 0;
+  startLevel();
+}
+
+/* =====================================================================
+   INPUT
+   ===================================================================== */
+window.addEventListener("keydown", e => {
+  keys[e.code] = true;
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
+  if (e.repeat) return;
+
+  if (e.code === "KeyR") newGame();
+  else if (e.code === "KeyP") {
+    if (state === "playing") state = "paused";
+    else if (state === "paused") state = "playing";
+  } else if (e.code === "Space" || e.code === "Enter") {
+    if (state === "start" || state === "gameover") newGame();
+    else if (state === "landed") { level++; startLevel(); }
+  }
+});
+window.addEventListener("keyup", e => { keys[e.code] = false; });
+window.addEventListener("blur", () => {          // auto-pause when tabbing away
+  for (const k in keys) keys[k] = false;
+  if (state === "playing") state = "paused";
+});
+
+/* =====================================================================
+   PHYSICS / UPDATE  (always called with the fixed STEP)
+   ===================================================================== */
+function toWorld(p) {
+  const c = Math.cos(ship.angle), s = Math.sin(ship.angle);
+  return { x: ship.x + p.x * c - p.y * s, y: ship.y + p.x * s + p.y * c };
+}
+
+function updateShip(dt) {
+  // Rotation (direct turn rate, like RCS thrusters holding a rate)
+  const turn = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
+  ship.angle += turn * CONFIG.ROT_SPEED * DEG * dt;
+  ship.angle = Math.atan2(Math.sin(ship.angle), Math.cos(ship.angle)); // wrap to [-pi, pi]
+
+  // Main engine pushes along the ship's "up" axis
+  ship.thrusting = (keys.ArrowUp || keys.KeyW) && ship.fuel > 0;
+  let ax = 0, ay = gravity;
+  if (ship.thrusting) {
+    const t = CONFIG.THRUST * M;
+    ax += Math.sin(ship.angle) * t;
+    ay -= Math.cos(ship.angle) * t;
+    ship.fuel = Math.max(0, ship.fuel - CONFIG.FUEL_BURN * dt);
+    emitExhaust();
+  }
+
+  // Semi-implicit Euler: update velocity, then position (stable & simple)
+  ship.vx += ax * dt;
+  ship.vy += ay * dt;
+  ship.x  += ship.vx * dt;
+  ship.y  += ship.vy * dt;
+
+  if (ship.x < -20 || ship.x > W + 20) return crash("Drifted out of the landing zone");
+
+  // Collision: hull touching ground = crash; feet touching = landing check
+  const hull = HULL.map(toWorld), feet = FEET.map(toWorld);
+  if (hull.some(p => p.y >= groundY(p.x))) return crash("Hull hit the ground");
+  if (!feet.some(p => p.y >= groundY(p.x))) return;
+
+  const vx = Math.abs(ship.vx / M), vy = ship.vy / M;
+  const tilt = Math.abs(ship.angle / DEG);
+  const pad = padAt(feet[0].x);
+  if (!pad || pad !== padAt(feet[1].x)) return crash("Missed the landing pad");
+  if (vy > CONFIG.SAFE_VY) return crash(`Too fast vertically (${vy.toFixed(1)} m/s)`);
+  if (vx > CONFIG.SAFE_VX) return crash(`Too fast sideways (${vx.toFixed(1)} m/s)`);
+  if (tilt > CONFIG.SAFE_ANGLE) return crash(`Tilted too far (${tilt.toFixed(0)}°)`);
+  land(pad, feet);
+}
+
+function land(pad, feet) {
+  ship.y -= Math.max(feet[0].y, feet[1].y) - pad.y;   // sit exactly on the pad
+  ship.vx = ship.vy = 0;
+  ship.thrusting = false;
+  const pts = Math.round(CONFIG.SCORE_BASE * pad.mult * level + ship.fuel * CONFIG.FUEL_BONUS);
+  score += pts;
+  if (score > highScore) { highScore = score; saveHighScore(highScore); }
+  message = `+${pts} points  (pad x${pad.mult}, fuel bonus ${Math.round(ship.fuel * CONFIG.FUEL_BONUS)})`;
+  state = "landed";
+}
+
+function crash(reason) {
+  ship.alive = false;
+  ship.thrusting = false;
+  message = reason;
+  explode(ship.x, ship.y);
+  if (score > highScore) { highScore = score; saveHighScore(highScore); }
+  state = "crashed";
+  stateTimer = 1.5;               // let the explosion play before game over
+}
+
+/* --- Particles (explosion debris + engine exhaust) --- */
+function explode(x, y) {
+  for (let i = 0; i < 90; i++) {
+    const a = rand(0, Math.PI * 2), sp = rand(30, 220);
+    particles.push({
+      x, y, vx: Math.cos(a) * sp + ship.vx * 0.3, vy: Math.sin(a) * sp + ship.vy * 0.3 - 60,
+      life: rand(0.8, 2.2), max: 2.2, size: rand(1.5, 3.5),
+      color: pick(["#ffd34d", "#ff8a1f", "#ff4b1f", "#bbbbbb", "#ffffff"]), gravity: true,
+    });
+  }
+}
+
+function emitExhaust() {
+  if (Math.random() > 0.6) return;
+  const n = toWorld({ x: rand(-3, 3), y: 6 });
+  const s = Math.sin(ship.angle), c = Math.cos(ship.angle);
+  const sp = rand(80, 160);
+  particles.push({
+    x: n.x, y: n.y, vx: ship.vx - s * sp + rand(-15, 15), vy: ship.vy + c * sp + rand(-15, 15),
+    life: rand(0.15, 0.35), max: 0.35, size: rand(1, 2.2), color: "#ffb347", gravity: false,
+  });
+}
+
+function updateParticles(dt) {
+  for (const p of particles) {
+    if (p.gravity) p.vy += gravity * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    const g = groundY(p.x);
+    if (p.y > g) { p.y = g; p.vy *= -0.3; p.vx *= 0.6; }   // simple ground bounce
+    p.life -= dt;
+  }
+  particles = particles.filter(p => p.life > 0);
+}
+
+function update(dt) {
+  if (state === "paused" || state === "start") return;
+  if (state === "playing") updateShip(dt);
+  if (state === "crashed" && (stateTimer -= dt) <= 0) state = "gameover";
+  if (bannerTimer > 0) bannerTimer -= dt;
+  updateParticles(dt);
+}
+
+/* =====================================================================
+   RENDERING
+   ===================================================================== */
+function drawStars(t) {
+  for (const s of stars) {
+    ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t * 1.5 + s.phase);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(s.x, s.y, s.r, s.r);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawTerrain() {
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  for (const p of terrain) ctx.lineTo(p.x, p.y);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fillStyle = "#1b1d24";
+  ctx.fill();
+  ctx.strokeStyle = "#9aa3b5";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  for (const p of pads) {
+    ctx.strokeStyle = p.mult >= 4 ? "#ff5c8a" : p.mult >= 2 ? "#ffd34d" : "#5cff9d";
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(p.x1, p.y); ctx.lineTo(p.x2, p.y); ctx.stroke();
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(`x${p.mult}`, (p.x1 + p.x2) / 2, p.y + 18);
+  }
+}
+
+function drawShip() {
+  if (!ship.alive) return;
+  ctx.save();
+  ctx.translate(ship.x, ship.y);
+  ctx.rotate(ship.angle);
+
+  // Flame (flickers each frame)
+  if (ship.thrusting && state === "playing") {
+    const len = rand(14, 26);
+    const g = ctx.createLinearGradient(0, 4, 0, 4 + len);
+    g.addColorStop(0, "#fff6c2"); g.addColorStop(0.4, "#ffb347"); g.addColorStop(1, "rgba(255,60,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(-5, 4); ctx.lineTo(5, 4); ctx.lineTo(rand(-1.5, 1.5), 4 + len); ctx.closePath(); ctx.fill();
+  }
+
+  ctx.strokeStyle = "#e8ecf4"; ctx.lineWidth = 1.5;
+  // Legs
+  ctx.beginPath();
+  ctx.moveTo(-7, 0); ctx.lineTo(-12, 10); ctx.moveTo(-15, 10); ctx.lineTo(-9, 10);
+  ctx.moveTo(7, 0);  ctx.lineTo(12, 10);  ctx.moveTo(9, 10);   ctx.lineTo(15, 10);
+  ctx.stroke();
+  // Body
+  ctx.fillStyle = "#c9d1e0";
+  ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(-7, -14); ctx.lineTo(0, -17); ctx.lineTo(7, -14); ctx.lineTo(10, 0); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Window
+  ctx.fillStyle = "#3a7bd5";
+  ctx.beginPath(); ctx.arc(0, -8, 3, 0, Math.PI * 2); ctx.fill();
+  // Nozzle
+  ctx.fillStyle = "#777";
+  ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(5, 4); ctx.lineTo(-5, 4); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    ctx.globalAlpha = clamp(p.life / p.max, 0, 1);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawHUD() {
+  const vy = -ship.vy / M;                 // positive = climbing
+  const vx = ship.vx / M;
+  const tilt = ship.angle / DEG;
+  const feetY = Math.max(...FEET.map(toWorld).map(p => p.y));
+  const alt = Math.max(0, (groundY(ship.x) - feetY) / M);
+  const OK = "#cfe3ff", BAD = "#ff4b4b";
+
+  ctx.font = "15px monospace";
+  ctx.textAlign = "left";
+  const rows = [
+    ["ALTITUDE", `${alt.toFixed(1)} m`, OK],
+    ["V-SPEED ", `${vy.toFixed(1)} m/s`, -vy > CONFIG.SAFE_VY ? BAD : OK],
+    ["H-SPEED ", `${vx.toFixed(1)} m/s`, Math.abs(vx) > CONFIG.SAFE_VX ? BAD : OK],
+    ["ANGLE   ", `${tilt.toFixed(0)}°`, Math.abs(tilt) > CONFIG.SAFE_ANGLE ? BAD : OK],
+  ];
+  rows.forEach(([label, val, col], i) => {
+    ctx.fillStyle = "#8894aa"; ctx.fillText(label, 16, 26 + i * 20);
+    ctx.fillStyle = col;       ctx.fillText(val, 110, 26 + i * 20);
+  });
+
+  // Fuel bar
+  const bw = 180, bx = W - bw - 16, by = 14, frac = ship.fuel / fuelMax;
+  ctx.fillStyle = "#8894aa"; ctx.textAlign = "right"; ctx.fillText("FUEL", bx - 8, by + 12);
+  ctx.strokeStyle = "#8894aa"; ctx.lineWidth = 1; ctx.strokeRect(bx, by, bw, 14);
+  ctx.fillStyle = frac < 0.2 ? BAD : frac < 0.5 ? "#ffd34d" : "#5cff9d";
+  ctx.fillRect(bx + 2, by + 2, (bw - 4) * frac, 10);
+
+  ctx.fillStyle = "#cfe3ff";
+  ctx.fillText(`SCORE ${score}   HI ${highScore}`, W - 16, by + 36);
+  ctx.fillText(`LEVEL ${level}   g ${(gravity / M).toFixed(2)} m/s²`, W - 16, by + 56);
+}
+
+function overlay(lines, dim = true) {
+  if (dim) { ctx.fillStyle = "rgba(0,0,0,0.55)"; ctx.fillRect(0, 0, W, H); }
+  ctx.textAlign = "center";
+  let y = H / 2 - (lines.length - 1) * 18;
+  for (const [text, size, color] of lines) {
+    ctx.font = `${size >= 30 ? "bold " : ""}${size}px monospace`;
+    ctx.fillStyle = color || "#e8ecf4";
+    ctx.fillText(text, W / 2, y);
+    y += size + 14;
+  }
+}
+
+function render(t) {
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, "#03040a"); sky.addColorStop(1, "#0d1124");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+  drawStars(t);
+
+  if (state === "start") {
+    overlay([
+      ["LANDER", 56, "#ffd34d"],
+      ["Land softly on a pad. Smaller pads score more.", 16],
+      ["UP / W  thrust    LEFT/RIGHT or A/D  rotate", 16, "#8894aa"],
+      ["P  pause    R  restart", 16, "#8894aa"],
+      [`Safe: V < ${CONFIG.SAFE_VY} m/s, H < ${CONFIG.SAFE_VX} m/s, tilt < ${CONFIG.SAFE_ANGLE}°`, 16, "#8894aa"],
+      [`High score: ${highScore}`, 16],
+      ["Press SPACE to start", 22, "#5cff9d"],
+    ], false);
+    return;
+  }
+
+  drawTerrain();
+  drawParticles();
+  drawShip();
+  drawHUD();
+
+  if (bannerTimer > 0 && state === "playing") {
+    ctx.globalAlpha = clamp(bannerTimer, 0, 1);
+    overlay([[banner, 26, "#ffd34d"]], false);
+    ctx.globalAlpha = 1;
+  }
+  if (state === "paused") overlay([["PAUSED", 40], ["Press P to resume", 16, "#8894aa"]]);
+  if (state === "landed") overlay([
+    ["THE EAGLE HAS LANDED", 34, "#5cff9d"], [message, 16], ["Press SPACE for the next level", 18, "#ffd34d"],
+  ]);
+  if (state === "gameover") overlay([
+    ["CRASHED", 44, "#ff4b4b"], [message, 16], [`Score: ${score}   High score: ${highScore}`, 18],
+    ["Press SPACE or R to try again", 18, "#ffd34d"],
+  ]);
+}
+
+/* =====================================================================
+   FIXED-TIMESTEP LOOP
+   Real elapsed time is accumulated and consumed in fixed STEP chunks,
+   so physics is identical at 30, 60 or 144 fps.
+   ===================================================================== */
+let lastTime = performance.now(), accumulator = 0;
+function frame(now) {
+  accumulator += Math.min((now - lastTime) / 1000, 0.25);  // cap to avoid spiral after tab-away
+  lastTime = now;
+  while (accumulator >= STEP) { update(STEP); accumulator -= STEP; }
+  render(now / 1000);
+  requestAnimationFrame(frame);
+}
+
+makeStars();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
