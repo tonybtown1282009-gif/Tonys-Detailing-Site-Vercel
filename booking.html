@@ -505,9 +505,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                 <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                 <optgroup label="Ceramic Coating">
-                  <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
-                  <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
-                  <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                  <option value="Ceramic Coating (3-Year)" data-service="Ceramic Coating (3-Year)">Ceramic Coating (3-Year) ($799.99&ndash;$1,049.99)</option>
+                  <option value="Ceramic Coating (Elite 5-Year)" data-service="Ceramic Coating (Elite 5-Year)">Ceramic Coating (Elite 5-Year) ($1,099.99&ndash;$1,349.99)</option>
                 </optgroup>
                 <optgroup label="Maintenance Plan">
                   <option value="Monthly Maintenance Visit" data-service="Monthly Maintenance Visit">Monthly Maintenance Visit ($150&ndash;$180)</option>
@@ -528,6 +527,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label class="check"><input type="checkbox" name="addons" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$60&ndash;$80</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
                 <label class="check"><input type="checkbox" name="addons" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Wheel Face Coating (3-Year)"><span class="ctxt">Wheel Face Coating (3-Year) <span class="cprice">+$250</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Wheel Face Coating (5-Year)"><span class="ctxt">Wheel Face Coating (5-Year) <span class="cprice">+$300</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Glass &amp; Trim Coating (3-Year)"><span class="ctxt">Glass &amp; Trim Coating (3-Year) <span class="cprice">+$250</span></span></label>
+                <label class="check"><input type="checkbox" name="addons" value="Glass &amp; Trim Coating (5-Year)"><span class="ctxt">Glass &amp; Trim Coating (5-Year) <span class="cprice">+$300</span></span></label>
               </div>
             </div>
             <div class="field full" id="upcharges-field">
@@ -563,9 +566,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                     <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                     <optgroup label="Ceramic Coating">
-                      <option value="Ceramic Coating (2-Year)" data-service="Ceramic Coating (2-Year)">Ceramic Coating (2-Year) ($299.99&ndash;$399.99)</option>
-                      <option value="Ceramic Coating (5-Year)" data-service="Ceramic Coating (5-Year)">Ceramic Coating (5-Year) ($799.99&ndash;$1,049.99)</option>
-                      <option value="Ceramic Coating (Elite 8-Year)" data-service="Ceramic Coating (Elite 8-Year)">Ceramic Coating (Elite 8-Year) ($1,099.99&ndash;$1,349.99)</option>
+                      <option value="Ceramic Coating (3-Year)" data-service="Ceramic Coating (3-Year)">Ceramic Coating (3-Year) ($799.99&ndash;$1,049.99)</option>
+                      <option value="Ceramic Coating (Elite 5-Year)" data-service="Ceramic Coating (Elite 5-Year)">Ceramic Coating (Elite 5-Year) ($1,099.99&ndash;$1,349.99)</option>
                     </optgroup>
                   </select>
                 </div>
@@ -576,6 +578,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="check"><input type="checkbox" name="addons_2" value="Clay &amp; Iron Decontamination"><span class="ctxt">Clay &amp; Iron Decontamination <span class="cprice">+$60&ndash;$80</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Odor Eliminator"><span class="ctxt">Odor Eliminator <span class="cprice">+$40&ndash;$75</span></span></label>
                     <label class="check"><input type="checkbox" name="addons_2" value="Headlight Restoration"><span class="ctxt">Headlight Restoration <span class="cprice">+$100</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Wheel Face Coating (3-Year)"><span class="ctxt">Wheel Face Coating (3-Year) <span class="cprice">+$250</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Wheel Face Coating (5-Year)"><span class="ctxt">Wheel Face Coating (5-Year) <span class="cprice">+$300</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Glass &amp; Trim Coating (3-Year)"><span class="ctxt">Glass &amp; Trim Coating (3-Year) <span class="cprice">+$250</span></span></label>
+                    <label class="check"><input type="checkbox" name="addons_2" value="Glass &amp; Trim Coating (5-Year)"><span class="ctxt">Glass &amp; Trim Coating (5-Year) <span class="cprice">+$300</span></span></label>
                   </div>
                 </div>
                 <div class="field full">
@@ -676,9 +682,8 @@ const PRICES = {
   "Wash, Clay, Seal": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
   "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
   "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
-  "Ceramic Coating (2-Year)": {"Sedan":299.99,"SUV/Crossover":349.99,"Large SUV/Truck":399.99,"Minivan":374.99},
-  "Ceramic Coating (5-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
-  "Ceramic Coating (Elite 8-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99},
+  "Ceramic Coating (3-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
+  "Ceramic Coating (Elite 5-Year)": {"Sedan":1099.99,"SUV/Crossover":1149.99,"Large SUV/Truck":1349.99,"Minivan":1249.99},
   "Monthly Maintenance Visit": {"Sedan":150,"SUV/Crossover":160,"Large SUV/Truck":180,"Minivan":170},
   "Biweekly Maintenance Visit": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":170,"Minivan":160}
 };
