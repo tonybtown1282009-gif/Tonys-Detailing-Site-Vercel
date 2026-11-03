@@ -28,13 +28,20 @@
 </div>
 {%- endmacro %}
 
+{% macro price_range(s) -%}
+{%- if s.price_key and s.slug == 'ceramic-coating' -%}From {{ starts_at(s) }}
+{%- elif s.price_key -%}{% set row = BASE_PRICES[s.price_key].values()|list %}{{ money(row|min) }} – {{ money(row|max) }}
+{%- elif s.flat_price -%}{{ starts_at(s) }}
+{%- else -%}Quoted after inspection{%- endif -%}
+{%- endmacro %}
+
 {% macro service_row(rows) -%}
 <div class="svc-boxes">
   {% for slug, blurb in rows %}{% set s = c.SERVICE_BY_SLUG[slug] %}
-  <a class="svc-box{% if slug == 'ceramic-coating' %} light{% endif %}" href="/{{ slug }}">
+  <a class="svc-box{% if slug == 'ceramic-coating' %} flag{% endif %}" href="/{{ slug }}">
     <b>{{ s.name }}</b>
     <span>{{ blurb }}</span>
-    {{ icon('arrow-right') }}
+    <em>{{ price_range(s) }}</em>
   </a>
   {% endfor %}
 </div>
@@ -43,15 +50,13 @@
 {% macro featured_rows(items) -%}
 <div class="feat-rows">
   {% for f in items %}{% set s = c.SERVICE_BY_SLUG[f.slug] %}
-  <article class="feat">
+  <article class="feat{% if loop.index is even %} flip{% endif %}">
     <div class="feat-copy">
-      <span class="eyebrow">{{ f.eyebrow }}</span>
-      <h3>{{ s.name }}</h3>
+      <h3>{{ s.name }}{% if f.eyebrow %} <span>— {{ f.eyebrow }}</span>{% endif %}</h3>
       {% for para in f.text %}<p>{{ para }}</p>{% endfor %}
       <div class="feat-actions">
         <a href="/quote?service={{ f.slug }}" class="btn btn-primary btn-sm" data-quote="{{ f.slug }}">Get a Quote</a>
         <a href="/{{ f.slug }}" class="link-arrow">Learn More {{ icon('arrow-right') }}</a>
-        {% if starts_at(s) %}<span class="feat-price">Starts at <b>{{ starts_at(s) }}</b></span>{% endif %}
       </div>
     </div>
     <a class="feat-img" href="/{{ f.slug }}" tabindex="-1" aria-hidden="true">{{ img(s.image, 1200, s.image_alt, '(max-width:760px) 100vw, 40vw', [600, 1200]) }}</a>

@@ -250,20 +250,19 @@ GRID_ORDER = [
 # Homepage services: four filled boxes (Tony's one-liners), then three
 # text-left / photo-right feature rows.
 HOME_ROW = [
-    ("ceramic-coating", "3–5 year professional coating after full paint prep."),
-    ("paint-correction", "Removes swirls, scratches, and oxidation. Professional one-step correction."),
-    ("wash-n-wax", "Hand wash, clay bar decontamination, and professional wax & sealant."),
+    ("ceramic-coating", "Professional 3–5 year coating, applied after full paint prep."),
+    ("paint-correction", "One-step machine polish that removes swirls, scratches, and oxidation."),
+    ("wash-n-wax", "Hand wash and clay bar decontamination, finished with professional wax & sealant."),
     ("full-detail", "A full deep clean, inside and out."),
 ]
 HOME_FEATURED = [
     {
         "slug": "ceramic-coating",
-        "eyebrow": "Flagship Service",
+        "eyebrow": "Our Flagship Service",
         "text": [
-            "Ceramic coating isn't just another service we offer — it's the one our "
-            "whole process is built around. A professional coating bonds to your paint "
-            "and protects it for 3 to 5 years, adding deep gloss and making every wash "
-            "easier.",
+            "Ceramic coating is the service we put the most care into. A professional "
+            "coating bonds to your paint and protects it for 3 to 5 years, adding deep "
+            "gloss and making every wash easier.",
             "Because a coating locks in whatever is underneath it, we never skip the "
             "prep: foam bath, bug removal, clay bar, IPA wipe-down, and a single-stage "
             "enhancement polish before the coating goes on. It takes about six hours, "
@@ -285,7 +284,7 @@ HOME_FEATURED = [
     },
     {
         "slug": "wash-n-wax",
-        "eyebrow": "Exterior Service",
+        "eyebrow": "",
         "text": [
             "Wash n' Wax keeps your paint clean, smooth, and protected between full "
             "details.",
