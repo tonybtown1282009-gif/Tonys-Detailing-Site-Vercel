@@ -182,7 +182,7 @@ SERVICES = [
         "name": "Ceramic Coating",
         "price_key": "Ceramic Coating (3-Year)",
         "image": "svc-ceramic",
-        "image_alt": "White Porsche 911 Targa after detailing",
+        "image_alt": "White Audi A5 Sportback after detailing",
         "short": "Long-term paint protection with full decontamination and polish "
                  "prep. 3-Year and Elite 5-Year packages.",
         "featured": True,
@@ -192,7 +192,7 @@ SERVICES = [
         "name": "Full Detail",
         "price_key": "Full Detail",
         "image": "svc-full-detail",
-        "image_alt": "Silver Toyota 4Runner after a full detail",
+        "image_alt": "Volvo XC60 leather interior after a full detail",
         "short": "The complete package — interior and exterior plus a wax "
                  "protection coat. Our most popular service.",
         "badge": "Most Popular",

@@ -21,8 +21,8 @@ IMAGES = {
     # fractions of the original frame (left, top, right, bottom).
     "hero": ("../../source-photos/porsche-side.jpg", (0, 0.22, 1, 0.92), (1920, 1200, 760)),
     "hero-m": ("../../source-photos/porsche-front.jpg", (0, 0.04, 1, 0.9), (1200, 800)),
-    "svc-ceramic": ("../../source-photos/porsche-front-2.jpg", (0, 0.15, 1, 0.65), (1200, 900, 600, 520)),
-    "svc-full-detail": ("../../source-photos/4runner.jpg", (0, 0.33, 1, 0.83), (1200, 900, 600, 520)),
+    "svc-ceramic": ("placeholder-22.jpg", (0, 0.05, 1, 0.94), (1200, 900, 600, 520)),
+    "svc-full-detail": ("placeholder-38.jpg", (0, 0.05, 1, 0.94), (1200, 900, 600, 520)),
     "svc-wash": ("../../source-photos/lincoln-foam.jpg", (0, 0.38, 1, 0.88), (1200, 900, 600, 520)),
     "svc-correction": ("../../source-photos/tesla.jpg", (0, 0.36, 1, 0.86), (1200, 900, 600, 520)),
     "svc-interior": ("placeholder-14.jpg", None, (1200, 900, 600, 520)),
