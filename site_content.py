@@ -134,7 +134,7 @@ SERVICES = [
         "name": "Wash n' Wax",
         "price_key": "Wash n' Wax",
         "image": "svc-wash",
-        "image_alt": "SUV covered in foam during a hand wash",
+        "image_alt": "Lincoln SUV in a foam pre-wash",
         "short": "Hand wash, clay bar decontamination, and professional wax & sealant.",
         "title": "Wash n' Wax — Mobile Exterior Detailing",
         "meta": "Foam wash, clay bar decontamination and a protective wax finish, "
@@ -157,7 +157,7 @@ SERVICES = [
         "name": "Paint Correction",
         "price_key": None,
         "image": "svc-correction",
-        "image_alt": "Glossy white paint after detailing",
+        "image_alt": "Gray Tesla Model 3 with glossy paint",
         "short": "Removes swirls, scratches, and oxidation — quoted after we "
                  "inspect your paint.",
         "title": "Paint Correction — One-Step & Multi-Step",
@@ -182,7 +182,7 @@ SERVICES = [
         "name": "Ceramic Coating",
         "price_key": "Ceramic Coating (3-Year)",
         "image": "svc-ceramic",
-        "image_alt": "Blue Volvo with glossy paint in a driveway",
+        "image_alt": "White Porsche 911 Targa after detailing",
         "short": "Long-term paint protection with full decontamination and polish "
                  "prep. 3-Year and Elite 5-Year packages.",
         "featured": True,
@@ -192,7 +192,7 @@ SERVICES = [
         "name": "Full Detail",
         "price_key": "Full Detail",
         "image": "svc-full-detail",
-        "image_alt": "White Audi with doors open during a full detail",
+        "image_alt": "Silver Toyota 4Runner after a full detail",
         "short": "The complete package — interior and exterior plus a wax "
                  "protection coat. Our most popular service.",
         "badge": "Most Popular",

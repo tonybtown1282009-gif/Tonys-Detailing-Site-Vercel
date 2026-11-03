@@ -17,12 +17,15 @@ GAL = os.path.join(ROOT, "static", "gallery")
 
 # name -> (source, crop box as fractions (l, t, r, b) or None, widths)
 IMAGES = {
-    "hero": ("placeholder-22.jpg", None, (1200, 760)),
-    "svc-ceramic": ("placeholder-35.jpg", None, (1200, 900, 600, 520)),
-    "svc-full-detail": ("placeholder-20.jpg", None, (1200, 900, 600, 520)),
-    "svc-wash": ("placeholder-28.jpg", None, (1200, 900, 600, 520)),
+    # Tony's Nov 2026 photos live in source-photos/ (not served); crops are
+    # fractions of the original frame (left, top, right, bottom).
+    "hero": ("../../source-photos/porsche-side.jpg", (0, 0.22, 1, 0.92), (1920, 1200, 760)),
+    "hero-m": ("../../source-photos/porsche-front.jpg", (0, 0.04, 1, 0.9), (1200, 800)),
+    "svc-ceramic": ("../../source-photos/porsche-front-2.jpg", (0, 0.15, 1, 0.65), (1200, 900, 600, 520)),
+    "svc-full-detail": ("../../source-photos/4runner.jpg", (0, 0.33, 1, 0.83), (1200, 900, 600, 520)),
+    "svc-wash": ("../../source-photos/lincoln-foam.jpg", (0, 0.38, 1, 0.88), (1200, 900, 600, 520)),
+    "svc-correction": ("../../source-photos/tesla.jpg", (0, 0.36, 1, 0.86), (1200, 900, 600, 520)),
     "svc-interior": ("placeholder-14.jpg", None, (1200, 900, 600, 520)),
-    "svc-correction": ("placeholder-22.jpg", (0.25, 0.15, 1.0, 0.85), (1200, 900, 600, 520)),
     "svc-headlight": ("../images/headlight-after.jpg", None, (1200, 900, 600, 520)),
     "headlight-before": ("../images/headlight-before.jpg", None, (700,)),
     "headlight-after": ("../images/headlight-after.jpg", None, (700,)),
@@ -35,7 +38,7 @@ def save(im, name, width):
     im = im.copy()
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
-    im.save(os.path.join(OUT, f"{name}-{width}.webp"), "WEBP", quality=80 if name == "hero" else 88, method=6)
+    im.save(os.path.join(OUT, f"{name}-{width}.webp"), "WEBP", quality=80 if name.startswith("hero") else 86, method=6)
 
 
 def logo():

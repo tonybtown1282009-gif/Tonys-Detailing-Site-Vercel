@@ -2,7 +2,8 @@
 {% import '_macros.html' as m with context %}
 {% block title %}Tony's Detailing — Mobile Auto Detailing & Ceramic Coating in Northeast Ohio{% endblock %}
 {% block head %}
-<link rel="preload" as="image" href="/static/img/hero-1200.webp" imagesrcset="/static/img/hero-760.webp 760w, /static/img/hero-1200.webp 1200w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(min-width:761px)" imagesrcset="/static/img/hero-1200.webp 1200w, /static/img/hero-1920.webp 1920w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width:760px)" imagesrcset="/static/img/hero-m-800.webp 800w, /static/img/hero-m-1200.webp 1200w" imagesizes="100vw" fetchpriority="high">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -28,7 +29,10 @@
 {% block content %}
 <section class="hero" id="hero">
   <div class="hero-media">
-    {{ m.img('hero', 1200, '', '100vw', [760, 1200], eager=True) }}
+    <picture>
+      <source media="(max-width:760px)" srcset="/static/img/hero-m-800.webp 800w, /static/img/hero-m-1200.webp 1200w" sizes="100vw">
+      <img src="/static/img/hero-1920.webp" srcset="/static/img/hero-760.webp 760w, /static/img/hero-1200.webp 1200w, /static/img/hero-1920.webp 1920w" sizes="100vw" alt="" fetchpriority="high" decoding="async">
+    </picture>
     {% if hero_video or hero_video_vertical %}
     <video muted loop playsinline preload="none" aria-hidden="true"
       {% if hero_video %}data-src="/static/media/hero-loop.mp4"{% endif %}
@@ -87,7 +91,7 @@
 
 <section class="sec sec-alt" id="ceramic">
   <div class="wrap cer">
-    <div class="cer-img">{{ m.img('svc-ceramic', 900, 'Blue Volvo with glossy paint after detailing', '(max-width:860px) 100vw, 50vw', [520, 900]) }}</div>
+    <div class="cer-img">{{ m.img('hero-m', 1200, 'White Porsche 911 Targa after detailing', '(max-width:860px) 100vw, 50vw', [800, 1200]) }}</div>
     <div class="cer-copy">
       <span class="eyebrow">Flagship Service</span>
       <h2 style="margin-top:14px">Ceramic Coating</h2>

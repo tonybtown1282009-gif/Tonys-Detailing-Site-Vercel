@@ -833,7 +833,7 @@ def test_hero_image_is_in_the_served_html(client):
     html = client.get("/").data.decode("utf-8")
     start = html.index('<div class="hero-media">')
     hero = html[start : html.index("</div>", start)]
-    assert 'src="/static/img/hero-1200.webp"' in hero
+    assert 'src="/static/img/hero-1920.webp"' in hero
     assert 'fetchpriority="high"' in hero
 
 
