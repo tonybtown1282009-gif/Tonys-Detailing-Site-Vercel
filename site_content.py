@@ -248,6 +248,10 @@ GRID_ORDER = [
     "wash-n-wax", "paint-correction", "headlight-restoration",
 ]
 
+# Homepage services: a text-only row, then three photo cards.
+HOME_ROW = ["ceramic-coating", "paint-correction", "wash-n-wax", "full-detail", "interior-detailing"]
+HOME_FEATURED = ["full-detail", "wash-n-wax", "ceramic-coating"]
+
 ADDON_COPY = {
     "Leather Conditioning": "Cleans, softens & protects leather seats and trim",
     "Clay & Iron Decontamination": "Iron & fallout removal",

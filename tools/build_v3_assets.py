@@ -18,12 +18,12 @@ GAL = os.path.join(ROOT, "static", "gallery")
 # name -> (source, crop box as fractions (l, t, r, b) or None, widths)
 IMAGES = {
     "hero": ("placeholder-22.jpg", None, (1200, 760)),
-    "svc-ceramic": ("placeholder-35.jpg", None, (900, 520)),
-    "svc-full-detail": ("placeholder-20.jpg", None, (900, 520)),
-    "svc-wash": ("placeholder-28.jpg", None, (900, 520)),
-    "svc-interior": ("placeholder-14.jpg", None, (900, 520)),
-    "svc-correction": ("placeholder-22.jpg", (0.25, 0.15, 1.0, 0.85), (900, 520)),
-    "svc-headlight": ("../images/headlight-after.jpg", None, (900, 520)),
+    "svc-ceramic": ("placeholder-35.jpg", None, (1200, 900, 600, 520)),
+    "svc-full-detail": ("placeholder-20.jpg", None, (1200, 900, 600, 520)),
+    "svc-wash": ("placeholder-28.jpg", None, (1200, 900, 600, 520)),
+    "svc-interior": ("placeholder-14.jpg", None, (1200, 900, 600, 520)),
+    "svc-correction": ("placeholder-22.jpg", (0.25, 0.15, 1.0, 0.85), (1200, 900, 600, 520)),
+    "svc-headlight": ("../images/headlight-after.jpg", None, (1200, 900, 600, 520)),
     "headlight-before": ("../images/headlight-before.jpg", None, (700,)),
     "headlight-after": ("../images/headlight-after.jpg", None, (700,)),
 }
@@ -35,7 +35,7 @@ def save(im, name, width):
     im = im.copy()
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
-    im.save(os.path.join(OUT, f"{name}-{width}.webp"), "WEBP", quality=74, method=6)
+    im.save(os.path.join(OUT, f"{name}-{width}.webp"), "WEBP", quality=80 if name == "hero" else 88, method=6)
 
 
 def logo():

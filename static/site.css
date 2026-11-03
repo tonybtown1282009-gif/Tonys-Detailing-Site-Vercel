@@ -449,3 +449,29 @@ body.menu-open{overflow:hidden;}
 #work .sec-head{margin-bottom:22px;}
 #work{padding:clamp(44px,6vw,72px) 0;}
 @media (max-width:760px){.work-compact figure{flex:0 0 44vw;}}
+/* Homepage services: text tiles row + three photo cards */
+.svc-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.svc-tile{display:flex;flex-direction:column;gap:6px;padding:20px 18px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);text-decoration:none;transition:border-color .2s,background .2s,transform .2s var(--ease);}
+.svc-tile:hover{border-color:var(--blue-ll);background:var(--surface-2);transform:translateY(-2px);}
+.svc-tile .ic{width:24px;height:24px;color:var(--blue-ll);margin-bottom:6px;}
+.svc-tile b{color:#fff;font:700 15px/1.25 var(--ff-h);text-transform:uppercase;letter-spacing:.02em;}
+.svc-tile span{color:var(--fg-4);font-size:13px;}
+.feat-title{margin:40px 0 16px;font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue-ll);}
+.svc-feat{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.svc-feat .svc-img{aspect-ratio:4/3;}
+.svc-feat .svc-img img{image-rendering:auto;}
+.svc-badge.flag{background:var(--blue-h);border-color:transparent;}
+@media (max-width:900px){.svc-row{grid-template-columns:repeat(2,1fr);}.svc-row .svc-tile:last-child{grid-column:1/-1;}}
+@media (max-width:760px){.svc-feat{grid-template-columns:1fr;gap:14px;}.svc-tile{padding:16px 14px;}}
+.svc-feat .svc{grid-column:auto;grid-row:auto;}
+@media (max-width:600px){
+  .svc-feat .svc{flex-direction:column;}
+  .svc-feat .svc .svc-img{width:auto;aspect-ratio:4/3;}
+  .svc-feat .svc .svc-badge{display:inline-block;}
+  .svc-feat .svc .svc-body{padding:18px 18px 20px;gap:8px;}
+  .svc-feat .svc h3{font-size:19px;}
+  .svc-feat .svc .svc-body p{-webkit-line-clamp:unset;display:block;font-size:15px;}
+  .svc-feat .svc .svc-actions .btn{min-height:42px;padding:0 16px;font-size:12px;}
+  .svc-feat .svc .link-arrow{font-size:13px;}
+  .svc-feat .svc .link-arrow .ic{display:inline;}
+}

@@ -61,7 +61,9 @@
       </div>
       <a href="/services" class="link-arrow">Full Pricing {{ icon('arrow-right') }}</a>
     </div>
-    {{ m.service_grid() }}
+    {{ m.service_row(c.HOME_ROW) }}
+    <h3 class="feat-title">Our Top Details</h3>
+    {{ m.featured_cards(c.HOME_FEATURED) }}
   </div>
 </section>
 

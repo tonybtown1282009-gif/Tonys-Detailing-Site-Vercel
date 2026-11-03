@@ -28,6 +28,40 @@
 </div>
 {%- endmacro %}
 
+{% macro service_row(slugs) -%}
+<div class="svc-row">
+  {% for slug in slugs %}{% set s = c.SERVICE_BY_SLUG[slug] %}
+  <a class="svc-tile" href="/{{ slug }}">
+    {{ icon({'interior-detailing':'armchair','wash-n-wax':'droplets','paint-correction':'sun','ceramic-coating':'gem','full-detail':'car-front','headlight-restoration':'lightbulb'}[slug]) }}
+    <b>{{ s.name }}</b>
+    <span>{% if starts_at(s) %}From {{ starts_at(s) }}{% else %}Quoted after inspection{% endif %}</span>
+  </a>
+  {% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro featured_cards(slugs) -%}
+<div class="svc-feat">
+  {% for slug in slugs %}{% set s = c.SERVICE_BY_SLUG[slug] %}
+  <article class="svc">
+    <a class="svc-img" href="/{{ slug }}" tabindex="-1" aria-hidden="true">
+      {{ img(s.image, 1200, s.image_alt, '(max-width:760px) 100vw, 33vw', [600, 1200]) }}
+      {% if slug == 'ceramic-coating' %}<span class="svc-badge flag">Flagship</span>{% elif s.badge %}<span class="svc-badge">{{ s.badge }}</span>{% endif %}
+    </a>
+    <div class="svc-body">
+      <h3>{{ s.name }}</h3>
+      <p>{{ s.short }}</p>
+      <div class="svc-price">{% if starts_at(s) %}Starts at <b>{{ starts_at(s) }}</b>{% endif %}</div>
+      <div class="svc-actions">
+        <a href="/quote?service={{ slug }}" class="btn btn-primary btn-sm" data-quote="{{ slug }}">Get a Quote</a>
+        <a href="/{{ slug }}" class="link-arrow">Learn More {{ icon('arrow-right') }}</a>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{%- endmacro %}
+
 {% macro review_cards(limit=6) -%}
 <div class="rev-grid">
   {% for name, tag, text in c.REVIEWS[:limit] %}
