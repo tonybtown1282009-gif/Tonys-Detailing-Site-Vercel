@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18237414368"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18237414368');
+</script>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W5PW7BVG');</script>
+<!-- End Google Tag Manager -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{% block title %}Tony's Detailing — Mobile Auto Detailing in Northeast Ohio{% endblock %}</title>
+<meta name="description" content="{% block description %}Professional mobile auto detailing in Northeast Ohio — interior, exterior, paint correction and ceramic coating brought to your home or office. Get a free quote.{% endblock %}">
+<link rel="canonical" href="{{ SITE_URL }}{{ '/' if path == '/' else path }}">
+{% if noindex %}<meta name="robots" content="noindex, follow">{% endif %}
+<meta name="theme-color" content="#07090d">
+<link rel="icon" href="/assets/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="icon" href="/assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/assets/favicon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tony's Detailing">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.description() }}">
+<meta property="og:url" content="{{ SITE_URL }}{{ '/' if path == '/' else path }}">
+<meta property="og:image" content="{{ SITE_URL }}/assets/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fonts/Montserrat-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/site.css?v=3">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W5PW7BVG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a href="/" class="brand" aria-label="Tony's Detailing — home">
+      <img src="/static/img/logo-mark.webp" alt="Tony's Detailing" width="95" height="40">
+    </a>
+    {% block navlinks %}
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/"{% if path == '/' %} aria-current="page"{% endif %}>Home</a>
+      <div class="nav-dd">
+        <button type="button" aria-expanded="false" aria-controls="ddServices">Services {{ icon('chevron-down') }}</button>
+        <div class="nav-dd-menu" id="ddServices">
+          {% for slug in c.GRID_ORDER %}{% set s = c.SERVICE_BY_SLUG[slug] %}
+          <a href="/{{ slug }}">{{ s.name }} {% if starts_at(s) %}<small>from {{ starts_at(s) }}</small>{% endif %}</a>
+          {% endfor %}
+          <hr>
+          <a href="/rv-detailing">RV Detailing</a>
+          <a href="/boat-detailing">Boat Detailing</a>
+          <hr>
+          <a href="/services">All Services &amp; Pricing {{ icon('arrow-right') }}</a>
+        </div>
+      </div>
+      <a href="/ceramic-coating"{% if path == '/ceramic-coating' %} aria-current="page"{% endif %}>Ceramic Coatings</a>
+      <a href="/about"{% if path == '/about' %} aria-current="page"{% endif %}>About Us</a>
+      <a href="/contact"{% if path == '/contact' %} aria-current="page"{% endif %}>Contact</a>
+    </nav>
+    {% endblock %}
+    <div class="nav-right">
+      <a href="tel:{{ c.PHONE_TEL }}" class="nav-phone">{{ icon('phone') }} {{ c.PHONE_DISPLAY }}</a>
+      <a href="/quote{% if svc %}?service={{ svc.slug }}{% endif %}" class="btn btn-primary btn-sm" data-quote="{{ svc.slug if svc else '' }}">Get a Quote</a>
+      <a href="tel:{{ c.PHONE_TEL }}" class="nav-call" aria-label="Call {{ c.PHONE_DISPLAY }}">{{ icon('phone') }}</a>
+      {% block burger %}<button type="button" class="nav-burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav">{{ icon('menu') }}</button>{% endblock %}
+    </div>
+  </div>
+</header>
+
+{% block mnav %}
+<nav class="mnav" id="mnav" aria-label="Mobile">
+  <a href="/">Home {{ icon('arrow-right') }}</a>
+  <details>
+    <summary>Services {{ icon('chevron-down') }}</summary>
+    {% for slug in c.GRID_ORDER %}<a href="/{{ slug }}">{{ c.SERVICE_BY_SLUG[slug].name }}</a>{% endfor %}
+    <a href="/rv-detailing">RV Detailing</a>
+    <a href="/boat-detailing">Boat Detailing</a>
+    <a href="/services">All Services &amp; Pricing</a>
+  </details>
+  <a href="/ceramic-coating">Ceramic Coatings {{ icon('arrow-right') }}</a>
+  <a href="/about">About Us {{ icon('arrow-right') }}</a>
+  <a href="/contact">Contact {{ icon('arrow-right') }}</a>
+  <a href="/quote" class="btn btn-primary btn-lg btn-block" data-quote="">Get a Free Quote</a>
+  <div class="mnav-contact">
+    <a href="tel:{{ c.PHONE_TEL }}">{{ icon('phone') }} Call or text {{ c.PHONE_DISPLAY }}</a>
+    <a href="mailto:{{ c.EMAIL }}">{{ icon('mail') }} {{ c.EMAIL }}</a>
+  </div>
+</nav>
+{% endblock %}
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="/static/img/logo-mark.webp" alt="Tony's Detailing" width="109" height="46" loading="lazy">
+        <p>Professional mobile auto detailing in Northeast Ohio. Based in Chardon — serving Geauga, Lake, and eastern Cuyahoga counties.</p>
+        {% set socials = c.SOCIAL.items()|selectattr(1)|list %}
+        {% if socials %}
+        <div class="foot-social">
+          {% for name, url in socials %}<a href="{{ url }}" rel="noopener" target="_blank">{{ name|capitalize }}</a>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          {% for slug in c.GRID_ORDER %}<li><a href="/{{ slug }}">{{ c.SERVICE_BY_SLUG[slug].name }}</a></li>{% endfor %}
+          <li><a href="/rv-detailing">RV Detailing</a></li>
+          <li><a href="/boat-detailing">Boat Detailing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services &amp; Pricing</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/gallery">Gallery</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul class="contact">
+          <li>{{ icon('phone') }}<a href="tel:{{ c.PHONE_TEL }}">{{ c.PHONE_DISPLAY }}</a></li>
+          <li>{{ icon('mail') }}<a href="mailto:{{ c.EMAIL }}">{{ c.EMAIL }}</a></li>
+          <li>{{ icon('map-pin') }}<span>Chardon, OH &amp; surrounding areas</span></li>
+          <li>{{ icon('clock') }}<span>By appointment — weekdays &amp; weekends</span></li>
+        </ul>
+        <div class="foot-social" style="margin-top:20px"><a href="/quote" data-quote="">Get a Free Quote</a></div>
+      </div>
+    </div>
+    <div class="chips" style="margin-top:36px" aria-label="Towns we serve">
+      {% for slug in AREA_PAGES %}<a href="/{{ slug }}">{{ c.AREA_PAGES_LABELS[slug] }}</a>{% endfor %}
+      <a href="/services#area">All service areas</a>
+    </div>
+    <div class="foot-legal">
+      <p>&copy; {{ year }} Tony's Detailing &middot; Chardon, OH. Prices subject to change; final quote confirmed on arrival.</p>
+      <p>Cancellations require 24 hours' notice.</p>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block mcta %}
+<div class="mcta" id="mcta">
+  <a href="tel:{{ c.PHONE_TEL }}" class="btn btn-ghost">{{ icon('phone') }} Call</a>
+  <a href="/quote{% if svc %}?service={{ svc.slug }}{% endif %}" class="btn btn-primary" data-quote="{{ svc.slug if svc else '' }}">Get a Free Quote</a>
+</div>
+{% endblock %}
+
+<script src="/static/site.js?v=3" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

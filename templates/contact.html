@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Contact Tony's Detailing — Call, Text, or Request a Quote{% endblock %}
+{% block description %}Call or text (216) 903-4783, email tonysdetailing.net@gmail.com, or request a free quote online. Mobile detailing in Chardon and Northeast Ohio.{% endblock %}
+{% block content %}
+<section class="phero">
+  <div class="wrap">
+    <span class="eyebrow">Get In Touch</span>
+    <h1>Contact Us</h1>
+    <p class="lede">The fastest way to get a price is the quote form below. Prefer to talk? Call or text — we reply within 24 hours.</p>
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap">
+    <div class="area-tiers">
+      <a class="card" href="tel:{{ c.PHONE_TEL }}" style="text-decoration:none"><h3>{{ icon('phone') }} Call or Text</h3><p style="color:#fff;font:700 20px var(--ff-h)">{{ c.PHONE_DISPLAY }}</p></a>
+      <a class="card" href="mailto:{{ c.EMAIL }}" style="text-decoration:none"><h3>{{ icon('mail') }} Email</h3><p style="color:#fff;word-break:break-all">{{ c.EMAIL }}</p></a>
+      <div class="card"><h3>{{ icon('clock') }} Hours</h3><p style="color:var(--fg-2)">By appointment — flexible scheduling, weekdays and weekends.</p></div>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div class="card"><h3>{{ icon('map-pin') }} Service Area</h3><p style="color:var(--fg-2)">Chardon, OH &amp; surrounding areas. Within ~15 mi for all services, up to 25 mi for a Full Detail, and beyond 25 mi by quote.</p><a href="/services#area" class="link-arrow" style="margin-top:14px">Service Area Details {{ icon('arrow-right') }}</a></div>
+      <div class="card"><h3>{{ icon('info') }} Good To Know</h3><p style="color:var(--fg-2)">We currently accept cash only, due after the detail is finished. Cancellations require 24 hours' notice.</p><a href="/faq" class="link-arrow" style="margin-top:14px">FAQ {{ icon('arrow-right') }}</a></div>
+    </div>
+  </div>
+</section>
+{{ m.quote_section() }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

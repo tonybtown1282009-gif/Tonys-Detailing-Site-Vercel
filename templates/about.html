@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}About Tony's Detailing — Owner-Operated Mobile Detailing in Chardon, OH{% endblock %}
+{% block description %}Meet Tony — owner-operated mobile detailing serving Geauga and Lake County. One detailer, every detail, done in your driveway.{% endblock %}
+{% block content %}
+<section class="phero has-img">
+  {{ m.img('work-20', 600, '', '100vw', eager=True) }}
+  <div class="wrap">
+    <span class="eyebrow">The Story</span>
+    <h1>One Detailer,<br>Every Detail</h1>
+    <p class="lede">No rotating crews, no franchise playbook — just one detailer who treats every vehicle like his own.</p>
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap two">
+    <div>
+      <span class="eyebrow">About Us</span>
+      <h2 style="margin-top:14px">Meet Tony</h2>
+    </div>
+    <div class="prose">
+      <p>Tony's Detailing started with a simple idea: do fewer cars, but do them right. Every booking is handled personally by Tony — from the first walk-around to the final wipe-down — so the quality never changes hands.</p>
+      <p>We come to you — your home or office. You don't rearrange your day or drop your car at a shop; we set up in your driveway and get to work. All we ask is access to an outlet and, in some cases, an outdoor water spigot.</p>
+      <p>We're upfront about what a detail can and can't do, we confirm your quote before we start, and we take before-and-after photos on every job — for your records and ours. It's detailing you can trust, from someone who stakes his name on it.</p>
+    </div>
+  </div>
+</section>
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Why It Matters</span><h2>The Owner-Operated Difference</h2><p>When one person owns the result, the details don't slip through the cracks.</p></div></div>
+    <div class="why-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+      {% for ic, h, p in [('hand-heart','One Set of Hands','The person who quotes your detail is the person who does it — consistent results, every visit.'),('search','Meticulous by Default','Vents, seams, door jambs, and the spots most crews skip — because it\'s my name on the work.'),('badge-check','Honest Quotes','Your price is confirmed on arrival, before any work begins. No surprises at the end.'),('map-pin','We Come To You','Home or office — your driveway becomes the detail bay. We just need access to an outlet and, in some cases, a water spigot.')] %}
+      <div class="why">{{ icon(ic) }}<h3>{{ h }}</h3><p>{{ p }}</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Where We Work</span><h2>Serving Geauga &amp; Lake County</h2><p>Based in Chardon and mobile across Geauga and Lake County, plus the east-side Cleveland suburbs. Not sure if you're in range? Just ask — we'll let you know.</p></div></div>
+    <div class="chips">{% for t in c.TOWNS %}<span>{{ t }}</span>{% endfor %}</div>
+  </div>
+</section>
+{{ m.reviews_section(alt=True) }}
+{{ m.quote_section() }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

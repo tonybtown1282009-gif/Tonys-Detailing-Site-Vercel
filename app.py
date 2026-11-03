@@ -18,11 +18,14 @@ from flask import (
     abort,
     jsonify,
     redirect,
+    render_template,
     request,
     Response,
     send_file,
     send_from_directory,
 )
+
+import site_content
 
 try:
     from dotenv import load_dotenv
@@ -55,7 +58,9 @@ SHOP_PHONE = "(216) 903-4783"
 # ──────────────────────────────────────────────────────────────────────────
 MEDIA_DIR = os.path.join(BASE_DIR, "static", "media")
 MEDIA_SLOTS = (
-    "hero-video.mp4",
+    "hero-loop.mp4",           # homepage hero, landscape screens (16:9)
+    "hero-loop-vertical.mp4",  # homepage hero, phones (9:16)
+    "hero-video.mp4",          # legacy clip, no longer used by the hero
     "hero-fallback.jpg",
     "rv-hero.jpg",
     "boat-hero.jpg",
@@ -75,7 +80,7 @@ RESEND_FROM = os.environ.get("RESEND_FROM", "Tony's Detailing <onboarding@resend
 VEHICLE_TYPES = ["Sedan", "SUV/Crossover", "Large SUV/Truck", "Minivan"]
 
 BASE_PRICES = {
-    "Wash, Clay, Seal": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
+    "Wash n' Wax": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
     "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
     "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
     # Ceramic coatings, priced by size like everything else. Both the 3-Year
@@ -95,6 +100,9 @@ BASE_PRICES = {
     "Monthly Maintenance Visit": {"Sedan": 150, "SUV/Crossover": 160, "Large SUV/Truck": 180, "Minivan": 170},
     "Biweekly Maintenance Visit": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 170, "Minivan": 160},
 }
+
+# Old service names still posted by bookmarked /booking links.
+SERVICE_ALIASES = {"Wash, Clay, Seal": "Wash n' Wax"}
 
 MAINTENANCE_SERVICES = {"Monthly Maintenance Visit", "Biweekly Maintenance Visit"}
 MAINTENANCE_SCOPE_NOTE = (
@@ -208,6 +216,7 @@ def parse_num_vehicles(raw):
 def vehicle_cost(service, vehicle_type, addons, upcharges):
     """Price a single vehicle: base (by service + size) + add-ons + upcharges."""
     vehicle = vehicle_type if vehicle_type in VEHICLE_TYPES else "Sedan"
+    service = SERVICE_ALIASES.get(service, service)
     base = BASE_PRICES.get(service, {}).get(vehicle, 0)
 
     addon_total = 0
@@ -307,7 +316,6 @@ HERO_PLACEHOLDER = '<div class="hero-media" id="heroMedia"></div>'
 
 # page file -> (still image slot, looping video slot or None)
 HERO_SLOTS = {
-    "index.html": ("hero-fallback.jpg", "hero-video.mp4"),
     "rv-detailing.html": ("rv-hero.jpg", None),
     "boat-detailing.html": ("boat-hero.jpg", None),
 }
@@ -571,6 +579,366 @@ def book():
 
 
 # ──────────────────────────────────────────────────────────────────────────
+#  Quote requests (v3 lead form)
+#  The multi-step form on every page posts here. Each lead is written to
+#  SQLite, emailed to the shop (Resend) and — when SHEETS_WEBHOOK_URL is set —
+#  appended to a Google Sheet. SQLite on Vercel lives in /tmp and is wiped on
+#  cold starts, so a lead only counts as delivered once the email or the sheet
+#  accepted it; otherwise the visitor is told to call/text instead of seeing a
+#  false "received".
+# ──────────────────────────────────────────────────────────────────────────
+import json as _json
+import re as _re
+import urllib.request as _urlreq
+
+SHEETS_WEBHOOK_URL = os.environ.get("SHEETS_WEBHOOK_URL", "")
+
+QUOTE_SERVICES = (
+    "Full Interior Detail",
+    "Wash n' Wax",
+    "Paint Correction",
+    "Ceramic Coating",
+    "Full Detail",
+    "Headlight Restoration",
+)
+QUOTE_SERVICE_SLUGS = {
+    "interior-detailing": "Full Interior Detail",
+    "wash-n-wax": "Wash n' Wax",
+    "paint-correction": "Paint Correction",
+    "ceramic-coating": "Ceramic Coating",
+    "full-detail": "Full Detail",
+    "headlight-restoration": "Headlight Restoration",
+}
+CERAMIC_PACKAGES = {
+    "3-Year Protection": "Ceramic Coating (3-Year)",
+    "5-Year Protection (Elite)": "Ceramic Coating (Elite 5-Year)",
+    "Not Sure — I'd Like More Information": None,
+}
+CORRECTION_TYPES = ("One-Step Correction", "More Extensive (Multi-Step) Correction", "Not Sure")
+LAST_DETAILED = ("Within the Last 3 Months", "3–6 Months Ago", "6–12 Months Ago",
+                 "More Than a Year Ago", "Never")
+CONDITIONS = ("Light Cleaning Needed", "Moderate Dirt and Buildup", "Heavy Dirt or Stains",
+              "Pet Hair", "Other")
+TIMINGS = ("As Soon as Possible", "Within 1–2 Weeks", "Within a Month", "Just Researching for Now")
+UTILITIES = ("Yes", "No", "I'm Not Sure")
+CONTACT_METHODS = ("Phone Call", "Text Message", "Email")
+CALL_TIMES = ("Morning", "Afternoon", "Evening", "Anytime", "I Prefer Text")
+
+# Service-area tiers, matching the rules on /services (straight-line miles).
+AREA_STANDARD_MI = 15
+AREA_EXTENDED_MI = 25
+_ZIP_PATH = os.path.join(BASE_DIR, "static", "data", "service-zips.json")
+try:
+    with open(_ZIP_PATH) as _fh:
+        SERVICE_ZIPS = _json.load(_fh)
+except (OSError, ValueError):
+    SERVICE_ZIPS = {}
+
+EMAIL_RE = _re.compile(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$")
+
+
+def area_for_zip(zip_code):
+    """(tier, miles) for a ZIP: standard / extended / outside / unknown."""
+    miles = SERVICE_ZIPS.get(zip_code)
+    if miles is None:
+        return "unknown", None
+    if miles <= AREA_STANDARD_MI:
+        return "standard", miles
+    if miles <= AREA_EXTENDED_MI:
+        return "extended", miles
+    return "outside", miles
+
+
+AREA_LABELS = {
+    "standard": "Standard area (within 15 mi)",
+    "extended": "Extended area (15–25 mi) — Full Detail minimum + travel fee",
+    "outside": "Outside 25 mi — travel quoted case by case",
+    "unknown": "ZIP not in service list — check location",
+}
+
+
+def _money(v):
+    return f"${v:,.0f}" if float(v).is_integer() else f"${v:,.2f}"
+
+
+def _price_text(price_key, size):
+    row = BASE_PRICES.get(price_key, {})
+    if not row:
+        return ""
+    if size in row:
+        return f"{_money(row[size])} ({size})"
+    lo, hi = min(row.values()), max(row.values())
+    return f"{_money(lo)}–{_money(hi)} (size not given)"
+
+
+def quote_estimate(services, size, ceramic_package):
+    """Human-readable starting prices per requested service, for the email."""
+    lines = []
+    for svc in services:
+        if svc == "Full Interior Detail":
+            lines.append(f"{svc}: {_price_text('Interior Detail', size)}")
+        elif svc in ("Wash n' Wax", "Full Detail"):
+            lines.append(f"{svc}: {_price_text(svc, size)}")
+        elif svc == "Ceramic Coating":
+            key = CERAMIC_PACKAGES.get(ceramic_package)
+            if key:
+                lines.append(f"{svc} — {ceramic_package}: {_price_text(key, size)}")
+            else:
+                lines.append(
+                    f"{svc}: 3-Year {_price_text('Ceramic Coating (3-Year)', size)}"
+                    f" / Elite {_price_text('Ceramic Coating (Elite 5-Year)', size)}"
+                )
+        elif svc == "Headlight Restoration":
+            lines.append(f"{svc}: {_money(ADDON_PRICES['Headlight Restoration'])} flat")
+        elif svc == "Paint Correction":
+            lines.append(f"{svc}: quoted after inspection")
+    return lines
+
+
+def _clean(value, allowed=None, limit=120):
+    value = (value or "").strip()[:limit]
+    if allowed is not None and value not in allowed:
+        return ""
+    return value
+
+
+def init_quotes_table():
+    conn = get_db()
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS quotes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created TEXT, first_name TEXT, last_name TEXT, phone TEXT, email TEXT,
+            vehicle_year TEXT, vehicle_make TEXT, vehicle_model TEXT, vehicle_size TEXT,
+            zip TEXT, area TEXT, miles REAL, services TEXT, ceramic_package TEXT,
+            correction_type TEXT, last_detailed TEXT, condition TEXT, timing TEXT,
+            utilities TEXT, notes TEXT, contact_method TEXT, call_time TEXT,
+            source_page TEXT, utm TEXT, estimate TEXT, delivered TEXT
+        )
+        """
+    )
+    conn.commit()
+    conn.close()
+
+
+def parse_quote(form):
+    """Validate a quote submission. Returns (lead, errors)."""
+    errors = {}
+    phone_digits = _re.sub(r"\D", "", form.get("phone") or "")
+    if len(phone_digits) == 11 and phone_digits.startswith("1"):
+        phone_digits = phone_digits[1:]
+    services = [s for s in form.getlist("services") if s in QUOTE_SERVICES]
+    services = sorted(set(services), key=QUOTE_SERVICES.index)
+    lead = {
+        "first_name": _clean(form.get("first_name"), limit=60),
+        "last_name": _clean(form.get("last_name"), limit=60),
+        "phone": phone_digits,
+        "email": _clean(form.get("email"), limit=120),
+        "vehicle_year": _clean(form.get("vehicle_year"), limit=4),
+        "vehicle_make": _clean(form.get("vehicle_make"), limit=40),
+        "vehicle_model": _clean(form.get("vehicle_model"), limit=60),
+        "vehicle_size": _clean(form.get("vehicle_size"), VEHICLE_TYPES),
+        "zip": _re.sub(r"\D", "", form.get("zip") or "")[:5],
+        "services": services,
+        "ceramic_package": _clean(form.get("ceramic_package"), CERAMIC_PACKAGES)
+        if "Ceramic Coating" in services else "",
+        "correction_type": _clean(form.get("correction_type"), CORRECTION_TYPES)
+        if "Paint Correction" in services else "",
+        "last_detailed": _clean(form.get("last_detailed"), LAST_DETAILED),
+        "condition": [c for c in form.getlist("condition") if c in CONDITIONS],
+        "timing": _clean(form.get("timing"), TIMINGS),
+        "utilities": _clean(form.get("utilities"), UTILITIES),
+        "notes": _clean(form.get("notes"), limit=2000),
+        "contact_method": _clean(form.get("contact_method"), CONTACT_METHODS),
+        "call_time": _clean(form.get("call_time"), CALL_TIMES),
+        "source_page": _clean(form.get("source_page"), limit=200),
+        "utm": _clean(form.get("utm"), limit=400),
+    }
+    if not lead["first_name"]:
+        errors["first_name"] = "Please enter your first name."
+    if len(lead["phone"]) != 10:
+        errors["phone"] = "Please enter a 10-digit phone number."
+    if not EMAIL_RE.match(lead["email"]):
+        errors["email"] = "Please enter a valid email address."
+    if len(lead["zip"]) != 5:
+        errors["zip"] = "Please enter a 5-digit ZIP code."
+    if lead["vehicle_year"] and not _re.fullmatch(r"(19|20)\d\d", lead["vehicle_year"]):
+        lead["vehicle_year"] = ""
+    if not services:
+        errors["services"] = "Please choose at least one service."
+    return lead, errors
+
+
+def _fmt_phone(d):
+    return f"({d[:3]}) {d[3:6]}-{d[6:]}" if len(d) == 10 else d
+
+
+def send_quote_email(lead):
+    """Email the lead to the shop. Returns True only if Resend accepted it."""
+    if not RESEND_API_KEY:
+        app.logger.warning("RESEND_API_KEY not set — quote email skipped.")
+        return False
+    try:
+        import html as _html
+        import resend
+
+        resend.api_key = RESEND_API_KEY
+        esc = lambda v: _html.escape(str(v)) if v else "—"  # noqa: E731
+
+        def row(label, value):
+            return (
+                "<tr><td style='padding:7px 14px;color:#8a8a8a;font-size:13px;"
+                "border-bottom:1px solid #eee;white-space:nowrap;vertical-align:top;'>"
+                f"{label}</td><td style='padding:7px 14px;color:#0a0a0a;font-size:14px;"
+                f"border-bottom:1px solid #eee;font-weight:600;'>{esc(value)}</td></tr>"
+            )
+
+        def section(label):
+            return (
+                "<tr><td colspan='2' style='padding:12px 14px 6px;background:#f4f6f9;"
+                "color:#1e3a5f;font-size:11px;font-weight:700;letter-spacing:.08em;"
+                f"text-transform:uppercase;'>{label}</td></tr>"
+            )
+
+        vehicle = " ".join(
+            v for v in (lead["vehicle_year"], lead["vehicle_make"], lead["vehicle_model"]) if v
+        )
+        miles = f" · ~{lead['miles']} mi" if lead.get("miles") is not None else ""
+        body = (
+            section("Contact")
+            + row("Name", f"{lead['first_name']} {lead['last_name']}".strip())
+            + row("Phone", _fmt_phone(lead["phone"]))
+            + row("Email", lead["email"])
+            + row("Prefers", lead["contact_method"])
+            + row("Best time", lead["call_time"])
+            + section("Vehicle & location")
+            + row("Vehicle", vehicle)
+            + row("Size", lead["vehicle_size"])
+            + row("ZIP", f"{lead['zip']}{miles}")
+            + row("Service area", AREA_LABELS[lead["area"]])
+            + section("Services")
+            + row("Requested", ", ".join(lead["services"]))
+            + row("Ceramic package", lead["ceramic_package"])
+            + row("Correction", lead["correction_type"])
+            + row("Starting prices", " | ".join(lead["estimate"]))
+            + section("Condition & timing")
+            + row("Last detailed", lead["last_detailed"])
+            + row("Condition", ", ".join(lead["condition"]))
+            + row("Timing", lead["timing"])
+            + row("Water & power", lead["utilities"])
+            + row("Notes", lead["notes"])
+            + section("Source")
+            + row("Page", lead["source_page"])
+            + row("Campaign", lead["utm"])
+            + row("Submitted", lead["created"])
+        )
+        html = (
+            "<div style='font-family:Arial,Helvetica,sans-serif;max-width:580px;margin:0 auto;'>"
+            "<div style='background:#1e3a5f;padding:20px 24px;border-radius:6px 6px 0 0;'>"
+            "<h1 style='color:#fff;font-size:20px;margin:0;'>New Quote Request</h1>"
+            f"<p style='color:#9ab4d4;font-size:13px;margin:6px 0 0;'>{esc(lead['timing'] or 'Timing not given')}</p>"
+            "</div><table style='width:100%;border-collapse:collapse;background:#fff;"
+            f"border:1px solid #eee;border-top:none;'>{body}</table>"
+            "<p style='color:#8a8a8a;font-size:12px;margin:14px 0 0;text-align:center;'>"
+            "Starting prices are list prices by size — confirm on arrival.</p></div>"
+        )
+        subject = (
+            f"New Quote — {lead['first_name']} {lead['last_name']}".strip()
+            + f" · {', '.join(lead['services'])} · {lead['zip']}"
+        )
+        resend.Emails.send({
+            "from": RESEND_FROM,
+            "to": [SHOP_EMAIL],
+            "subject": subject[:180],
+            "html": html,
+            "reply_to": lead["email"] or None,
+        })
+        return True
+    except Exception as exc:  # noqa: BLE001
+        app.logger.error("Quote email failed: %s", exc)
+        return False
+
+
+def send_quote_to_sheet(lead):
+    """Append the lead to Google Sheets via an Apps Script web app (optional)."""
+    if not SHEETS_WEBHOOK_URL:
+        return False
+    payload = dict(lead)
+    payload["phone"] = _fmt_phone(lead["phone"])
+    for k in ("services", "condition", "estimate"):
+        payload[k] = ", ".join(lead[k])
+    payload["area"] = AREA_LABELS[lead["area"]]
+    try:
+        req = _urlreq.Request(
+            SHEETS_WEBHOOK_URL,
+            data=_json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with _urlreq.urlopen(req, timeout=8) as res:
+            return 200 <= res.status < 400
+    except Exception as exc:  # noqa: BLE001
+        app.logger.error("Quote sheet backup failed: %s", exc)
+        return False
+
+
+def delivery_configured():
+    return bool(RESEND_API_KEY or SHEETS_WEBHOOK_URL)
+
+
+@app.route("/api/quote", methods=["POST"])
+def quote():
+    form = request.form
+    # Honeypot: real visitors never see or fill this field.
+    if (form.get("website") or "").strip():
+        return jsonify({"ok": True})
+
+    lead, errors = parse_quote(form)
+    if errors:
+        return jsonify({"ok": False, "errors": errors}), 400
+
+    lead["area"], lead["miles"] = area_for_zip(lead["zip"])
+    lead["estimate"] = quote_estimate(
+        lead["services"], lead["vehicle_size"], lead["ceramic_package"]
+    )
+    lead["created"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    emailed = send_quote_email(lead)
+    sheeted = send_quote_to_sheet(lead)
+    delivered = emailed or sheeted
+    channels = ",".join(c for c, ok in (("email", emailed), ("sheet", sheeted)) if ok)
+
+    conn = get_db()
+    conn.execute(
+        """INSERT INTO quotes (created, first_name, last_name, phone, email,
+            vehicle_year, vehicle_make, vehicle_model, vehicle_size, zip, area, miles,
+            services, ceramic_package, correction_type, last_detailed, condition,
+            timing, utilities, notes, contact_method, call_time, source_page, utm,
+            estimate, delivered)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (
+            lead["created"], lead["first_name"], lead["last_name"], lead["phone"],
+            lead["email"], lead["vehicle_year"], lead["vehicle_make"],
+            lead["vehicle_model"], lead["vehicle_size"], lead["zip"], lead["area"],
+            lead["miles"], ", ".join(lead["services"]), lead["ceramic_package"],
+            lead["correction_type"], lead["last_detailed"], ", ".join(lead["condition"]),
+            lead["timing"], lead["utilities"], lead["notes"], lead["contact_method"],
+            lead["call_time"], lead["source_page"], lead["utm"],
+            " | ".join(lead["estimate"]), channels or "none",
+        ),
+    )
+    conn.commit()
+    conn.close()
+
+    # On Vercel with no channel configured — or every channel failing — the
+    # lead would only exist in ephemeral /tmp. Say so, so the visitor calls.
+    if not delivered and (os.environ.get("VERCEL") or delivery_configured()):
+        return jsonify({"ok": False, "error": "delivery"}), 503
+
+    return jsonify({"ok": True, "first_name": lead["first_name"]})
+
+
+# ──────────────────────────────────────────────────────────────────────────
 #  Routes — static frontend
 # ──────────────────────────────────────────────────────────────────────────
 # Clean URLs of every public page, in sitemap order. The booking backend and
@@ -587,23 +955,47 @@ AREA_PAGES = (
     "bentleyville",
 )
 
-# Every public page, as (canonical URL, file on disk), in sitemap order.
+# Static pages, as (canonical URL, file on disk), in sitemap order.
 # The site is served at clean URLs; the .html form of each is registered as a
 # permanent redirect so old links still land, but nothing on the site links to
 # it and only the clean form is canonical.
 PAGES = (
-    ("/", "index.html"),
     ("/booking", "booking.html"),
-    ("/ceramic-coating", "ceramic-coating.html"),
     ("/rv-detailing", "rv-detailing.html"),
     ("/boat-detailing", "boat-detailing.html"),
-    ("/about", "about.html"),
     ("/gallery", "gallery.html"),
     ("/reviews", "reviews.html"),
     ("/faq", "faq.html"),
 ) + tuple((f"/{slug}", f"{slug}.html") for slug in AREA_PAGES)
 
-PUBLIC_PAGES = tuple(url for url, _ in PAGES)
+# Templated (v3) pages: (canonical URL, template, extra context).
+# Content lives in site_content.py; shared chrome in templates/base.html.
+SERVICE_PAGE_SLUGS = tuple(
+    s["slug"] for s in site_content.SERVICES if s["slug"] != "ceramic-coating"
+)
+TEMPLATE_PAGES = (
+    ("/", "home.html", {}),
+    ("/services", "services.html", {}),
+    ("/ceramic-coating", "ceramic.html", {"service": "ceramic-coating"}),
+) + tuple(
+    (f"/{slug}", "service.html", {"service": slug}) for slug in SERVICE_PAGE_SLUGS
+) + (
+    ("/about", "about.html", {}),
+    ("/contact", "contact.html", {}),
+    ("/quote", "quote.html", {}),
+)
+
+# Meta-ad landing pages: linkable, noindex, kept out of the sitemap.
+LANDING_PAGES = tuple(
+    (f"/lp/{slug}", "landing.html", {"lp": slug, "service": lp["service"]})
+    for slug, lp in site_content.LANDING_PAGES.items()
+)
+
+# Old .html files the templates replaced; their URLs still redirect.
+LEGACY_HTML = {"/index.html": "/", "/about.html": "/about",
+               "/ceramic-coating.html": "/ceramic-coating"}
+
+PUBLIC_PAGES = tuple(url for url, _, _ in TEMPLATE_PAGES) + tuple(url for url, _ in PAGES)
 
 # ──────────────────────────────────────────────────────────────────────────
 #  Canonical site URL
@@ -668,6 +1060,94 @@ def _register_page(url, filename):
 
 for _url, _filename in PAGES:
     _register_page(_url, _filename)
+
+
+# ── Templated pages ──
+with open(os.path.join(BASE_DIR, "templates", "icons.json")) as _fh:
+    ICONS = _json.load(_fh)
+
+
+def icon(name, cls="ic"):
+    """Inline Lucide SVG (paths extracted by tools/build_v3_assets.py)."""
+    from markupsafe import Markup
+
+    return Markup(
+        f'<svg class="{cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{ICONS.get(name, "")}</svg>'
+    )
+
+
+def starts_at(svc):
+    """'$120' style starting price for a service dict, or '' when quoted."""
+    if svc.get("price_key"):
+        return _money(min(BASE_PRICES[svc["price_key"]].values()))
+    if svc.get("flat_price"):
+        return _money(ADDON_PRICES[svc["flat_price"]])
+    return ""
+
+
+@app.context_processor
+def _site_context():
+    return {
+        "c": site_content,
+        "icon": icon,
+        "money": _money,
+        "starts_at": starts_at,
+        "BASE_PRICES": BASE_PRICES,
+        "ADDON_PRICES": ADDON_PRICES,
+        "CLAY_PRICES": CLAY_PRICES,
+        "TRAVEL_FEE": TRAVEL_FEE,
+        "VEHICLE_TYPES": VEHICLE_TYPES,
+        "QUOTE_SERVICE_SLUGS": QUOTE_SERVICE_SLUGS,
+        "CERAMIC_PACKAGES": CERAMIC_PACKAGES,
+        "CORRECTION_TYPES": CORRECTION_TYPES,
+        "LAST_DETAILED": LAST_DETAILED,
+        "CONDITIONS": CONDITIONS,
+        "TIMINGS": TIMINGS,
+        "UTILITIES": UTILITIES,
+        "CONTACT_METHODS": CONTACT_METHODS,
+        "CALL_TIMES": CALL_TIMES,
+        "SITE_URL": SITE_URL,
+        "AREA_PAGES": AREA_PAGES,
+        "MAINTENANCE_SCOPE_NOTE": MAINTENANCE_SCOPE_NOTE,
+        "year": datetime.now().year,
+    }
+
+
+def _register_template(url, template, ctx, noindex=False):
+    def view(_t=template, _ctx=ctx, _url=url):
+        svc = site_content.SERVICE_BY_SLUG.get(_ctx.get("service", ""))
+        return render_template(
+            _t,
+            path=_url,
+            svc=svc,
+            noindex=noindex,
+            hero_video=media_present("hero-loop.mp4"),
+            hero_video_vertical=media_present("hero-loop-vertical.mp4"),
+            **_ctx,
+        )
+
+    view.__name__ = "tpl_" + (url.strip("/").replace("/", "_").replace("-", "_") or "home")
+    app.add_url_rule(url, view_func=view)
+
+
+for _url, _tpl, _ctx in TEMPLATE_PAGES:
+    _register_template(_url, _tpl, _ctx)
+for _url, _tpl, _ctx in LANDING_PAGES:
+    _register_template(_url, _tpl, _ctx, noindex=True)
+
+
+def _legacy_redirect(_to):
+    def view():
+        query = request.query_string.decode()
+        return redirect(f"{_to}?{query}" if query else _to, code=301)
+    return view
+
+
+for _old, _new in LEGACY_HTML.items():
+    app.add_url_rule(_old, endpoint="legacy_" + _old.strip("/").replace(".", "_").replace("-", "_"),
+                     view_func=_legacy_redirect(_new))
 
 
 @app.route("/robots.txt")
@@ -779,6 +1259,7 @@ def set_headers(response):
 
 # Initialize the database on import (covers both local + serverless cold starts).
 init_db()
+init_quotes_table()
 
 
 if __name__ == "__main__":

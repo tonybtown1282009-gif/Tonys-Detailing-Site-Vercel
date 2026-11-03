@@ -8,7 +8,9 @@ site once its file has real content; empty slots are hidden automatically.
 
 | File | Where it shows | Recommended |
 |------|----------------|-------------|
-| `hero-video.mp4` | Homepage hero background (desktop only). Lazy-loaded after the page loads; phones and reduced-motion visitors never download it. | MP4, H.264, no audio track, ~10–20s loop, keep under ~2 MB — run it through `tools/compress_hero_video.py` |
+| `hero-loop.mp4` | Homepage hero loop, landscape screens. 6–10s, 1920×1080, steady footage, no audio, under ~3 MB. |
+| `hero-loop-vertical.mp4` | Homepage hero loop, phones. 6–10s, 1080×1920, under ~2 MB. Both load only after the page has loaded, never with reduced motion or data saver on. |
+| `hero-video.mp4` | Legacy clip (no longer shown). Lazy-loaded after the page loads; phones and reduced-motion visitors never download it. | MP4, H.264, no audio track, ~10–20s loop, keep under ~2 MB — run it through `tools/compress_hero_video.py` |
 | `hero-fallback.jpg` | Homepage hero background, and the video's poster. This is what paints first, so keep one here even when the video is filled. | JPG, 1920×1080 |
 | `rv-hero.jpg` | `/rv-detailing` hero background. | JPG, 1920×1080 |
 | `boat-hero.jpg` | `/boat-detailing` hero background. | JPG, 1920×1080 |

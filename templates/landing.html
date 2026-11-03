@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}{{ c.LANDING_PAGES[lp].title }}{% endblock %}
+{% block description %}{{ c.LANDING_PAGES[lp].lede }}{% endblock %}
+{% block body_class %}lp{% endblock %}
+{% block navlinks %}{% endblock %}
+{% block burger %}{% endblock %}
+{% block mnav %}{% endblock %}
+{% block content %}
+{% set lp_data = c.LANDING_PAGES[lp] %}
+<section class="phero has-img">
+  {{ m.img(svc.image, 900, '', '100vw', [520, 900], eager=True) }}
+  <div class="wrap">
+    <span class="eyebrow">{{ lp_data.eyebrow }}</span>
+    <h1>{{ lp_data.h1 }}</h1>
+    <p class="lede">{{ lp_data.lede }}</p>
+    {% if lp_data.promo %}<p class="promo">{{ lp_data.promo }}</p>{% endif %}
+    <div class="price-chip">{% if starts_at(svc) %}Starts at <b>{{ starts_at(svc) }}</b> by vehicle size{% endif %}</div>
+    <div class="hero-actions">
+      <a href="#quote" class="btn btn-primary btn-lg" data-quote="{{ svc.slug }}">{{ lp_data.cta }}</a>
+    </div>
+  </div>
+</section>
+<div class="wrap lp-strip">
+  <span><span class="stars" aria-hidden="true">{% for _ in range(5) %}{{ icon('star') }}{% endfor %}</span> 5-star Google reviews</span>
+  <span>{{ icon('map-pin') }} We come to your home or office</span>
+  <span>{{ icon('badge-check') }} Price confirmed before work begins</span>
+</div>
+
+{% if svc.slug == 'ceramic-coating' %}
+<section class="sec">
+  <div class="wrap two">
+    <div>
+      <span class="eyebrow">Why Prep Matters</span>
+      <h2 style="margin-top:14px">The Coating Is Only As Good As The Paint Under It</h2>
+      <div class="prose" style="margin-top:16px"><p>A ceramic coating locks in whatever condition your paint is in. That's why every package starts with a full decontamination and a single-stage enhancement polish, so the coating bonds to clean, polished paint — not to whatever is sitting on top of it.</p></div>
+    </div>
+    <div class="card">
+      <h3>Every Package Includes</h3>
+      <ul class="checks">{% for i in ['Exterior hand wash and foam bath','Bug splatter removal','Clay bar service — micro-contaminant removal','Wheels and rims deep cleaned','Isopropyl alcohol wipe down (coating prep)','Single-stage paint enhancement polish','Free follow-up wash, 1 week after service'] %}<li>{{ icon('check') }}<span>{{ i }}</span></li>{% endfor %}</ul>
+    </div>
+  </div>
+</section>
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Packages</span><h2>Choose Your Protection</h2></div></div>
+    <div class="pkg-row" style="margin:0">
+      <div class="pkg"><small>3-Year</small><b>3-Year Coating</b><span>3-year rated coating · about 6 hours · from {{ money(BASE_PRICES['Ceramic Coating (3-Year)']['Sedan']) }}</span></div>
+      <div class="pkg"><small>Elite · 5-Year</small><b>Elite Ceramic</b><span>DIY Detail 5-year coating · about 6 hours · from {{ money(BASE_PRICES['Ceramic Coating (Elite 5-Year)']['Sedan']) }}</span></div>
+    </div>
+    <p class="note">Multi-stage paint correction is not included and is quoted separately if your paint needs it.</p>
+  </div>
+</section>
+{% else %}
+<section class="sec">
+  <div class="wrap two">
+    <div>
+      <span class="eyebrow">The Full Detail</span>
+      <h2 style="margin-top:14px">Inside And Out, In Your Driveway</h2>
+      <div class="prose" style="margin-top:16px"><p>{{ svc.intro }}</p></div>
+      <p class="note">{{ svc.note }}</p>
+    </div>
+    <div class="card">
+      <h3>What's Included</h3>
+      <ul class="checks">{% for i in svc.included %}<li>{{ icon('check') }}<span>{{ i }}</span></li>{% endfor %}{% for i in c.SERVICE_BY_SLUG['interior-detailing'].included %}<li>{{ icon('check') }}<span>{{ i }}</span></li>{% endfor %}</ul>
+    </div>
+  </div>
+</section>
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="work-grid">{% for n, alt in c.WORK_PHOTOS[:4] %}<figure>{{ m.img('work-' ~ n, 600, alt, '(max-width:760px) 72vw, 25vw') }}</figure>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">What Clients Say</span><h2>Trusted By Local Drivers</h2></div></div>
+    {{ m.review_cards(3) }}
+  </div>
+</section>
+
+{{ m.quote_section(svc.slug, lp_data.cta|title, 'Free Quote') }}
+{% endblock %}
+{% block footer %}
+<footer class="foot" style="padding:28px 0">
+  <div class="wrap foot-legal" style="margin:0;border:0;padding:0">
+    <p>&copy; {{ year }} Tony's Detailing &middot; Chardon, OH &middot; <a href="tel:{{ c.PHONE_TEL }}">{{ c.PHONE_DISPLAY }}</a></p>
+    <p><a href="/">Visit our main site</a></p>
+  </div>
+</footer>
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

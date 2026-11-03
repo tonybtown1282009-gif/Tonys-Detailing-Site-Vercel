@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Tony's Detailing — Mobile Auto Detailing & Ceramic Coating in Northeast Ohio{% endblock %}
+{% block head %}
+<link rel="preload" as="image" media="(min-width:761px)" imagesrcset="/static/img/hero-1200.webp 1200w, /static/img/hero-1920.webp 1920w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width:760px)" imagesrcset="/static/img/hero-m-800.webp 800w, /static/img/hero-m-1200.webp 1200w" imagesizes="100vw" fetchpriority="high">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoWash",
+  "@id": "{{ SITE_URL }}/#business",
+  "name": "Tony's Detailing",
+  "description": "Owner-operated mobile auto detailing — interior and exterior detailing, paint correction and ceramic coating, brought to your home or office.",
+  "url": "{{ SITE_URL }}/",
+  "telephone": "+12169034783",
+  "email": "{{ c.EMAIL }}",
+  "image": "{{ SITE_URL }}/assets/og-card.jpg",
+  "logo": "{{ SITE_URL }}/assets/logo.png",
+  "priceRange": "$$",
+  "address": {"@type": "PostalAddress", "addressLocality": "Chardon", "addressRegion": "OH", "addressCountry": "US"},
+  "areaServed": [
+    {"@type": "AdministrativeArea", "name": "Geauga County, OH"},
+    {"@type": "AdministrativeArea", "name": "Lake County, OH"},
+    {"@type": "AdministrativeArea", "name": "Eastern Cuyahoga County, OH"}
+  ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<section class="hero" id="hero">
+  <div class="hero-media">
+    <picture>
+      <source media="(max-width:760px)" srcset="/static/img/hero-m-800.webp 800w, /static/img/hero-m-1200.webp 1200w" sizes="100vw">
+      <img src="/static/img/hero-1920.webp" srcset="/static/img/hero-760.webp 760w, /static/img/hero-1200.webp 1200w, /static/img/hero-1920.webp 1920w" sizes="100vw" alt="" fetchpriority="high" decoding="async">
+    </picture>
+    {% if hero_video or hero_video_vertical %}
+    <video muted loop playsinline preload="none" aria-hidden="true"
+      {% if hero_video %}data-src="/static/media/hero-loop.mp4"{% endif %}
+      {% if hero_video_vertical %}data-src-vertical="/static/media/hero-loop-vertical.mp4"{% endif %}></video>
+    {% endif %}
+  </div>
+  <div class="hero-in">
+    <span class="eyebrow">Mobile Detailing &middot; Northeast Ohio</span>
+    <h1>Your Car.<br><span>Our Job.</span></h1>
+    <p class="hero-sub"><strong>Professional mobile auto detailing in Northeast Ohio.</strong>Interior detailing, exterior detailing, paint correction, and ceramic coating — brought directly to your location.</p>
+    <div class="hero-actions">
+      <a href="/quote" class="btn btn-primary btn-lg" data-quote="">Get a Free Quote {{ icon('arrow-right') }}</a>
+      <a href="#services" class="btn btn-ghost btn-lg">View Our Services</a>
+    </div>
+    <div class="hero-trust">
+      <span><span class="stars" aria-hidden="true">{% for _ in range(5) %}{{ icon('star') }}{% endfor %}</span> 5-star Google reviews</span>
+      <span>{{ icon('map-pin') }} We come to you</span>
+      <span>{{ icon('badge-check') }} Price confirmed before work begins</span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">What We Offer</span>
+        <h2>Our Services</h2>
+        <p>Pick a service to get a quote, or learn more about what's included. Every service comes to you — home, office, or wherever you park.</p>
+      </div>
+      <a href="/services" class="link-arrow">Full Pricing {{ icon('arrow-right') }}</a>
+    </div>
+    {{ m.service_row(c.HOME_ROW) }}
+    {{ m.featured_rows(c.HOME_FEATURED) }}
+  </div>
+</section>
+
+{{ m.reviews_section(alt=True) }}
+
+<section class="sec" id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">Why Tony's Detailing</span>
+        <h2>We Take Our Time</h2>
+        <p>Owner-operated, by appointment, and focused on doing the job properly — not on how many cars we can fit in a day.</p>
+      </div>
+    </div>
+    <div class="why-grid">
+      {% for ic, h, p in c.WHY_US %}
+      <div class="why">{{ icon(ic) }}<h3>{{ h }}</h3><p>{{ p }}</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="ceramic">
+  <div class="wrap cer">
+    <div class="cer-img">{{ m.img('hero-m', 1200, 'White Porsche 911 Targa after detailing', '(max-width:860px) 100vw, 50vw', [800, 1200]) }}</div>
+    <div class="cer-copy">
+      <span class="eyebrow">Flagship Service</span>
+      <h2 style="margin-top:14px">Ceramic Coating</h2>
+      <p>A ceramic coating is a liquid protective layer, applied by hand, that bonds to your paint. It adds depth and gloss and makes the vehicle easier to keep clean — and because it locks in whatever condition the paint is in, the prep matters as much as the coating.</p>
+      <ul class="cer-points">
+        <li>{{ icon('spray-can') }}<div><b>Proper prep, every time</b><span>Foam bath, bug removal, clay bar, wheels deep cleaned, IPA wipe-down, and a single-stage enhancement polish before any coating goes on.</span></div></li>
+        <li>{{ icon('shield-check') }}<div><b>Protection rated in years</b><span>Choose a 3-year rated coating or our Elite 5-year coating. Free follow-up wash one week after service.</span></div></li>
+      </ul>
+      <div class="pkg-row">
+        <div class="pkg"><small>3-Year</small><b>3-Year Coating</b><span>From {{ money(BASE_PRICES['Ceramic Coating (3-Year)']['Sedan']) }}</span></div>
+        <div class="pkg"><small>Elite · 5-Year</small><b>Elite Ceramic</b><span>From {{ money(BASE_PRICES['Ceramic Coating (Elite 5-Year)']['Sedan']) }}</span></div>
+      </div>
+      <div class="hero-actions" style="margin-top:0">
+        <a href="/ceramic-coating" class="btn btn-primary btn-lg">Explore Ceramic Coatings</a>
+        <a href="/quote?service=ceramic-coating" class="btn btn-ghost btn-lg" data-quote="ceramic-coating">Get a Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">Our Work</span>
+        <h2>Recent Details</h2>
+        <p>Real vehicles, detailed in our customers' driveways.</p>
+      </div>
+      <a href="/gallery" class="link-arrow">View Full Gallery {{ icon('arrow-right') }}</a>
+    </div>
+    <div class="work-grid work-compact">
+      <figure>{{ m.img('headlight-before', 700, 'Foggy headlight before restoration', '(max-width:760px) 44vw, 16vw') }}<figcaption>Before</figcaption></figure>
+      <figure>{{ m.img('headlight-after', 700, 'Clear headlight after restoration', '(max-width:760px) 44vw, 16vw') }}<figcaption>After</figcaption></figure>
+      {% for n, alt in c.WORK_PHOTOS[:4] %}<figure>{{ m.img('work-' ~ n, 600, alt, '(max-width:760px) 44vw, 16vw') }}</figure>{% endfor %}
+    </div>
+  </div>
+</section>
+
+{{ m.quote_section() }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

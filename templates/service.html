@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}{{ svc.title }} | Tony's Detailing{% endblock %}
+{% block description %}{{ svc.meta }}{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Service","name":{{ svc.name|tojson }},"serviceType":{{ svc.name|tojson }},
+ "description":{{ svc.intro|tojson }},"areaServed":"Northeast Ohio",
+ "provider":{"@type":"AutoWash","@id":"{{ SITE_URL }}/#business","name":"Tony's Detailing","telephone":"+12169034783"}}
+</script>
+{% endblock %}
+{% block content %}
+<section class="phero has-img">
+  {{ m.img(svc.image, 900, '', '100vw', [520, 900], eager=True) }}
+  <div class="wrap">
+    <span class="eyebrow">Mobile Service &middot; Northeast Ohio</span>
+    <h1>{{ svc.name }}</h1>
+    <p class="lede">{{ svc.intro }}</p>
+    <div class="price-chip">{% if starts_at(svc) %}Starts at <b>{{ starts_at(svc) }}</b>{% if svc.price_key %} by vehicle size{% else %} per set{% endif %}{% else %}<b>Quoted after inspection</b>{% endif %}</div>
+    <div class="hero-actions">
+      <a href="#quote" class="btn btn-primary btn-lg" data-quote="{{ svc.slug }}">Get a Free Quote {{ icon('arrow-right') }}</a>
+      <a href="tel:{{ c.PHONE_TEL }}" class="btn btn-ghost btn-lg">{{ icon('phone') }} {{ c.PHONE_DISPLAY }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap two">
+    <div class="card">
+      <h3>{% if svc.slug == 'paint-correction' %}How It Works{% else %}What's Included{% endif %}</h3>
+      <ul class="checks">{% for i in svc.included %}<li>{{ icon('check') }}<span>{{ i }}</span></li>{% endfor %}</ul>
+      {% if svc.note %}<p class="note">{{ svc.note }}</p>{% endif %}
+    </div>
+    <div>
+      {% if svc.before_after %}
+      <div class="ba" style="margin:0">
+        <figure>{{ m.img('headlight-before', 700, 'Foggy headlight before restoration', '50vw') }}<figcaption>Before</figcaption></figure>
+        <figure>{{ m.img('headlight-after', 700, 'Clear headlight after restoration', '50vw') }}<figcaption>After</figcaption></figure>
+      </div>
+      {% elif svc.slug == 'paint-correction' %}
+      <div class="card">
+        <h3>Planning a Ceramic Coating?</h3>
+        <div class="prose"><p>A coating locks in whatever condition your paint is in, so correcting it first gives the best result. Both of our ceramic packages already include a single-stage enhancement polish; multi-stage correction is quoted separately.</p></div>
+        <a href="/ceramic-coating" class="link-arrow" style="margin-top:18px">Explore Ceramic Coatings {{ icon('arrow-right') }}</a>
+      </div>
+      {% elif svc.price_key %}
+      <div class="tbl-wrap">
+        <table class="ptbl">
+          <thead><tr><th>Vehicle size</th><th>Price</th></tr></thead>
+          <tbody>{% for size, p in BASE_PRICES[svc.price_key].items() %}<tr><td>{{ size.replace('/', ' / ') }}</td><td>{{ money(p) }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <p class="note">Base prices assume normal wear. Heavy pet hair, deep staining, smoke/odor and excessive debris may add to the price — always confirmed with you before work begins.</p>
+      {% endif %}
+      {% if svc.addons %}
+      <div class="card" style="margin-top:16px">
+        <h3>Popular Add-Ons</h3>
+        <ul class="addon-list">
+          {% for a in svc.addons %}<li><span><b>{{ a }}</b><small>{{ c.ADDON_COPY[a] }}</small></span><span class="p">{% if a == 'Clay & Iron Decontamination' %}+{{ money(CLAY_PRICES['Sedan']) }}–{{ money(CLAY_PRICES['Large SUV/Truck']) }}{% elif a == 'Odor Eliminator' %}+$40–$75{% else %}+{{ money(ADDON_PRICES[a]) }}{% endif %}</span></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Good To Know</span><h2>Common Questions</h2></div><a href="/faq" class="link-arrow">All FAQs {{ icon('arrow-right') }}</a></div>
+    {{ m.faqs(svc.faqs) }}
+  </div>
+</section>
+
+{{ m.quote_section(svc.slug, 'Get a Free ' ~ svc.name ~ ' Quote') }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

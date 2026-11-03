@@ -400,15 +400,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="nav-dd" id="navSvcDd">
       <button type="button" class="nav-dd-btn" aria-expanded="false" aria-controls="navSvcMenu">Services <i data-lucide="chevron-down"></i></button>
       <div class="nav-dd-menu" id="navSvcMenu">
-        <a href="/#services">Car Detailing</a>
+        <a href="/services">Car Detailing</a>
         <a href="/rv-detailing">RV Detailing</a>
         <a href="/boat-detailing">Boat Detailing</a>
         <a href="/ceramic-coating">Ceramic Coating</a>
       </div>
     </div>
-    <a href="/#pricing">Pricing</a>
-    <a href="/#area">Service Area</a>
-    <a href="/#contact">Contact</a>
+    <a href="/services#pricing">Pricing</a>
+    <a href="/services#area">Service Area</a>
+    <a href="/contact">Contact</a>
   </div>
   <div class="nav-right" style="flex:0 0 auto;">
     <a href="tel:+12169034783" class="nav-phone" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i>(216) 903-4783</a>
@@ -423,14 +423,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="drawer">
   <button type="button" class="drawer-dd-btn" id="drawerSvcBtn" aria-expanded="false" aria-controls="drawerSvcList">Services <i data-lucide="chevron-down"></i></button>
   <div class="drawer-dd-list" id="drawerSvcList" hidden>
-    <a href="/#services">Car Detailing <i data-lucide="arrow-right"></i></a>
+    <a href="/services">Car Detailing <i data-lucide="arrow-right"></i></a>
     <a href="/rv-detailing">RV Detailing <i data-lucide="arrow-right"></i></a>
     <a href="/boat-detailing">Boat Detailing <i data-lucide="arrow-right"></i></a>
     <a href="/ceramic-coating">Ceramic Coating <i data-lucide="arrow-right"></i></a>
   </div>
-  <a href="/#pricing">Pricing <i data-lucide="arrow-right"></i></a>
-  <a href="/#area">Service Area <i data-lucide="arrow-right"></i></a>
-  <a href="/#contact">Contact <i data-lucide="arrow-right"></i></a>
+  <a href="/services#pricing">Pricing <i data-lucide="arrow-right"></i></a>
+  <a href="/services#area">Service Area <i data-lucide="arrow-right"></i></a>
+  <a href="/contact">Contact <i data-lucide="arrow-right"></i></a>
   <a href="tel:+12169034783" onclick="gtag('event','conversion',{'send_to':'AW-18237414368/t4VuCLPxv8gcEOC3o_hD'})"><i data-lucide="phone"></i> (216) 903-4783</a>
 </div>
 
@@ -501,7 +501,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label for="service">Service <span class="req">*</span></label>
               <select id="service" name="service" required>
                 <option value="">Select a service&hellip;</option>
-                <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
+                <option value="Wash n' Wax" data-service="Wash n' Wax">Wash n' Wax ($140&ndash;$180)</option>
                 <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                 <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                 <optgroup label="Ceramic Coating">
@@ -562,7 +562,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <label for="service_2">Service</label>
                   <select id="service_2" name="service_2">
                     <option value="">Select a service&hellip;</option>
-                    <option value="Wash, Clay, Seal" data-service="Wash, Clay, Seal">Wash, Clay, Seal ($140&ndash;$180)</option>
+                    <option value="Wash n' Wax" data-service="Wash n' Wax">Wash n' Wax ($140&ndash;$180)</option>
                     <option value="Interior Detail" data-service="Interior Detail">Interior Detail ($120&ndash;$155)</option>
                     <option value="Full Detail" data-service="Full Detail">Full Detail ($195&ndash;$240)</option>
                     <optgroup label="Ceramic Coating">
@@ -679,7 +679,7 @@ const money = n => '$' + n.toLocaleString('en-US', {
   minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2
 });
 const PRICES = {
-  "Wash, Clay, Seal": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
+  "Wash n' Wax": {"Sedan":140,"SUV/Crossover":150,"Large SUV/Truck":180,"Minivan":165},
   "Interior Detail": {"Sedan":120,"SUV/Crossover":135,"Large SUV/Truck":155,"Minivan":145},
   "Full Detail":     {"Sedan":195,"SUV/Crossover":215,"Large SUV/Truck":240,"Minivan":225},
   "Ceramic Coating (3-Year)": {"Sedan":799.99,"SUV/Crossover":849.99,"Large SUV/Truck":1049.99,"Minivan":949.99},
@@ -950,8 +950,8 @@ tdIcons();
 <!-- Fixed bottom tab bar — mobile only. `aria-current` marks this page. -->
 <nav id="mtabs" aria-label="Primary">
   <a href="/"><i data-lucide="house"></i><span>Home</span></a>
-  <a href="/#services"><i data-lucide="sparkles"></i><span>Services</span></a>
-  <a href="/#pricing"><i data-lucide="tag"></i><span>Pricing</span></a>
+  <a href="/services"><i data-lucide="sparkles"></i><span>Services</span></a>
+  <a href="/services#pricing"><i data-lucide="tag"></i><span>Pricing</span></a>
   <a href="/gallery"><i data-lucide="images"></i><span>Gallery</span></a>
   <a href="/booking" aria-current="page"><i data-lucide="calendar-check"></i><span>Book</span></a>
 </nav>

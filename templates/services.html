@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Services & Pricing | Tony's Detailing — Mobile Detailing in NE Ohio{% endblock %}
+{% block description %}Mobile detailing services and pricing: Full Detail, Interior, Wash n' Wax, Paint Correction, Ceramic Coating and Headlight Restoration. Priced by vehicle size.{% endblock %}
+{% block content %}
+{% set cols = [('Sedan','Sedan'),('SUV/Crossover','SUV / Crossover'),('Large SUV/Truck','Lg. SUV / Truck'),('Minivan','Minivan')] %}
+<section class="phero">
+  <div class="wrap">
+    <span class="eyebrow">Services &amp; Pricing</span>
+    <h1>Everything We Offer</h1>
+    <p class="lede">Base pricing scales with vehicle size. Condition upcharges are estimates — your final amount is confirmed after a quick walk-around on arrival, before any work begins.</p>
+    <div class="hero-actions"><a href="/quote" class="btn btn-primary btn-lg" data-quote="">Get a Free Quote {{ icon('arrow-right') }}</a></div>
+  </div>
+</section>
+
+<section class="sec"><div class="wrap">{{ m.service_grid() }}</div></section>
+
+<section class="sec sec-alt" id="pricing">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Transparent Pricing</span><h2>Pricing &amp; Upcharges</h2></div></div>
+    <div class="tbl-title"><h3>Base Pricing by Vehicle Size</h3><span>USD</span></div>
+    <div class="tbl-wrap">
+      <table class="ptbl">
+        <thead><tr><th>Service</th>{% for _, label in cols %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for row in ["Wash n' Wax", 'Interior Detail', 'Full Detail'] %}
+          <tr><td>{{ row }}</td>{% for key, label in cols %}<td data-label="{{ label }}">{{ money(BASE_PRICES[row][key]) }}</td>{% endfor %}</tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tbl-title" style="margin-top:32px"><h3>Ceramic Coating</h3><span>USD</span></div>
+    <div class="tbl-wrap">
+      <table class="ptbl">
+        <thead><tr><th>Package</th>{% for _, label in cols %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for row, label in [('Ceramic Coating (3-Year)','3-Year Coating'),('Ceramic Coating (Elite 5-Year)','Elite Ceramic (5-Year)')] %}
+          <tr><td>{{ label }}</td>{% for key, l in cols %}<td data-label="{{ l }}">{{ money(BASE_PRICES[row][key]) }}</td>{% endfor %}</tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two" style="margin-top:32px">
+      <div class="card">
+        <h3>Add-Ons</h3>
+        <ul class="addon-list">
+          <li><span><b>Leather Conditioning</b><small>{{ c.ADDON_COPY['Leather Conditioning'] }}</small></span><span class="p">+{{ money(ADDON_PRICES['Leather Conditioning']) }} flat</span></li>
+          <li><span><b>Clay &amp; Iron Decontamination</b><small>Sedan +{{ money(CLAY_PRICES['Sedan']) }} / SUV +{{ money(CLAY_PRICES['SUV/Crossover']) }} / Truck +{{ money(CLAY_PRICES['Large SUV/Truck']) }}</small></span><span class="p">+{{ money(CLAY_PRICES['Sedan']) }}–{{ money(CLAY_PRICES['Large SUV/Truck']) }}</span></li>
+          <li><span><b>Odor Eliminator</b><small>{{ c.ADDON_COPY['Odor Eliminator'] }}</small></span><span class="p">+$40–$75</span></li>
+          <li><span><b>Headlight Restoration</b><small>Flat rate, any vehicle</small></span><span class="p">{{ money(ADDON_PRICES['Headlight Restoration']) }} flat</span></li>
+          <li><span><b>Wheel Face Coating</b><small>3-Year {{ money(ADDON_PRICES['Wheel Face Coating (3-Year)']) }} / 5-Year {{ money(ADDON_PRICES['Wheel Face Coating (5-Year)']) }}</small></span><span class="p">+{{ money(ADDON_PRICES['Wheel Face Coating (3-Year)']) }}–{{ money(ADDON_PRICES['Wheel Face Coating (5-Year)']) }}</span></li>
+          <li><span><b>Glass &amp; Trim Coating</b><small>Windshield durability varies due to wiper wear; rating applies to side and rear glass.</small></span><span class="p">+{{ money(ADDON_PRICES['Glass & Trim Coating (3-Year)']) }}–{{ money(ADDON_PRICES['Glass & Trim Coating (5-Year)']) }}</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Condition Upcharges <span style="color:var(--fg-4);font-weight:500;text-transform:none;letter-spacing:0;font-size:13px">· estimate</span></h3>
+        <ul class="checks">
+          {% for u in ['Pet hair (moderate – heavy)','Deep staining','Smoke / odor treatment','Excessive debris / clutter'] %}<li>{{ icon('info') }}<span>{{ u }}</span></li>{% endfor %}
+        </ul>
+        <p class="note">Final quote given on arrival. Prices may shift based on vehicle condition, pet hair, embedded debris, and travel distance. You'll see and approve any adjustments before any work begins.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="maintenance">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Between Full Details</span><h2>Maintenance Plans</h2>
+      <p>Recurring upkeep on a monthly or biweekly schedule — a quick spray-down wash and interior refresh that keeps your vehicle looking sharp. Priced by vehicle size, per visit.</p></div></div>
+    <div class="tbl-wrap">
+      <table class="ptbl">
+        <thead><tr><th>Plan</th>{% for _, label in cols %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for row, label in [('Monthly Maintenance Visit','Monthly Visit'),('Biweekly Maintenance Visit','Biweekly Visit')] %}
+          <tr><td>{{ label }}</td>{% for key, l in cols %}<td data-label="{{ l }}">{{ money(BASE_PRICES[row][key]) }}</td>{% endfor %}</tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="two" style="margin-top:24px">
+      <div class="card">
+        <h3>Included Every Visit</h3>
+        <ul class="checks">
+          <li>{{ icon('check') }}<span><b style="color:#fff">Exterior:</b> spray down wheels, hand wash, dry — no clay, prewash, or decon</span></li>
+          <li>{{ icon('check') }}<span><b style="color:#fff">Interior:</b> vacuum only (no extraction), mats cleaned, dry microfiber wipe-down of surfaces — spray only if visibly soiled</span></li>
+          <li>{{ icon('check') }}<span><b style="color:#fff">Glass:</b> interior &amp; exterior glass, every visit</span></li>
+        </ul>
+        <p class="note">{{ MAINTENANCE_SCOPE_NOTE }}</p>
+      </div>
+      <div class="card">
+        <h3>Travel Fee</h3>
+        <div class="prose"><p>+{{ money(TRAVEL_FEE) }} flat per visit when your address falls outside our standard service area.</p></div>
+        <a href="/booking?plan=Monthly%20Maintenance%20Visit" class="btn btn-ghost" style="margin-top:20px">Book a Maintenance Plan</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="area">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Where We Work</span><h2>Service Area</h2>
+      <p>Based in Chardon, Ohio — serving Geauga, eastern Cuyahoga, and Lake counties. We come to you.</p></div></div>
+    <div class="area-tiers">
+      <div class="pkg"><small>Within 15 miles</small><b>Standard</b><span>All services available. No distance surcharge.</span></div>
+      <div class="pkg"><small>15–25 miles</small><b>+$15–$25</b><span>Extended area toward Beachwood and surrounding suburbs. Full Detail is the minimum service, with a modest surcharge based on exact location.</span></div>
+      <div class="pkg"><small>Beyond 25 miles</small><b>Quoted</b><span>Considered case-by-case. Travel surcharge starts at $40 and depends on distance and scheduling.</span></div>
+    </div>
+    <h3 style="margin-top:32px;text-transform:uppercase;font-size:15px;letter-spacing:.06em">Towns We Serve</h3>
+    <div class="chips">
+      {% for slug in AREA_PAGES %}<a href="/{{ slug }}">{{ c.AREA_PAGES_LABELS[slug] }}</a>{% endfor %}
+      {% for t in c.TOWNS if t not in c.AREA_PAGES_LABELS.values() %}<span>{{ t }}</span>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap two">
+    <a class="card" href="/rv-detailing" style="text-decoration:none"><h3>RV Detailing {{ icon('arrow-right') }}</h3><p style="color:var(--fg-3)">Full deep details for travel trailers and motorhomes, priced by size.</p></a>
+    <a class="card" href="/boat-detailing" style="text-decoration:none"><h3>Boat Detailing {{ icon('arrow-right') }}</h3><p style="color:var(--fg-3)">Mobile boat detailing — contact us for a quote.</p></a>
+  </div>
+</section>
+
+{{ m.quote_section() }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

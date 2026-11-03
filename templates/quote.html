@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Get a Free Quote | Tony's Detailing{% endblock %}
+{% block description %}Request a free quote for mobile detailing, paint correction or ceramic coating in Northeast Ohio. Five quick steps — we reply within 24 hours.{% endblock %}
+{% block mcta %}{% endblock %}
+{% block content %}
+{{ m.quote_section('', 'Get Your Free Quote', 'Tony\'s Detailing') }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}

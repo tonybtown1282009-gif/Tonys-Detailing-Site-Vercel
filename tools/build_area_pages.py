@@ -10,7 +10,7 @@ made once and re-run:
     python tools/build_area_pages.py
 
 The pricing table is read out of the "Base Pricing by Vehicle Size" card in
-index.html rather than retyped, so the towns can never drift from the
+/services rather than retyped, so the towns can never drift from the
 public pricing table.
 """
 
@@ -19,7 +19,6 @@ import re
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DONOR = os.path.join(BASE_DIR, "boat-detailing.html")
-INDEX = os.path.join(BASE_DIR, "index.html")
 CSS_OUT = os.path.join(BASE_DIR, "static", "area-page.css")
 SITE = "https://tonys-detailing.vercel.app"
 
@@ -197,6 +196,16 @@ def read(path):
         return fh.read()
 
 
+def render_services_page():
+    """The /services page as the app serves it (its pricing table is the source)."""
+    import sys
+
+    sys.path.insert(0, BASE_DIR)
+    import app as site_app
+
+    return site_app.app.test_client().get("/services").data.decode("utf-8")
+
+
 def extract_pricing_rows(index_html):
     """Lift the base pricing rows out of index.html's #pricing section.
 
@@ -209,7 +218,7 @@ def extract_pricing_rows(index_html):
         re.S,
     )
     if not card:
-        raise SystemExit("could not find the base pricing table in index.html")
+        raise SystemExit("could not find the base pricing table on /services")
     return card.group(1).strip("\n")
 
 
@@ -580,7 +589,7 @@ def tail_for_towns(tail):
 def main():
     donor = read(DONOR)
     parts = shell_parts(donor)
-    pricing_rows = extract_pricing_rows(read(INDEX))
+    pricing_rows = extract_pricing_rows(render_services_page())
 
     os.makedirs(os.path.dirname(CSS_OUT), exist_ok=True)
     with open(CSS_OUT, "w", encoding="utf-8") as fh:
