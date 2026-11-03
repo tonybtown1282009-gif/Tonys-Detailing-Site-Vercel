@@ -117,12 +117,10 @@
       </div>
       <a href="/gallery" class="link-arrow">View Full Gallery {{ icon('arrow-right') }}</a>
     </div>
-    <div class="ba">
-      <figure>{{ m.img('headlight-before', 700, 'Foggy headlight before restoration', '(max-width:760px) 50vw, 600px') }}<figcaption>Before</figcaption></figure>
-      <figure>{{ m.img('headlight-after', 700, 'Clear headlight after restoration', '(max-width:760px) 50vw, 600px') }}<figcaption>After</figcaption></figure>
-    </div>
-    <div class="work-grid">
-      {% for n, alt in c.WORK_PHOTOS %}<figure>{{ m.img('work-' ~ n, 600, alt, '(max-width:760px) 72vw, 25vw') }}</figure>{% endfor %}
+    <div class="work-grid work-compact">
+      <figure>{{ m.img('headlight-before', 700, 'Foggy headlight before restoration', '(max-width:760px) 44vw, 16vw') }}<figcaption>Before</figcaption></figure>
+      <figure>{{ m.img('headlight-after', 700, 'Clear headlight after restoration', '(max-width:760px) 44vw, 16vw') }}<figcaption>After</figcaption></figure>
+      {% for n, alt in c.WORK_PHOTOS[:4] %}<figure>{{ m.img('work-' ~ n, 600, alt, '(max-width:760px) 44vw, 16vw') }}</figure>{% endfor %}
     </div>
   </div>
 </section>

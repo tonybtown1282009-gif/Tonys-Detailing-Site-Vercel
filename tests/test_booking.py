@@ -522,7 +522,7 @@ def test_homepage_our_work_strip(client):
     html = client.get("/").data.decode("utf-8")
     assert "Recent Details" in html
     assert "work-grid" in html
-    assert html.count("/static/img/work-") >= 8
+    assert html.count("/static/img/work-") >= 4  # compact strip; full set on /gallery
     assert 'href="/gallery"' in html
 
 

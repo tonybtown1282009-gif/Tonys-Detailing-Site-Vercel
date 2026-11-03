@@ -442,3 +442,10 @@ body.menu-open{overflow:hidden;}
   .phero .hero-actions .btn,.cer-copy .hero-actions .btn,.cta-band .hero-actions .btn{flex:1 1 100%;}
   .btn-lg{white-space:normal;text-align:center;line-height:1.25;padding-top:12px;padding-bottom:12px;}
 }
+/* Compact "Recent Details" strip: before/after + 4 photos in one row */
+.work-compact{grid-template-columns:repeat(6,1fr);gap:10px;}
+.work-compact figure{position:relative;}
+.work-compact figcaption{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:999px;background:rgba(7,9,13,.8);color:#fff;font:700 10px/1 var(--ff-h);letter-spacing:.12em;text-transform:uppercase;}
+#work .sec-head{margin-bottom:22px;}
+#work{padding:clamp(44px,6vw,72px) 0;}
+@media (max-width:760px){.work-compact figure{flex:0 0 44vw;}}
