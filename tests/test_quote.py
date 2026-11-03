@@ -152,8 +152,9 @@ def test_landing_pages_noindex_and_out_of_sitemap(client):
 
 def test_cards_show_server_prices(client):
     html = client.get("/").data.decode()
-    assert "Starts at <b>$799.99</b>" in html  # ceramic 3-Year sedan
-    assert "Starts at <b>$195</b>" in html     # full detail sedan
+    assert "From $799.99" in html          # ceramic 3-Year sedan
+    assert "$195 – $240" in html           # full detail sedan → large SUV/truck
+    assert "Quoted after inspection" in html  # paint correction
     assert "Premium Detail" not in html
 
 
