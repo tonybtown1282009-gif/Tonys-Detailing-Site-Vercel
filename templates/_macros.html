@@ -28,35 +28,33 @@
 </div>
 {%- endmacro %}
 
-{% macro service_row(slugs) -%}
-<div class="svc-row">
-  {% for slug in slugs %}{% set s = c.SERVICE_BY_SLUG[slug] %}
-  <a class="svc-tile" href="/{{ slug }}">
-    {{ icon({'interior-detailing':'armchair','wash-n-wax':'droplets','paint-correction':'sun','ceramic-coating':'gem','full-detail':'car-front','headlight-restoration':'lightbulb'}[slug]) }}
+{% macro service_row(rows) -%}
+<div class="svc-boxes">
+  {% for slug, blurb in rows %}{% set s = c.SERVICE_BY_SLUG[slug] %}
+  <a class="svc-box{% if slug == 'ceramic-coating' %} light{% endif %}" href="/{{ slug }}">
     <b>{{ s.name }}</b>
-    <span>{% if starts_at(s) %}From {{ starts_at(s) }}{% else %}Quoted after inspection{% endif %}</span>
+    <span>{{ blurb }}</span>
+    {{ icon('arrow-right') }}
   </a>
   {% endfor %}
 </div>
 {%- endmacro %}
 
-{% macro featured_cards(slugs) -%}
-<div class="svc-feat">
-  {% for slug in slugs %}{% set s = c.SERVICE_BY_SLUG[slug] %}
-  <article class="svc">
-    <a class="svc-img" href="/{{ slug }}" tabindex="-1" aria-hidden="true">
-      {{ img(s.image, 1200, s.image_alt, '(max-width:760px) 100vw, 33vw', [600, 1200]) }}
-      {% if slug == 'ceramic-coating' %}<span class="svc-badge flag">Flagship</span>{% elif s.badge %}<span class="svc-badge">{{ s.badge }}</span>{% endif %}
-    </a>
-    <div class="svc-body">
+{% macro featured_rows(items) -%}
+<div class="feat-rows">
+  {% for f in items %}{% set s = c.SERVICE_BY_SLUG[f.slug] %}
+  <article class="feat">
+    <div class="feat-copy">
+      <span class="eyebrow">{{ f.eyebrow }}</span>
       <h3>{{ s.name }}</h3>
-      <p>{{ s.short }}</p>
-      <div class="svc-price">{% if starts_at(s) %}Starts at <b>{{ starts_at(s) }}</b>{% endif %}</div>
-      <div class="svc-actions">
-        <a href="/quote?service={{ slug }}" class="btn btn-primary btn-sm" data-quote="{{ slug }}">Get a Quote</a>
-        <a href="/{{ slug }}" class="link-arrow">Learn More {{ icon('arrow-right') }}</a>
+      {% for para in f.text %}<p>{{ para }}</p>{% endfor %}
+      <div class="feat-actions">
+        <a href="/quote?service={{ f.slug }}" class="btn btn-primary btn-sm" data-quote="{{ f.slug }}">Get a Quote</a>
+        <a href="/{{ f.slug }}" class="link-arrow">Learn More {{ icon('arrow-right') }}</a>
+        {% if starts_at(s) %}<span class="feat-price">Starts at <b>{{ starts_at(s) }}</b></span>{% endif %}
       </div>
     </div>
+    <a class="feat-img" href="/{{ f.slug }}" tabindex="-1" aria-hidden="true">{{ img(s.image, 1200, s.image_alt, '(max-width:760px) 100vw, 40vw', [600, 1200]) }}</a>
   </article>
   {% endfor %}
 </div>

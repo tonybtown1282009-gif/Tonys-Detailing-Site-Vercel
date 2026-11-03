@@ -135,18 +135,17 @@ SERVICES = [
         "price_key": "Wash n' Wax",
         "image": "svc-wash",
         "image_alt": "SUV covered in foam during a hand wash",
-        "short": "Our exterior tier: foam wash, clay bar decontamination, and a "
-                 "protective wax finish.",
+        "short": "Hand wash, clay bar decontamination, and professional wax & sealant.",
         "title": "Wash n' Wax — Mobile Exterior Detailing",
         "meta": "Foam wash, clay bar decontamination and a protective wax finish, "
                 "brought to your home or office in Northeast Ohio.",
         "intro": "Our exterior-only service. A foam pre-soak and hand wash, clay "
                  "bar decontamination to pull embedded grime off the paint, and a "
-                 "protective wax finish — wheels, tires and glass included.",
+                 "professional wax & sealant finish — wheels, tires and glass included.",
         "included": [
             "Foam wash, rinse & hand dry",
             "Clay bar decontamination",
-            "Protective wax finish",
+            "Professional wax & sealant finish",
             "Tire shine & wheel clean",
             "Exterior window & trim wipe",
         ],
@@ -159,8 +158,8 @@ SERVICES = [
         "price_key": None,
         "image": "svc-correction",
         "image_alt": "Glossy white paint after detailing",
-        "short": "Machine polishing to restore gloss and reduce swirl marks — "
-                 "quoted after we inspect your paint.",
+        "short": "Removes swirls, scratches, and oxidation — quoted after we "
+                 "inspect your paint.",
         "title": "Paint Correction — One-Step & Multi-Step",
         "meta": "One-step and multi-step paint correction in Northeast Ohio. Every "
                 "job is quoted after a paint inspection. Request a free quote.",
@@ -248,9 +247,55 @@ GRID_ORDER = [
     "wash-n-wax", "paint-correction", "headlight-restoration",
 ]
 
-# Homepage services: a text-only row, then three photo cards.
-HOME_ROW = ["ceramic-coating", "paint-correction", "wash-n-wax", "full-detail", "interior-detailing"]
-HOME_FEATURED = ["full-detail", "wash-n-wax", "ceramic-coating"]
+# Homepage services: four filled boxes (Tony's one-liners), then three
+# text-left / photo-right feature rows.
+HOME_ROW = [
+    ("ceramic-coating", "3–5 year professional coating after full paint prep."),
+    ("paint-correction", "Removes swirls, scratches, and oxidation. Professional one-step correction."),
+    ("wash-n-wax", "Hand wash, clay bar decontamination, and professional wax & sealant."),
+    ("full-detail", "A full deep clean, inside and out."),
+]
+HOME_FEATURED = [
+    {
+        "slug": "ceramic-coating",
+        "eyebrow": "Flagship Service",
+        "text": [
+            "Ceramic coating isn't just another service we offer — it's the one our "
+            "whole process is built around. A professional coating bonds to your paint "
+            "and protects it for 3 to 5 years, adding deep gloss and making every wash "
+            "easier.",
+            "Because a coating locks in whatever is underneath it, we never skip the "
+            "prep: foam bath, bug removal, clay bar, IPA wipe-down, and a single-stage "
+            "enhancement polish before the coating goes on. It takes about six hours, "
+            "right in your driveway, and includes a free follow-up wash one week later.",
+        ],
+    },
+    {
+        "slug": "full-detail",
+        "eyebrow": "Most Popular",
+        "text": [
+            "Our Full Detail is a complete deep clean, inside and out — and the service "
+            "most of our customers book.",
+            "Inside, we vacuum the seats, floors, and trunk, wipe down every surface and "
+            "the console, clean the vents and interior glass, and deodorize. Outside, we "
+            "wash the body, wheels, and glass and finish with a wax protection coat. We "
+            "walk the vehicle with you before we start and again when we're done, so you "
+            "see exactly what you're paying for.",
+        ],
+    },
+    {
+        "slug": "wash-n-wax",
+        "eyebrow": "Exterior Service",
+        "text": [
+            "Wash n' Wax keeps your paint clean, smooth, and protected between full "
+            "details.",
+            "We start with a foam pre-wash and a careful hand wash, then use a clay bar "
+            "to pull embedded grime off the paint so it feels smooth again. We finish "
+            "with a professional wax and sealant for gloss and protection, plus clean "
+            "wheels, tire shine, and wiped-down exterior glass and trim.",
+        ],
+    },
+]
 
 ADDON_COPY = {
     "Leather Conditioning": "Cleans, softens & protects leather seats and trim",
