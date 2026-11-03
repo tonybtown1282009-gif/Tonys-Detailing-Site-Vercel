@@ -61,7 +61,7 @@ def test_parse_num_vehicles(raw, expected):
 # ──────────────────────────────────────────────────────────────────────────
 def test_base_price_matrix():
     expected = {
-        "Wash, Clay, Seal": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
+        "Wash n' Wax": {"Sedan": 140, "SUV/Crossover": 150, "Large SUV/Truck": 180, "Minivan": 165},
         "Interior Detail": {"Sedan": 120, "SUV/Crossover": 135, "Large SUV/Truck": 155, "Minivan": 145},
         "Full Detail": {"Sedan": 195, "SUV/Crossover": 215, "Large SUV/Truck": 240, "Minivan": 225},
         "Ceramic Coating (3-Year)": {
@@ -86,8 +86,8 @@ def test_leather_addon_flat():
 def test_clay_iron_addon_scales_with_vehicle():
     expected = {"Sedan": 60, "SUV/Crossover": 70, "Large SUV/Truck": 80, "Minivan": 70}
     for vehicle, clay in expected.items():
-        base = appmod.BASE_PRICES["Wash, Clay, Seal"][vehicle]
-        cost = appmod.vehicle_cost("Wash, Clay, Seal", vehicle, ["Clay & Iron Decontamination"], [])
+        base = appmod.BASE_PRICES["Wash n' Wax"][vehicle]
+        cost = appmod.vehicle_cost("Wash n' Wax", vehicle, ["Clay & Iron Decontamination"], [])
         assert cost == base + clay, f"{vehicle}: expected {base + clay}, got {cost}"
 
 
@@ -143,7 +143,7 @@ def test_single_vehicle_no_discount():
 
 
 def test_referral_requires_full_detail_minimum():
-    for service in ("Wash, Clay, Seal", "Interior Detail"):
+    for service in ("Wash n' Wax", "Interior Detail"):
         total, summary = appmod.calculate_estimate("1", "A Friend", veh(service, "Sedan"))
         assert "Referral" not in summary
         assert total == appmod.BASE_PRICES[service]["Sedan"]
@@ -177,7 +177,7 @@ def test_two_vehicles_multi_discount():
 def test_three_plus_prices_second_vehicle_twice():
     # v1 Full SUV 215 + v2 Wash/Clay/Seal Sedan 140 x 2 = 495, less 10% = 445.5
     total, summary = appmod.calculate_estimate(
-        "3+", "", veh("Full Detail", "SUV/Crossover"), veh("Wash, Clay, Seal", "Sedan")
+        "3+", "", veh("Full Detail", "SUV/Crossover"), veh("Wash n' Wax", "Sedan")
     )
     assert total == 445.5
     assert "Multi-vehicle 10%" in summary
@@ -187,7 +187,7 @@ def test_referral_eligible_via_second_vehicle():
     # v1 Wash/Clay/Seal Sedan 140 (not eligible) + v2 Full Sedan 195 (eligible) = 335
     # multi 33.5, referral 35 => 335 - 68.5 = 266.5
     total, summary = appmod.calculate_estimate(
-        "2", "Bob", veh("Wash, Clay, Seal", "Sedan"), veh("Full Detail", "Sedan")
+        "2", "Bob", veh("Wash n' Wax", "Sedan"), veh("Full Detail", "Sedan")
     )
     assert total == 266.5
     assert "Multi-vehicle 10% (-$33.50)" in summary
@@ -212,7 +212,7 @@ def test_full_stack_two_vehicles_with_addons():
 def test_second_vehicle_ignored_when_count_one():
     # num=1 should ignore the v2 dict entirely
     total, summary = appmod.calculate_estimate(
-        "1", "", veh("Wash, Clay, Seal", "Sedan"), veh("Full Detail", "Large SUV/Truck")
+        "1", "", veh("Wash n' Wax", "Sedan"), veh("Full Detail", "Large SUV/Truck")
     )
     assert total == 140
     assert summary == "None"
@@ -520,12 +520,9 @@ def test_gallery_placeholder_images_serve(client):
 
 def test_homepage_our_work_strip(client):
     html = client.get("/").data.decode("utf-8")
-    assert "Our Work" in html
-    assert "work-strip" in html
-    for i in range(7, 35):
-        assert f"/static/gallery/placeholder-{i}.jpg" in html
-    # The hover overlay links through to the full gallery page.
-    assert "work-overlay" in html
+    assert "Recent Details" in html
+    assert "work-grid" in html
+    assert html.count("/static/img/work-") >= 8
     assert 'href="/gallery"' in html
 
 
@@ -680,7 +677,9 @@ def test_every_page_has_seo_head_tags(client):
         assert 'rel="icon"' in html, page
         assert "woff2" in html, page
         assert "unpkg.com" not in html, page
-        assert "/assets/lucide-1.23.0.min.js" in html, page
+        # v2 static pages load the Lucide bundle; v3 templated pages inline
+        # their icons and use the shared stylesheet instead.
+        assert ("/assets/lucide-1.23.0.min.js" in html) or ("/static/site.css" in html), page
 
 
 def test_homepage_has_localbusiness_jsonld(client):
@@ -791,7 +790,7 @@ def test_area_pages_service_and_localbusiness_jsonld(client):
 
 
 def test_area_page_pricing_matches_homepage_table(client):
-    """Town pricing is lifted from index.html — it must not drift from it."""
+    """Town pricing must not drift from the /services pricing table."""
     import re
 
     def base_rows(html):
@@ -800,22 +799,23 @@ def test_area_page_pricing_matches_homepage_table(client):
             html,
             re.S,
         ).group(1)
-        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "|", body)).strip()
+        return [c.strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", body, re.S)]
 
-    home = base_rows(client.get("/").data.decode("utf-8"))
-    assert "$" in home
+    home = base_rows(client.get("/services").data.decode("utf-8"))
+    assert home[0] == "Wash n&#39; Wax" and "$140" in home
     for slug in appmod.AREA_PAGES:
         page = base_rows(client.get(f"/{slug}").data.decode("utf-8"))
-        assert page == home, f"{slug} pricing differs from the homepage table"
+        assert page == home, f"{slug} pricing differs from the /services table"
 
 
 def test_homepage_links_every_area_page(client):
-    """Nav dropdown and the Service Area section both have to carry the towns."""
+    """Footer (every v3 page) and the /services area section carry the towns."""
     html = client.get("/").data.decode("utf-8")
-    start = html.index('<section id="area">')
-    area_section = html[start : html.index("</section>", start)]
+    services = client.get("/services").data.decode("utf-8")
+    start = services.index('<section class="sec sec-alt" id="area">')
+    area_section = services[start : services.index("</section>", start)]
     for slug in appmod.AREA_PAGES:
-        assert f'href="/{slug}"' in html, f"nav is missing /{slug}"
+        assert f'href="/{slug}"' in html, f"homepage is missing /{slug}"
         assert f'href="/{slug}"' in area_section, f"#area is missing /{slug}"
 
 
@@ -831,9 +831,10 @@ def test_area_pages_in_sitemap(client):
 def test_hero_image_is_in_the_served_html(client):
     """The hero must paint from the document, not from a later fetch."""
     html = client.get("/").data.decode("utf-8")
-    assert '<div class="hero-media" id="heroMedia"><img' in html
-    assert 'src="/static/media/hero-fallback.jpg"' in html
-    assert 'fetchpriority="high"' in html
+    start = html.index('<div class="hero-media">')
+    hero = html[start : html.index("</div>", start)]
+    assert 'src="/static/img/hero-1200.webp"' in hero
+    assert 'fetchpriority="high"' in hero
 
 
 def test_hero_does_not_fetch_the_media_manifest(client):
@@ -843,15 +844,21 @@ def test_hero_does_not_fetch_the_media_manifest(client):
         assert "fetch('/api/media')" not in html, path
 
 
-def test_hero_video_is_lazy_not_eager(client):
-    """The 1.7MB video must not be a blocking src in the initial HTML."""
+def test_hero_video_is_lazy_not_eager(client, tmp_path, monkeypatch):
+    """A hero loop, once added, must not be a blocking src in the initial HTML."""
     import re
     html = client.get("/").data.decode("utf-8")
-    tag = re.search(r"<video[^>]*>", html).group(0)
+    if not appmod.media_present("hero-loop.mp4"):
+        assert "<video" not in html  # no footage yet -> still image only
+    monkeypatch.setattr(appmod, "MEDIA_DIR", str(tmp_path))
+    (tmp_path / "hero-loop.mp4").write_bytes(b"\x00\x00\x00\x18ftyp")
+    (tmp_path / "hero-loop-vertical.mp4").write_bytes(b"\x00\x00\x00\x18ftyp")
+    html = client.get("/").data.decode("utf-8")
+    tag = re.search(r"<video[^>]*>", html, re.S).group(0)
     assert 'preload="none"' in tag, tag
-    assert 'data-src="/static/media/hero-video.mp4"' in tag, tag
+    assert 'data-src="/static/media/hero-loop.mp4"' in tag, tag
+    assert 'data-src-vertical="/static/media/hero-loop-vertical.mp4"' in tag, tag
     assert " src=" not in tag, "video should carry data-src, not src"
-    assert 'poster="/static/media/hero-fallback.jpg"' in tag, tag
 
 
 def test_empty_media_slot_renders_an_empty_hero(client):

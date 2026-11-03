@@ -1,0 +1,210 @@
+{# Shared building blocks. Import with:  {% import '_macros.html' as m with context %} #}
+
+{% macro img(name, w, alt, sizes='100vw', widths=None, eager=False, cls='') -%}
+<img src="/static/img/{{ name }}-{{ w }}.webp"{% if widths %} srcset="{% for x in widths %}/static/img/{{ name }}-{{ x }}.webp {{ x }}w{{ ', ' if not loop.last }}{% endfor %}" sizes="{{ sizes }}"{% endif %} alt="{{ alt }}"{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async"{% if cls %} class="{{ cls }}"{% endif %}>
+{%- endmacro %}
+
+{% macro service_card(s) -%}
+<article class="svc{% if s.featured %} featured{% endif %}">
+  <a class="svc-img" href="/{{ s.slug }}" tabindex="-1" aria-hidden="true">
+    {{ img(s.image, 900 if s.featured else 520, s.image_alt, '(max-width:600px) 116px, (max-width:900px) 50vw, 33vw' if not s.featured else '(max-width:900px) 100vw, 66vw', [520, 900]) }}
+    {% if s.featured %}<span class="svc-badge">Flagship Service</span>{% elif s.badge %}<span class="svc-badge">{{ s.badge }}</span>{% endif %}
+  </a>
+  <div class="svc-body">
+    <h3>{{ s.name }}</h3>
+    <p>{{ s.short }}</p>
+    <div class="svc-price">{% if starts_at(s) %}Starts at <b>{{ starts_at(s) }}</b>{% else %}<b style="font-size:14px;margin:0">Quoted after inspection</b>{% endif %}</div>
+    <div class="svc-actions">
+      <a href="/quote?service={{ s.slug }}" class="btn btn-primary btn-sm" data-quote="{{ s.slug }}">Get a Quote</a>
+      <a href="/{{ s.slug }}" class="link-arrow">Learn More {{ icon('arrow-right') }}</a>
+    </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro service_grid() -%}
+<div class="svc-grid">
+  {% for slug in c.GRID_ORDER %}{{ service_card(c.SERVICE_BY_SLUG[slug]) }}{% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro review_cards(limit=6) -%}
+<div class="rev-grid">
+  {% for name, tag, text in c.REVIEWS[:limit] %}
+  <figure class="rev">
+    <div class="stars" aria-label="5 out of 5 stars">{% for _ in range(5) %}{{ icon('star') }}{% endfor %}</div>
+    <blockquote>{{ text }}</blockquote>
+    <footer>
+      <span class="av" aria-hidden="true">{{ name.split()|map('first')|join }}</span>
+      <span class="who"><b>{{ name }}</b><small>{% if tag %}{{ tag }} · {% endif %}Google review</small></span>
+    </footer>
+  </figure>
+  {% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro reviews_section(alt=False) -%}
+<section class="sec{% if alt %} sec-alt{% endif %}" id="reviews">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">What Clients Say</span>
+        <h2>Trusted By Local Drivers</h2>
+        <div class="rev-summary" style="margin-top:14px">
+          <span class="stars" aria-hidden="true">{% for _ in range(5) %}{{ icon('star') }}{% endfor %}</span>
+          <span>Real, unedited reviews from our Google Business Profile.</span>
+        </div>
+      </div>
+    </div>
+    {{ review_cards(3 if alt else 6) }}
+    <div class="rev-actions">
+      <a href="/reviews" class="btn btn-ghost">Read All Reviews</a>
+      <a href="{{ c.GOOGLE_REVIEWS_URL }}" class="link-arrow" target="_blank" rel="noopener" style="align-self:center">View Us On Google {{ icon('arrow-right') }}</a>
+    </div>
+  </div>
+</section>
+{%- endmacro %}
+
+{% macro faqs(keys) -%}
+<div class="faq">
+  {% for k in keys %}{% set q, a = c.FAQ[k] %}
+  <details><summary>{{ q }} {{ icon('chevron-down') }}</summary><p>{{ a }}</p></details>
+  {% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro quote_section(preselect='', heading='Get Your Free Quote', eyebrow='Free Quote') -%}
+<section class="sec quote-sec" id="quote">
+  <div class="wrap quote-wrap">
+    <div class="quote-intro">
+      <span class="eyebrow">{{ eyebrow }}</span>
+      <h2 style="margin-top:14px">{{ heading }}</h2>
+      <p>Five quick steps — about two minutes. Tell us about your vehicle and what you need, and Tony will follow up personally.</p>
+      <ul>
+        <li>{{ icon('clock') }} We reply within 24 hours.</li>
+        <li>{{ icon('badge-check') }} Your final price is confirmed on arrival, before any work begins.</li>
+        <li>{{ icon('map-pin') }} We come to your home or office.</li>
+      </ul>
+      <p class="alt">Prefer to talk? Call or text <a href="tel:{{ c.PHONE_TEL }}">{{ c.PHONE_DISPLAY }}</a>.</p>
+    </div>
+    {{ quote_form(preselect) }}
+  </div>
+</section>
+{%- endmacro %}
+
+{% macro opt(name, value, type='radio', label=None) -%}
+<label class="opt"><input type="{{ type }}" name="{{ name }}" value="{{ value }}"><span>{{ label or value }}</span></label>
+{%- endmacro %}
+
+{% macro quote_form(preselect='') -%}
+<div class="qf" id="qf" data-preselect="{{ preselect }}">
+  <div class="qf-progress" aria-hidden="true">
+    <div class="qf-progress-top"><b data-step-title>Contact Info</b><span>Step <span data-step-num>1</span> of 5</span></div>
+    <div class="qf-bar"><i></i></div>
+    <div class="qf-dots"><span class="on">Contact</span><span>Vehicle</span><span>Services</span><span>Details</span><span>Finish</span></div>
+  </div>
+  <form action="/api/quote" method="post" novalidate>
+    <input type="hidden" name="source_page" value="{{ path }}">
+    <input type="hidden" name="utm" value="">
+    <div class="qf-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <fieldset class="qf-step active" data-step="1" data-title="Contact Info">
+      <legend tabindex="-1">Let's Start With You</legend>
+      <p class="qf-hint">So we know who to send your quote to.</p>
+      <div class="qf-grid">
+        <div class="fld"><label for="q-first">First Name <span class="req">*</span></label><input id="q-first" name="first_name" autocomplete="given-name" required><span class="fld-err">Please enter your first name.</span></div>
+        <div class="fld"><label for="q-last">Last Name <span class="opt-tag">(optional)</span></label><input id="q-last" name="last_name" autocomplete="family-name"></div>
+        <div class="fld"><label for="q-phone">Phone Number <span class="req">*</span></label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(440) 555-0123" required data-validate="phone"><span class="fld-err">Please enter a 10-digit phone number.</span></div>
+        <div class="fld"><label for="q-email">Email Address <span class="req">*</span></label><input id="q-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" required data-validate="email"><span class="fld-err">Please enter a valid email address.</span></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="qf-step" data-step="2" data-title="Vehicle Info">
+      <legend tabindex="-1">Your Vehicle</legend>
+      <p class="qf-hint">Helps us price accurately and plan the right products.</p>
+      <div class="qf-grid three">
+        <div class="fld"><label for="q-year">Year</label><input id="q-year" name="vehicle_year" inputmode="numeric" maxlength="4" placeholder="2021" autocomplete="off"></div>
+        <div class="fld"><label for="q-make">Make</label><input id="q-make" name="vehicle_make" placeholder="Honda" autocomplete="off"></div>
+        <div class="fld"><label for="q-model">Model</label><input id="q-model" name="vehicle_model" placeholder="CR-V" autocomplete="off"></div>
+      </div>
+      <div class="grp" style="margin-top:20px">
+        <span class="qf-q">Vehicle size <small>Pick the closest — pricing is by size.</small></span>
+        <div class="opts">
+          {% for v in VEHICLE_TYPES %}{{ opt('vehicle_size', v, label=v.replace('/', ' / ')) }}{% endfor %}
+        </div>
+      </div>
+      <div class="qf-grid" style="margin-top:20px">
+        <div class="fld"><label for="q-zip">ZIP code where the vehicle is <span class="req">*</span></label><input id="q-zip" name="zip" inputmode="numeric" maxlength="5" placeholder="44024" autocomplete="postal-code" required data-validate="zip"><span class="fld-err">Please enter a 5-digit ZIP code.</span>
+          <span class="zip-note" data-zip-note>{{ icon('info') }}<span></span></span></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="qf-step" data-step="3" data-title="Services">
+      <legend tabindex="-1">What Can We Help With?</legend>
+      <p class="qf-hint">Choose one or more.</p>
+      <div class="grp" data-group="services">
+        <div class="svc-opts">
+          {% for s in c.SERVICES %}
+          <label class="opt{% if s.slug == 'ceramic-coating' %} flag{% endif %}"><input type="checkbox" name="services" value="{{ QUOTE_SERVICE_SLUGS[s.slug] }}" data-slug="{{ s.slug }}"><span>{{ icon({'interior-detailing':'armchair','wash-n-wax':'droplets','paint-correction':'sun','ceramic-coating':'gem','full-detail':'car-front','headlight-restoration':'lightbulb'}[s.slug]) }}<em>{{ QUOTE_SERVICE_SLUGS[s.slug] }}<small>{% if starts_at(s) %}from {{ starts_at(s) }}{% else %}quoted after inspection{% endif %}</small></em></span></label>
+          {% endfor %}
+        </div>
+        <span class="grp-err" style="margin-top:10px">Please choose at least one service.</span>
+      </div>
+      <div class="cond" data-when="Ceramic Coating">
+        <span class="qf-q">Which coating package are you interested in?</span>
+        <div class="opts">{% for p in CERAMIC_PACKAGES %}{{ opt('ceramic_package', p) }}{% endfor %}</div>
+      </div>
+      <div class="cond" data-when="Paint Correction">
+        <span class="qf-q">What type of correction are you interested in?</span>
+        <div class="opts">{% for p in CORRECTION_TYPES %}{{ opt('correction_type', p) }}{% endfor %}</div>
+      </div>
+    </fieldset>
+
+    <fieldset class="qf-step" data-step="4" data-title="Condition & Timing">
+      <legend tabindex="-1">Condition &amp; Timing</legend>
+      <p class="qf-hint">All optional — but it helps us give you an accurate quote.</p>
+      <div class="grp"><span class="qf-q">When was your vehicle last professionally detailed?</span>
+        <div class="opts">{% for v in LAST_DETAILED %}{{ opt('last_detailed', v) }}{% endfor %}</div></div>
+      <div class="grp"><span class="qf-q">How would you describe its current condition? <small>Select all that apply.</small></span>
+        <div class="opts">{% for v in CONDITIONS %}{{ opt('condition', v, 'checkbox') }}{% endfor %}</div></div>
+      <div class="grp"><span class="qf-q">When would you like it serviced?</span>
+        <div class="opts">{% for v in TIMINGS %}{{ opt('timing', v) }}{% endfor %}</div></div>
+      <div class="grp"><span class="qf-q">Does the service location have running water and electricity? <small>Our mobile setup needs an outlet, and some jobs need a water spigot.</small></span>
+        <div class="opts">{% for v in UTILITIES %}{{ opt('utilities', v) }}{% endfor %}</div></div>
+    </fieldset>
+
+    <fieldset class="qf-step" data-step="5" data-title="Finish">
+      <legend tabindex="-1">Almost Done</legend>
+      <p class="qf-hint">Last step — how should we reach you?</p>
+      <div class="fld"><label for="q-notes">Anything else you'd like us to know about your vehicle or the service? <span class="opt-tag">(optional)</span></label>
+        <textarea id="q-notes" name="notes" placeholder="Stains, scratches, a specific date, gate code…"></textarea></div>
+      <div class="grp" style="margin-top:22px"><span class="qf-q">Preferred contact method</span>
+        <div class="opts">{% for v in CONTACT_METHODS %}{{ opt('contact_method', v) }}{% endfor %}</div></div>
+      <div class="grp"><span class="qf-q">When are you generally available for a quick call?</span>
+        <div class="opts">{% for v in CALL_TIMES %}{{ opt('call_time', v) }}{% endfor %}</div></div>
+    </fieldset>
+
+    <div class="qf-nav">
+      <button type="button" class="btn-back" data-back hidden>{{ icon('chevron-left') }} Back</button>
+      <button type="button" class="btn btn-primary btn-lg" data-next>Continue {{ icon('arrow-right') }}</button>
+      <button type="submit" class="btn btn-primary btn-lg" data-submit hidden>Submit My Quote Request</button>
+    </div>
+  </form>
+
+  <div class="qf-done" role="status" aria-live="polite">
+    <div class="badge-ok">{{ icon('check') }}</div>
+    <h3>Request Received</h3>
+    <p data-done-msg>Thanks! Tony's Detailing has your quote request and will follow up within 24 hours.</p>
+    <p style="color:var(--fg-4);font-size:14px">Need us sooner? Call or text <a href="tel:{{ c.PHONE_TEL }}" style="color:#fff">{{ c.PHONE_DISPLAY }}</a>.</p>
+  </div>
+  <div class="qf-fail" role="alert">
+    <h3>We Couldn't Send That</h3>
+    <p>Something went wrong on our end and your request didn't go through. Please reach Tony directly — it only takes a second.</p>
+    <div class="row">
+      <a href="tel:{{ c.PHONE_TEL }}" class="btn btn-primary">{{ icon('phone') }} Call</a>
+      <a href="sms:{{ c.PHONE_TEL }}" class="btn btn-ghost" data-sms>{{ icon('message-square') }} Text My Request</a>
+      <a href="mailto:{{ c.EMAIL }}" class="btn btn-ghost" data-mailto>{{ icon('mail') }} Email</a>
+    </div>
+  </div>
+</div>
+{%- endmacro %}

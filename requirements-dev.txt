@@ -5,3 +5,6 @@ pytest>=8.0
 # Only needed to regenerate fonts/*.woff2 (tools/build_fonts.py).
 fonttools>=4.50
 brotli>=1.1
+
+# Only needed to regenerate static/data/service-zips.json (tools/build_service_zips.py).
+zipcodes>=1.2

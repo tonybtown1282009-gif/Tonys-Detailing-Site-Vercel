@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Ceramic Coating in Chardon & Northeast Ohio | Tony's Detailing{% endblock %}
+{% block description %}Mobile ceramic coating with full decontamination and polish prep. 3-Year and Elite 5-Year packages, priced by vehicle size. Request ceramic coating information.{% endblock %}
+{% block content %}
+{% set p3 = BASE_PRICES['Ceramic Coating (3-Year)'] %}{% set p5 = BASE_PRICES['Ceramic Coating (Elite 5-Year)'] %}
+{% set prep = ['Exterior hand wash and foam bath','Bug splatter removal','Clay bar service — micro-contaminant removal from paint','Wheels and rims deep cleaned','Isopropyl alcohol wipe down (coating prep)','Single-stage paint enhancement polish'] %}
+<section class="phero has-img">
+  {{ m.img('svc-ceramic', 900, '', '100vw', [520, 900], eager=True) }}
+  <div class="wrap">
+    <span class="eyebrow">Flagship Service &middot; Long-Term Paint Protection</span>
+    <h1>Ceramic Coating</h1>
+    <p class="lede">Two durability tiers, each priced by vehicle size, with full decontamination and polish prep on every one — about six hours, done right at your home.</p>
+    <div class="price-chip">Starts at <b>{{ money(p3['Sedan']) }}</b></div>
+    <div class="hero-actions">
+      <a href="#quote" class="btn btn-primary btn-lg" data-quote="ceramic-coating">Request Ceramic Coating Information</a>
+      <a href="#packages" class="btn btn-ghost btn-lg">Compare Packages</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap two">
+    <div>
+      <span class="eyebrow">What It Is</span>
+      <h2 style="margin-top:14px">Protection That Bonds To Your Paint</h2>
+      <div class="prose" style="margin-top:18px">
+        <p>A ceramic coating is a liquid protective layer, applied by hand, that bonds to your vehicle's paint. Once it cures it adds depth and gloss and makes the vehicle easier to keep clean between washes.</p>
+        <p>Unlike the wax protection coat in a regular detail, a coating is rated in years. Our 3-Year package uses a 3-year rated coating; the Elite package uses DIY Detail's 5-year ceramic coating, rated for 5+ years with proper maintenance.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Why Proper Prep Matters</h3>
+      <div class="prose"><p>A coating locks in whatever condition the paint is in. Every step below is done by hand before the coating goes on, so it bonds to properly prepped, polished paint rather than to whatever is sitting on top of it.</p></div>
+      <ul class="checks" style="margin-top:18px">{% for i in prep %}<li>{{ icon('check') }}<span>{{ i }}</span></li>{% endfor %}</ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="packages">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Packages</span><h2>Compare Coating Packages</h2><p>Both packages run the same full process. The difference is the coating product and how long it's rated to last.</p></div></div>
+    <div class="tbl-wrap">
+      <table class="ptbl">
+        <thead><tr><th></th><th>3-Year Coating</th><th>Elite Ceramic (5-Year)</th></tr></thead>
+        <tbody>
+          <tr><td>Coating</td><td data-label="3-Year">3-year rated coating</td><td data-label="Elite">DIY Detail 5-year ceramic coating</td></tr>
+          <tr><td>Rated durability</td><td data-label="3-Year">3 years</td><td data-label="Elite">5+ years with proper maintenance</td></tr>
+          <tr><td>Full prep + enhancement polish</td><td data-label="3-Year">Included</td><td data-label="Elite">Included</td></tr>
+          <tr><td>Follow-up wash (1 week after)</td><td data-label="3-Year">Free</td><td data-label="Elite">Free</td></tr>
+          <tr><td>Time on site</td><td data-label="3-Year">About 6 hours</td><td data-label="Elite">About 6 hours</td></tr>
+          {% for size in ['Sedan','SUV/Crossover','Large SUV/Truck'] %}
+          <tr><td>{{ size.replace('/', ' / ') }}</td><td data-label="3-Year">{{ money(p3[size]) }}</td><td data-label="Elite">{{ money(p5[size]) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="two" style="margin-top:24px">
+      <div class="card">
+        <h3>Coating Add-Ons</h3>
+        <ul class="addon-list">
+          <li><span><b>Wheel Face Coating</b><small>Ceramic coating on wheel faces</small></span><span class="p">{{ money(ADDON_PRICES['Wheel Face Coating (3-Year)']) }} / {{ money(ADDON_PRICES['Wheel Face Coating (5-Year)']) }}</span></li>
+          <li><span><b>Glass &amp; Trim Coating</b><small>Windshield durability varies due to wiper wear; rating applies to side and rear glass.</small></span><span class="p">{{ money(ADDON_PRICES['Glass & Trim Coating (3-Year)']) }} / {{ money(ADDON_PRICES['Glass & Trim Coating (5-Year)']) }}</span></li>
+        </ul>
+        <p class="note">Add-on prices shown as 3-Year / 5-Year.</p>
+      </div>
+      <div class="card">
+        <h3>About Paint Correction</h3>
+        <div class="prose"><p>Both tiers include a single-stage enhancement polish, which lifts light swirls and improves gloss — it is not a full correction and won't remove deeper scratches. Multi-stage paint correction is quoted separately; if your paint needs it, tell us and we'll take a look.</p></div>
+        <a href="/paint-correction" class="link-arrow" style="margin-top:16px">Paint Correction {{ icon('arrow-right') }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap two">
+    <div>
+      <span class="eyebrow">Long-Term Protection</span>
+      <h2 style="margin-top:14px">Caring For Your Coating</h2>
+      <div class="prose" style="margin-top:16px"><p>A ceramic coating is durable, but it isn't bulletproof. Hand wash or touchless wash only once the coating is on — follow that and you'll get the full rated life out of it.</p></div>
+    </div>
+    <div class="card">
+      <h3>Three Things That Damage A Coating</h3>
+      <ul class="checks">
+        <li>{{ icon('circle-alert') }}<span><b style="color:#fff">Automatic and tunnel car washes.</b> The spinning brushes drag grit across the panel and can scratch through the coating into your clear coat.</span></li>
+        <li>{{ icon('circle-alert') }}<span><b style="color:#fff">Clay barring a coated surface.</b> Clay is an abrasive — running it over a finished coating strips it off.</span></li>
+        <li>{{ icon('circle-alert') }}<span><b style="color:#fff">Strong acidic cleaners.</b> Aggressive wheel and paint chemicals break the coating down early.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+{{ m.reviews_section(alt=True) }}
+{{ m.quote_section('ceramic-coating', 'Request Ceramic Coating Information', 'Ceramic Coating') }}
+{% endblock %}
+{% block scripts %}<script src="/static/quote.js?v=3" defer></script>{% endblock %}
