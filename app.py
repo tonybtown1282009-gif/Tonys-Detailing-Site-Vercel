@@ -983,6 +983,7 @@ TEMPLATE_PAGES = (
     ("/about", "about.html", {}),
     ("/contact", "contact.html", {}),
     ("/quote", "quote.html", {}),
+    ("/privacy", "privacy.html", {}),
 )
 
 # Meta-ad landing pages: linkable, noindex, kept out of the sitemap.

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% import '_macros.html' as m with context %}
+{% block title %}Privacy Policy — Tony's Detailing{% endblock %}
+{% block description %}How Tony's Detailing collects, uses, and protects the information you share through our website, quote form, and booking form.{% endblock %}
+{% block content %}
+<section class="phero">
+  <div class="wrap">
+    <span class="eyebrow">Legal</span>
+    <h1>Privacy Policy</h1>
+    <p class="lede">Effective November 4, 2026</p>
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap">
+    <div class="prose" style="max-width:760px">
+      <p>Tony's Detailing ("we," "us") is a mobile auto detailing service based in Chardon, Ohio. This policy explains what information we collect when you visit this website or contact us, how we use it, and the choices you have.</p>
+
+      <h2>Information We Collect</h2>
+      <p><strong>Information you give us.</strong> When you request a quote, book a service, call, text, or email us, we collect what you provide, such as your name, phone number, email address, service address or general location, vehicle type and details, the services you're interested in, how you heard about us, and any notes you include.</p>
+      <p><strong>Information collected automatically.</strong> Like most websites, our site and its hosting provider record basic technical data such as your browser type, device, IP address, pages visited, and the date and time of your visit. We also use advertising and analytics tools (see below) that may use cookies or similar technologies.</p>
+
+      <h2>How We Use Your Information</h2>
+      <ul>
+        <li>To respond to your questions and give you a quote</li>
+        <li>To schedule, confirm, and complete your appointment</li>
+        <li>To contact you by phone, text, or email about your service</li>
+        <li>To send an occasional follow-up, such as a request for a review</li>
+        <li>To measure how well our advertising works and improve our website</li>
+      </ul>
+
+      <h2>Advertising &amp; Cookies</h2>
+      <p>We use Google Ads conversion tracking to understand when someone who clicked one of our ads calls us or submits a form. We may also use similar tools from Meta (Facebook and Instagram). These services may place cookies on your device and collect information about your activity on our site and across other websites to measure ad performance and show you relevant ads.</p>
+      <p>You can opt out of personalized ads through <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ad Settings</a> and your <a href="https://www.facebook.com/adpreferences" target="_blank" rel="noopener">Facebook Ad Preferences</a>, or block cookies in your browser settings. You can learn more at <a href="https://optout.aboutads.info" target="_blank" rel="noopener">optout.aboutads.info</a>.</p>
+
+      <h2>How We Share Information</h2>
+      <p><strong>We do not sell your personal information.</strong> We share it only with service providers that help us run the business, such as our website host, our email delivery provider, and the advertising and analytics tools described above, and only as needed for them to provide those services. We may also disclose information if required by law.</p>
+
+      <h2>Text Messages</h2>
+      <p>If you give us your phone number, we may text you about your quote or appointment. Message and data rates may apply. Reply STOP at any time to stop receiving texts. We do not sell or share your mobile number or text messaging consent with third parties for their marketing purposes.</p>
+
+      <h2>Photos of Your Vehicle</h2>
+      <p>We take before-and-after photos of our work. We may share photos of vehicles in our gallery or on social media, but we avoid showing license plates or personal items. If you'd rather we not post photos of your vehicle, just let us know.</p>
+
+      <h2>How Long We Keep It</h2>
+      <p>We keep your information for as long as we need it to serve you, keep reasonable business records, and meet legal obligations.</p>
+
+      <h2>Security</h2>
+      <p>We take reasonable steps to protect your information, but no website or online transmission is completely secure.</p>
+
+      <h2>Your Choices</h2>
+      <p>You can ask us to access, correct, or delete the personal information we have about you, or to stop contacting you, by emailing or calling us using the details below.</p>
+
+      <h2>Children</h2>
+      <p>This website is not directed to children under 13, and we do not knowingly collect personal information from them.</p>
+
+      <h2>Changes to This Policy</h2>
+      <p>We may update this policy from time to time. The effective date at the top of this page shows when it was last changed.</p>
+
+      <h2>Contact Us</h2>
+      <p>Tony's Detailing<br>Chardon, OH<br>Phone: <a href="tel:{{ c.PHONE_TEL }}">{{ c.PHONE_DISPLAY }}</a><br>Email: <a href="mailto:{{ c.EMAIL }}">{{ c.EMAIL }}</a></p>
+    </div>
+  </div>
+</section>
+{{ m.quote_section() }}
+{% endblock %}
